@@ -62,7 +62,12 @@ jobs:
             docker stop dangbun-server || true
             docker rm dangbun-server || true
             docker pull ${{ secrets.ECR_REGISTRY }}/${{ secrets.ECR_REPOSITORY }}:latest
-            docker run -d -p 8080:8080 --name dangbun-server ${{ secrets.ECR_REGISTRY }}/${{ secrets.ECR_REPOSITORY }}:latest
+            docker run -d -p 8080:8080 \
+              -e PROD_DB_URL=${{ secrets.PROD_DB_URL }} \
+              -e PROD_DB_USER=${{ secrets.PROD_DB_USER }} \
+              -e PROD_DB_PASSWORD=${{ secrets.PROD_DB_PASSWORD }} \
+              --name dangbun-server \
+              ${{ secrets.ECR_REGISTRY }}/${{ secrets.ECR_REPOSITORY }}:latest
 
       - name: Health Check
         uses: jtalk/url-health-check-action@v4
