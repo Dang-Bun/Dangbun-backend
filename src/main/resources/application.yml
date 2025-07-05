@@ -1,0 +1,63 @@
+spring:
+  application:
+    name: dangbun
+  profiles:
+    group:
+      local: db-local, port-local, common
+      prod: db-prod, port-prod, common
+    active: prod
+---
+
+# ?? DB
+spring:
+  config:
+    activate:
+      on-profile: db-local
+
+  datasource:
+    url: jdbc:mysql://localhost:3306/DopamineMarket
+    username: ${LOCAL_DB_USER}
+    password: ${LOCAL_DB_PASSWORD}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.MySQLDialect
+---
+
+#prod DB
+spring:
+  config:
+    activate:
+      on-profile: db-prod
+  datasource:
+    url: jdbc:mysql://database-1.clwm6uwgugn0.ap-northeast-2.rds.amazonaws.com
+    username: "admin"
+    password: "dangbun01"
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.MySQLDialect
+
+---
+spring:
+  config:
+    activate:
+      on-profile: port-prod
+
+server:
+  port: 8080
+  servlet:
+    context-path:
