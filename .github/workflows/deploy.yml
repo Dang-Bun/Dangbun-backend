@@ -72,7 +72,7 @@ jobs:
               ${{ secrets.ECR_REGISTRY }}/${{ secrets.ECR_REPOSITORY }}:latest
 
       - name: Wait for server to start
-        run: sleep 20
+        run: sleep 40
         
       - name: Health Check
         uses: jtalk/url-health-check-action@v4
