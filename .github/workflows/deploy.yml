@@ -63,6 +63,7 @@ jobs:
             docker rm dangbun-server || true
             docker pull ${{ secrets.ECR_REGISTRY }}/${{ secrets.ECR_REPOSITORY }}:latest
             docker run -d -p 8080:8080 \
+              -e SPRING_PROFILES_ACTIVE=prod \
               -e PROD_DB_URL=${{ secrets.PROD_DB_URL }} \
               -e PROD_DB_USER=${{ secrets.PROD_DB_USER }} \
               -e PROD_DB_PASSWORD=${{ secrets.PROD_DB_PASSWORD }} \
