@@ -5,7 +5,9 @@ spring:
     group:
       local: db-local, port-local, common
       prod: db-prod, port-prod, common
-    active: prod
+    active: db-local
+
+
 ---
 
 # ?? DB
@@ -20,6 +22,10 @@ spring:
     password: ${LOCAL_DB_PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
 
+  data:
+    redis:
+      host: localhost
+      port: 6379
 
   jpa:
     hibernate:
@@ -29,6 +35,7 @@ spring:
       hibernate:
         format_sql: true
         dialect: org.hibernate.dialect.MySQLDialect
+
 ---
 
 #prod DB
@@ -67,6 +74,8 @@ spring:
   config:
     activate:
       on-profile: common
+jwt:
+  secret: ${JWT_SECRET}
 
 management:
   endpoints:

@@ -32,6 +32,7 @@ import java.util.Arrays;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final TokenProvider tokenProvider;
     private final UserRepository userRepository;
+    private final RefreshTokenRepository refreshTokenRepository;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
@@ -44,9 +45,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             if (token != null && !token.equalsIgnoreCase("null")) {
                 authenticate(request, response, token);
             }
-            if (token == null) {
-                throw new RuntimeException("No Bearer Token in request");
-            }
+
         } catch (RuntimeException e) {
             logger.error(e);
         }
@@ -79,31 +78,33 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 throw new RuntimeException(e);
             }
 
-            refreshAuthentication(accessToken, request, response);
+            refreshAuthentication(request, response);
 
             return;
         }
     }
 
-    private void refreshAuthentication(String accessToken, HttpServletRequest request, HttpServletResponse response) {
+    private void refreshAuthentication(HttpServletRequest request, HttpServletResponse response) {
         try {
             String refreshToken = getRefreshToken(request);
-            if(isValidRefreshToken(refreshToken, accessToken)){
-
-                String userId = tokenProvider.validateAndGetUserId(refreshToken);
-                User user = userRepository.findById(Long.valueOf(userId))
-                        .orElseThrow(() -> new UsernameNotFoundException("사용자를 찾을 수 없습니다."));
-
-
-                AbstractAuthenticationToken authentication = createAuthenticationToken(request, userId);
-
-                SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
-                securityContext.setAuthentication(authentication);
-                SecurityContextHolder.setContext(securityContext);
-
-                String newAccessToken = tokenProvider.createAccessToken(user);
-                response.setHeader("Authorization", "Bearer " + newAccessToken);
+            Claims claims = tokenProvider.parseClaims(refreshToken);
+            if (!isValidRefreshToken(refreshToken,claims)) {
+                throw new RuntimeException("Invalid refresh Token");
             }
+            String userId = claims.getSubject();
+            User user = userRepository.findById(Long.valueOf(userId))
+                    .orElseThrow(() -> new UsernameNotFoundException("사용자를 찾을 수 없습니다."));
+
+
+            AbstractAuthenticationToken authentication = createAuthenticationToken(request, userId);
+
+            SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
+            securityContext.setAuthentication(authentication);
+            SecurityContextHolder.setContext(securityContext);
+
+            String newAccessToken = tokenProvider.createAccessToken(user);
+            response.setHeader("Authorization", "Bearer " + newAccessToken);
+
         } catch (Exception e) {
             log.warn("refreshAuthentication 실패: {}", e.getMessage());
 
@@ -112,24 +113,17 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
     }
 
-    private boolean isValidRefreshToken(String refreshToken, String accessToken) {
+    private boolean isValidRefreshToken(String refreshToken,Claims refreshClaims) {
         try {
-            Claims refreshClaims = tokenProvider.parseClaims(refreshToken);
-            Claims accessClaims = tokenProvider.parseClaims(accessToken);
-
             String tokenType = refreshClaims.get("token_type", String.class);
-            if (!"refresh".equals(tokenType)) {
-                return false;
-            }
+            if(!"refresh".equals(tokenType)) return false;
 
-            String refreshUserId = refreshClaims.getSubject();
-            String accessUserId = accessClaims.getSubject();
-            return refreshUserId.equals(accessUserId);
-        }catch (ExpiredJwtException e){
-            logger.error(e);
-            return false;
-        }catch (Exception e){
-            logger.error(e);
+            String userId = refreshClaims.getSubject();
+            RefreshToken saved = refreshTokenRepository.findById(Long.valueOf(userId)).orElse(null);
+            return saved != null && saved.getToken().equals(refreshToken);
+
+        } catch (Exception e){
+            log.error("RefreshToken 유효성 검사 중 오류",e);
             return false;
         }
     }
