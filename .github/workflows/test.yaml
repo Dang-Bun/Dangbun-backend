@@ -58,6 +58,15 @@ jobs:
 
       - name: Grant permission to gradlew
         run: chmod +x gradlew
+        
+      - name: Wait for MySQL to be ready
+        run: |
+          echo "Waiting for MySQL..."
+          for i in {1..30}; do
+            nc -z mysql 3306 && echo "MySQL is up!" && break
+            echo "Waiting for MySQL to start... ($i)"
+            sleep 2
+          done
 
       - name: Run tests
         run: ./gradlew test
