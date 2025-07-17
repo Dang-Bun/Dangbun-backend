@@ -5,7 +5,7 @@ spring:
     group:
       local: db-local, port-local, common
       prod: db-prod, port-prod, common
-#    active: db-local
+#    active: local
 
 
 ---
@@ -48,7 +48,10 @@ spring:
     username: ${PROD_DB_USER}
     password: ${PROD_DB_PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
-
+  data:
+    redis:
+      port: 6379
+      host: redis
   jpa:
     hibernate:
       ddl-auto: update
@@ -91,10 +94,7 @@ spring:
           ssl:
             enable: true
     auth-code-expiration-millis: 1800000
-  data:
-    redis:
-      port: 6379
-      host: redis
+
 
 
 
