@@ -27,7 +27,11 @@ public class WebSecurityConfig {
         http.httpBasic(AbstractHttpConfigurer::disable);
         http.sessionManagement((sessionManagement) -> sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
         http.authorizeHttpRequests((authorizeRequest) -> {
-            authorizeRequest.requestMatchers("/", "/auth/**").permitAll();
+            authorizeRequest.requestMatchers(
+                    "/",
+                    "/auth/**",
+                    "/actuator/health"
+            ).permitAll();
             authorizeRequest.anyRequest().authenticated();
         });
 
