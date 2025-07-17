@@ -5,7 +5,7 @@ spring:
     group:
       local: db-local, port-local, common
       prod: db-prod, port-prod, common
-    active: db-local
+#    active: db-local
 
 
 ---
@@ -17,7 +17,7 @@ spring:
       on-profile: db-local
 
   datasource:
-    url: jdbc:mysql://localhost:3306/dangbun
+    url: jdbc:mysql://127.0.0.1:3306/dangbun
     username: ${LOCAL_DB_USER}
     password: ${LOCAL_DB_PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
