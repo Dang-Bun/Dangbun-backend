@@ -4,10 +4,16 @@ services:
     env:
       MYSQL_DATABASE: dangbun
       MYSQL_ROOT_PASSWORD: root
+      MYSQL_USER: testuser
+      MYSQL_PASSWORD: testpass
     ports:
       - 3306:3306
     options: >-
-      --health-cmd="mysqladmin ping -h localhost"
+      --health-cmd="mysqladmin ping -h 127.0.0.1 -u root -proot"
       --health-interval=10s
       --health-timeout=5s
-      --health-retries=3
+      --health-retries=5
+
+env:
+  LOCAL_DB_USER: testuser
+  LOCAL_DB_PASSWORD: testpass
