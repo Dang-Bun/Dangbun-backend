@@ -74,6 +74,30 @@ spring:
   config:
     activate:
       on-profile: common
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: kuitdangbun@gmail.com
+    password: ${MAIL_PASSWORD}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+          connectiontimeout: 5000
+          timeout: 5000
+          writetimeout: 5000
+          ssl:
+            enable: true
+    auth-code-expiration-millis: 1800000
+  data:
+    redis:
+      port: 6379
+      host: ${REDIS_HOST:localhost}
+
+
+
 jwt:
   secret: ${JWT_SECRET}
 
@@ -85,3 +109,4 @@ management:
   endpoint:
     health:
       show-details: always
+
