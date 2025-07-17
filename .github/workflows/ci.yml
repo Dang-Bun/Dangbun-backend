@@ -9,7 +9,7 @@ services:
     ports:
       - 3306:3306
     options: >-
-      --health-cmd="mysqladmin ping -h 127.0.0.1 -u root -proot"
+      --health-cmd="mysqladmin ping -h mysql -u root -proot"
       --health-interval=10s
       --health-timeout=5s
       --health-retries=5
@@ -18,3 +18,4 @@ env:
   SPRING_PROFILES_ACTIVE: local
   LOCAL_DB_USER: testuser
   LOCAL_DB_PASSWORD: testpass
+  LOCAL_DB_URL: jdbc:mysql://mysql:3306/dangbun
