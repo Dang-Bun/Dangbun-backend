@@ -15,5 +15,6 @@ services:
       --health-retries=5
 
 env:
+  SPRING_PROFILES_ACTIVE: local
   LOCAL_DB_USER: testuser
   LOCAL_DB_PASSWORD: testpass
