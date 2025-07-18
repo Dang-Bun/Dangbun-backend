@@ -10,6 +10,8 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.filter.CorsFilter;
 
@@ -27,7 +29,15 @@ public class WebSecurityConfig {
         http.httpBasic(AbstractHttpConfigurer::disable);
         http.sessionManagement((sessionManagement) -> sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
         http.authorizeHttpRequests((authorizeRequest) -> {
-            authorizeRequest.requestMatchers("/", "/auth/**").permitAll();
+            authorizeRequest
+                    .requestMatchers(
+                            "/users/logout"
+                    ).authenticated()
+                    .requestMatchers(
+                            "/",
+                            "/users/**",
+                            "/actuator/health"
+                    ).permitAll();
             authorizeRequest.anyRequest().authenticated();
         });
 
@@ -35,6 +45,11 @@ public class WebSecurityConfig {
         http.addFilterBefore(jwtExceptionFilter,jwtAuthenticationFilter.getClass());
 
         return http.build();
+    }
+
+    @Bean
+    public PasswordEncoder passwordEncoder(){
+        return new BCryptPasswordEncoder();
     }
 
 }

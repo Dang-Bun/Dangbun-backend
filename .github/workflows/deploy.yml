@@ -63,13 +63,18 @@ jobs:
             docker rm dangbun-server || true
             docker pull ${{ secrets.ECR_REGISTRY }}/${{ secrets.ECR_REPOSITORY }}:latest
             docker run -d -p 8080:8080 \
+              --network=dangbun-network \
               -e SPRING_PROFILES_ACTIVE=prod \
               -e PROD_DB_URL=${{ secrets.PROD_DB_URL }} \
               -e PROD_DB_USER=${{ secrets.PROD_DB_USER }} \
               -e PROD_DB_PASSWORD=${{ secrets.PROD_DB_PASSWORD }} \
+              -e JWT_SECRET=${{ secrets.JWT_SECRET }} \
               --name dangbun-server \
               ${{ secrets.ECR_REGISTRY }}/${{ secrets.ECR_REPOSITORY }}:latest
 
+      - name: Wait for server to start
+        run: sleep 40
+        
       - name: Health Check
         uses: jtalk/url-health-check-action@v4
         with:
