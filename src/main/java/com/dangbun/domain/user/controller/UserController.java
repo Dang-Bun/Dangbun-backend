@@ -1,18 +1,19 @@
 package com.dangbun.domain.user.controller;
 
-import com.dangbun.domain.user.dto.request.AuthCodeRequest;
+import com.dangbun.domain.user.dto.request.DeleteUserAccountRequest;
+import com.dangbun.domain.user.dto.request.PostUserCertCodeRequest;
+import com.dangbun.domain.user.dto.request.PostUserPasswordUpdateRequest;
 import com.dangbun.domain.user.dto.request.PostUserSignUpRequest;
-import com.dangbun.domain.user.entity.User;
-import com.dangbun.domain.user.exception.ErrorCode;
+import com.dangbun.domain.user.entity.CustomUserDetails;
 import com.dangbun.domain.user.service.UserService;
-import com.dangbun.global.response.ResponseDTO;
+import com.dangbun.global.response.BaseResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.validation.annotation.Validated;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import static com.dangbun.domain.user.exception.ErrorCode.*;
 
 @Slf4j
 @RestController
@@ -22,49 +23,47 @@ public class UserController {
 
 
     private final UserService userService;
-    private ErrorCode errorCode;
 
     @PostMapping("/email-code")
-    public ResponseDTO generateAuthCode(@RequestBody @Valid AuthCodeRequest request){
-        String email = request.getEmail();
-        try {
-            userService.sendAuthCode(email);
-        }catch (RuntimeException e){
-            log.error(e.toString());
-            return new ResponseDTO(EXIST_EMAIL.getCode(), EXIST_EMAIL.getMessage());
-        }
-        return null;
+    public ResponseEntity<BaseResponse<?>> generateAuthCode(@RequestBody @Valid PostUserCertCodeRequest request) {
+        String email = request.email();
+        userService.sendAuthCode(email);
+        return ResponseEntity.ok(BaseResponse.ok(null));
     }
 
     @PostMapping("/signup")
-    public void signUp(@RequestBody @Validated PostUserSignUpRequest request){
-        User user = new User();
-
-
+    public ResponseEntity<BaseResponse<?>> signUp(@RequestBody @Valid PostUserSignUpRequest request) {
+        userService.signup(request);
+        return ResponseEntity.ok(BaseResponse.ok(null));
     }
 
     @PostMapping("/login")
-    public void login(){
+    public BaseResponse<?> login() {
 
+        return null;
     }
 
     @PostMapping("/logout")
-    public void logout(){
+    public BaseResponse<?> logout() {
+
+        return null;
 
     }
 
-    @PatchMapping("/password/reset")
-    public void updatePassword(){
 
+    @PostMapping("/me/password")
+    public ResponseEntity<BaseResponse<?>> updatePassword(@RequestBody @Valid PostUserPasswordUpdateRequest request) {
+        userService.updatePassword(request);
+        return ResponseEntity.ok(BaseResponse.ok(null));
     }
 
 
     @DeleteMapping("/me")
-    public void deleteCurrentUser(){
-
+    public ResponseEntity<BaseResponse<?>> deleteCurrentUser(@AuthenticationPrincipal CustomUserDetails customUser,
+                                                             @RequestBody DeleteUserAccountRequest request) {
+        userService.deleteCurrentUser(customUser, request);
+        return null;
     }
-
-
 
 
 }
