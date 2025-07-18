@@ -1,9 +1,6 @@
 package com.dangbun.domain.user.controller;
 
-import com.dangbun.domain.user.dto.request.DeleteUserAccountRequest;
-import com.dangbun.domain.user.dto.request.PostUserCertCodeRequest;
-import com.dangbun.domain.user.dto.request.PostUserPasswordUpdateRequest;
-import com.dangbun.domain.user.dto.request.PostUserSignUpRequest;
+import com.dangbun.domain.user.dto.request.*;
 import com.dangbun.domain.user.entity.CustomUserDetails;
 import com.dangbun.domain.user.service.UserService;
 import com.dangbun.global.response.BaseResponse;
@@ -25,22 +22,22 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping("/email-code")
-    public ResponseEntity<BaseResponse<?>> generateAuthCode(@RequestBody @Valid PostUserCertCodeRequest request) {
+    public ResponseEntity<?> generateAuthCode(@RequestBody @Valid PostUserCertCodeRequest request) {
         String email = request.email();
         userService.sendAuthCode(email);
         return ResponseEntity.ok(BaseResponse.ok(null));
     }
 
     @PostMapping("/signup")
-    public ResponseEntity<BaseResponse<?>> signUp(@RequestBody @Valid PostUserSignUpRequest request) {
+    public ResponseEntity<?> signUp(@RequestBody @Valid PostUserSignUpRequest request) {
         userService.signup(request);
         return ResponseEntity.ok(BaseResponse.ok(null));
     }
 
     @PostMapping("/login")
-    public BaseResponse<?> login() {
-
-        return null;
+    public ResponseEntity<?> login(@RequestBody @Valid PostUserLoginRequest request) {
+        userService.login(request);
+        return ResponseEntity.ok(BaseResponse.ok(null));
     }
 
     @PostMapping("/logout")
@@ -59,7 +56,7 @@ public class UserController {
 
 
     @DeleteMapping("/me")
-    public ResponseEntity<BaseResponse<?>> deleteCurrentUser(@AuthenticationPrincipal CustomUserDetails customUser,
+    public ResponseEntity<?> deleteCurrentUser(@AuthenticationPrincipal CustomUserDetails customUser,
                                                              @RequestBody DeleteUserAccountRequest request) {
         userService.deleteCurrentUser(customUser, request);
         return null;

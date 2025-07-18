@@ -1,6 +1,7 @@
 package com.dangbun.domain.user.service;
 
 import com.dangbun.domain.user.dto.request.DeleteUserAccountRequest;
+import com.dangbun.domain.user.dto.request.PostUserLoginRequest;
 import com.dangbun.domain.user.dto.request.PostUserPasswordUpdateRequest;
 import com.dangbun.domain.user.dto.request.PostUserSignUpRequest;
 import com.dangbun.domain.user.entity.CustomUserDetails;
@@ -45,9 +46,6 @@ public class UserService {
     }
 
 
-    public void login(){
-
-    }
 
     public void logout(){
 
@@ -162,5 +160,14 @@ public class UserService {
         }
 
         throw new InvalidEmailException(INVALID_EMAIL);
+    }
+
+    public void login(@Valid PostUserLoginRequest request) {
+        User user = userRepository.findByEmail(request.email())
+                .orElseThrow(()->new UserNotFoundException(NO_SUCH_USER));
+
+        if(!passwordEncoder.matches(request.password(), user.getPassword())){
+            throw new InvalidPasswordException(INVALID_PASSWORD);
+        }
     }
 }
