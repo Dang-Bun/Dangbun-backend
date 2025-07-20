@@ -1,6 +1,7 @@
 package com.dangbun.domain.duty.controller;
 
 import com.dangbun.domain.duty.dto.request.PostDutyCreateRequest;
+import com.dangbun.domain.duty.dto.response.GetDutyListResponse;
 import com.dangbun.domain.duty.dto.response.PostDutyCreateResponse;
 import com.dangbun.domain.duty.service.DutyService;
 import com.dangbun.global.response.BaseResponse;
@@ -12,6 +13,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @Validated
 @Tag(name = "Duty", description = "DutyController - 당번 관련 API")
@@ -28,6 +31,12 @@ public class DutyController {
             @RequestBody @Valid PostDutyCreateRequest request
     ) {
         return ResponseEntity.ok(BaseResponse.ok(dutyService.createDuty(placeId, request)));
+    }
+
+    @Operation(summary = "당번 목록 조회", description = "해당 플레이스의 당번 목록을 조회합니다.")
+    @GetMapping("/places/{placeId}/duties")
+    public ResponseEntity<BaseResponse<List<GetDutyListResponse>>> getDutyList(@PathVariable Long placeId) {
+        return ResponseEntity.ok(BaseResponse.ok(dutyService.getDutyList(placeId)));
     }
 
 }
