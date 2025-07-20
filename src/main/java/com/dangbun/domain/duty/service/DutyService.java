@@ -1,6 +1,7 @@
 package com.dangbun.domain.duty.service;
 
 import com.dangbun.domain.duty.dto.request.PostDutyCreateRequest;
+import com.dangbun.domain.duty.dto.response.GetDutyListResponse;
 import com.dangbun.domain.duty.dto.response.PostDutyCreateResponse;
 import com.dangbun.domain.duty.entity.Duty;
 import com.dangbun.domain.duty.exception.custom.*;
@@ -10,6 +11,9 @@ import com.dangbun.domain.place.repository.PlaceRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+
 import static com.dangbun.domain.duty.response.status.DutyExceptionResponse.*;
 
 @Service
@@ -36,6 +40,19 @@ public class DutyService {
 
         Duty saved = dutyRepository.save(duty);
         return PostDutyCreateResponse.of(saved.getDutyId());
+    }
+
+    @Transactional
+    public List<GetDutyListResponse> getDutyList(Long placeId) {
+        if (!placeRepository.existsById(placeId)) {
+            throw new PlaceNotFoundException(PLACE_NOT_FOUND);
+        }
+
+        List<Duty> duties = dutyRepository.findByPlace_PlaceId(placeId);
+
+        return duties.stream()
+                .map(GetDutyListResponse::of)
+                .toList();
     }
 
 }
