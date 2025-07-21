@@ -1,11 +1,9 @@
 package com.dangbun.domain.duty.controller;
 
+import com.dangbun.domain.duty.dto.request.PostAddMembersRequest;
 import com.dangbun.domain.duty.dto.request.PostDutyCreateRequest;
 import com.dangbun.domain.duty.dto.request.PutDutyUpdateRequest;
-import com.dangbun.domain.duty.dto.response.GetDutyInfoResponse;
-import com.dangbun.domain.duty.dto.response.GetDutyListResponse;
-import com.dangbun.domain.duty.dto.response.PostDutyCreateResponse;
-import com.dangbun.domain.duty.dto.response.PutDutyUpdateResponse;
+import com.dangbun.domain.duty.dto.response.*;
 import com.dangbun.domain.duty.service.DutyService;
 import com.dangbun.global.response.BaseResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -62,6 +60,15 @@ public class DutyController {
     @GetMapping("/duties/{dutyId}")
     public ResponseEntity<BaseResponse<GetDutyInfoResponse>> getDutyInfo(@PathVariable Long dutyId) {
         return ResponseEntity.ok(BaseResponse.ok(dutyService.getDutyInfo(dutyId)));
+    }
+
+    @Operation(summary = "당번 정보 - 멤버 추가", description = "당번에 멤버를 추가합니다.")
+    @PostMapping("/duties/{dutyId}/members")
+    public ResponseEntity<BaseResponse<PostAddMembersResponse>> addMembers(
+            @PathVariable Long dutyId,
+            @RequestBody PostAddMembersRequest request
+    ) {
+        return ResponseEntity.ok(BaseResponse.ok(dutyService.addMembers(dutyId, request)));
     }
 
 }
