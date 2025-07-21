@@ -67,4 +67,13 @@ public class DutyService {
         return PutDutyUpdateResponse.of(duty.getDutyId(),duty.getName(), duty.getIcon());
     }
 
+    @Transactional
+    public void deleteDuty(Long dutyId) {
+        Duty duty = dutyRepository.findById(dutyId)
+                .orElseThrow(() -> new DutyNotFoundException(DUTY_NOT_FOUND));
+
+        dutyRepository.delete(duty);
+    }
+
+
 }
