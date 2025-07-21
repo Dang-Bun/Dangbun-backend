@@ -72,9 +72,6 @@ jobs:
               -e MAIL_PASSWORD=${{ secrets.MAIL_PASSWORD }} \
               --name dangbun-server \
               ${{ secrets.ECR_REGISTRY }}/${{ secrets.ECR_REPOSITORY }}:latest
-
-      - name: Wait for server to start
-        run: sleep 40
         
       - name: Health Check
         uses: jtalk/url-health-check-action@v4
