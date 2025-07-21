@@ -1,8 +1,10 @@
 package com.dangbun.domain.duty.service;
 
 import com.dangbun.domain.duty.dto.request.PostDutyCreateRequest;
+import com.dangbun.domain.duty.dto.request.PutDutyUpdateRequest;
 import com.dangbun.domain.duty.dto.response.GetDutyListResponse;
 import com.dangbun.domain.duty.dto.response.PostDutyCreateResponse;
+import com.dangbun.domain.duty.dto.response.PutDutyUpdateResponse;
 import com.dangbun.domain.duty.entity.Duty;
 import com.dangbun.domain.duty.exception.custom.*;
 import com.dangbun.domain.duty.repository.DutyRepository;
@@ -53,6 +55,16 @@ public class DutyService {
         return duties.stream()
                 .map(GetDutyListResponse::of)
                 .toList();
+    }
+
+    @Transactional
+    public PutDutyUpdateResponse updateDuty(Long dutyId, PutDutyUpdateRequest request) {
+        Duty duty = dutyRepository.findById(dutyId)
+                .orElseThrow(() -> new DutyNotFoundException(DUTY_NOT_FOUND));
+
+        duty.update(request.name(), request.icon());
+
+        return PutDutyUpdateResponse.of(duty.getDutyId(),duty.getName(), duty.getIcon());
     }
 
 }

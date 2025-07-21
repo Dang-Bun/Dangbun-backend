@@ -32,4 +32,9 @@ public class Duty {
         this.place = place;
     }
 
+    public void update(String name, DutyIcon icon) {
+        this.name = name;
+        this.icon = icon;
+    }
+
 }
