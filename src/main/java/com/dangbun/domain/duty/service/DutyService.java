@@ -2,15 +2,15 @@ package com.dangbun.domain.duty.service;
 
 import com.dangbun.domain.cleaning.entity.Cleaning;
 import com.dangbun.domain.cleaning.repository.CleaningRepository;
+import com.dangbun.domain.duty.dto.request.PostAddMembersRequest;
 import com.dangbun.domain.duty.dto.request.PostDutyCreateRequest;
 import com.dangbun.domain.duty.dto.request.PutDutyUpdateRequest;
-import com.dangbun.domain.duty.dto.response.GetDutyInfoResponse;
-import com.dangbun.domain.duty.dto.response.GetDutyListResponse;
-import com.dangbun.domain.duty.dto.response.PostDutyCreateResponse;
-import com.dangbun.domain.duty.dto.response.PutDutyUpdateResponse;
+import com.dangbun.domain.duty.dto.response.*;
 import com.dangbun.domain.duty.entity.Duty;
 import com.dangbun.domain.duty.exception.custom.*;
 import com.dangbun.domain.duty.repository.DutyRepository;
+import com.dangbun.domain.member.entity.Member;
+import com.dangbun.domain.member.repository.MemberRepository;
 import com.dangbun.domain.memberduty.entity.MemberDuty;
 import com.dangbun.domain.memberduty.repository.MemberDutyRepository;
 import com.dangbun.domain.place.entity.Place;
@@ -19,7 +19,10 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import static com.dangbun.domain.duty.response.status.DutyExceptionResponse.*;
 
@@ -31,6 +34,7 @@ public class DutyService {
     private final PlaceRepository placeRepository;
     private final MemberDutyRepository memberDutyRepository;
     private final CleaningRepository cleaningRepository;
+    private final MemberRepository memberRepository;
 
     @Transactional
     public PostDutyCreateResponse createDuty(Long placeId, PostDutyCreateRequest request) {
@@ -113,4 +117,43 @@ public class DutyService {
                 cleaningInfos
         );
     }
+
+    // DutyService.java (추가)
+    @Transactional
+    public PostAddMembersResponse addMembers(Long dutyId, PostAddMembersRequest request) {
+        Duty duty = dutyRepository.findById(dutyId)
+                .orElseThrow(() -> new DutyNotFoundException(DUTY_NOT_FOUND));
+
+        List<Long> requestedIds = request.memberIds();
+
+        List<Member> members = memberRepository.findAllById(requestedIds);
+        Set<Long> foundIds = members.stream()
+                .map(Member::getMemberId)
+                .collect(Collectors.toSet());
+
+        List<Long> notFoundIds = requestedIds.stream()
+                .filter(id -> !foundIds.contains(id))
+                .toList();
+
+        if (!notFoundIds.isEmpty()) {
+            throw new MemberNotFoundException(MEMBER_NOT_FOUND, "존재하지 않는 멤버 ID: " + notFoundIds);
+        }
+
+
+        List<Long> addedMemberIds = new ArrayList<>();
+        for (Member member : members) {
+            boolean exists = memberDutyRepository.existsByDutyAndMember(duty, member);
+            if (!exists) {
+                MemberDuty md = MemberDuty.builder()
+                        .duty(duty)
+                        .member(member)
+                        .build();
+                memberDutyRepository.save(md);
+                addedMemberIds.add(member.getMemberId());
+            }
+        }
+
+        return PostAddMembersResponse.of(addedMemberIds);
+    }
+
 }
