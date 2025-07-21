@@ -49,4 +49,11 @@ public class DutyController {
     ) {
         return ResponseEntity.ok(BaseResponse.ok(dutyService.updateDuty(dutyId, request)));
     }
+
+    @Operation(summary = "당번 삭제", description = "해당 당번을 삭제합니다.")
+    @DeleteMapping("/duties/{dutyId}")
+    public ResponseEntity<BaseResponse<Void>> deleteDuty(@PathVariable Long dutyId) {
+        dutyService.deleteDuty(dutyId);
+        return ResponseEntity.ok(BaseResponse.ok(null));
+    }
 }
