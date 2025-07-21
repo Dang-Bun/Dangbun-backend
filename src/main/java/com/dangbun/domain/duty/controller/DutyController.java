@@ -2,6 +2,7 @@ package com.dangbun.domain.duty.controller;
 
 import com.dangbun.domain.duty.dto.request.PostDutyCreateRequest;
 import com.dangbun.domain.duty.dto.request.PutDutyUpdateRequest;
+import com.dangbun.domain.duty.dto.response.GetDutyInfoResponse;
 import com.dangbun.domain.duty.dto.response.GetDutyListResponse;
 import com.dangbun.domain.duty.dto.response.PostDutyCreateResponse;
 import com.dangbun.domain.duty.dto.response.PutDutyUpdateResponse;
@@ -56,4 +57,11 @@ public class DutyController {
         dutyService.deleteDuty(dutyId);
         return ResponseEntity.ok(BaseResponse.ok(null));
     }
+
+    @Operation(summary = "당번 정보 조회", description = "당번의 멤버 목록, 청소 목록을 조회합니다.")
+    @GetMapping("/duties/{dutyId}")
+    public ResponseEntity<BaseResponse<GetDutyInfoResponse>> getDutyInfo(@PathVariable Long dutyId) {
+        return ResponseEntity.ok(BaseResponse.ok(dutyService.getDutyInfo(dutyId)));
+    }
+
 }
