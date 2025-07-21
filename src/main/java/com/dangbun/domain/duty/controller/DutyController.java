@@ -1,8 +1,10 @@
 package com.dangbun.domain.duty.controller;
 
 import com.dangbun.domain.duty.dto.request.PostDutyCreateRequest;
+import com.dangbun.domain.duty.dto.request.PutDutyUpdateRequest;
 import com.dangbun.domain.duty.dto.response.GetDutyListResponse;
 import com.dangbun.domain.duty.dto.response.PostDutyCreateResponse;
+import com.dangbun.domain.duty.dto.response.PutDutyUpdateResponse;
 import com.dangbun.domain.duty.service.DutyService;
 import com.dangbun.global.response.BaseResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -39,4 +41,12 @@ public class DutyController {
         return ResponseEntity.ok(BaseResponse.ok(dutyService.getDutyList(placeId)));
     }
 
+    @Operation(summary = "당번 수정", description = "해당 당번의 이름이나 아이콘을 수정합니다.")
+    @PutMapping("/duties/{dutyId}")
+    public ResponseEntity<BaseResponse<PutDutyUpdateResponse>> updateDuty(
+            @PathVariable Long dutyId,
+            @RequestBody @Valid PutDutyUpdateRequest request
+    ) {
+        return ResponseEntity.ok(BaseResponse.ok(dutyService.updateDuty(dutyId, request)));
+    }
 }
