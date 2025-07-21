@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.NoHandlerFoundException;
 
+import java.util.Objects;
+
 import static com.dangbun.global.response.status.BaseExceptionResponse.*;
 
 @Order(Ordered.LOWEST_PRECEDENCE)

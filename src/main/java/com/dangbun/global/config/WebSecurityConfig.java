@@ -10,6 +10,8 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.filter.CorsFilter;
 
@@ -27,17 +29,21 @@ public class WebSecurityConfig {
         http.httpBasic(AbstractHttpConfigurer::disable);
         http.sessionManagement((sessionManagement) -> sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
         http.authorizeHttpRequests((authorizeRequest) -> {
-            authorizeRequest.requestMatchers(
-                    "/",
-                    "/auth/**",
-                    "/actuator/health",
+            authorizeRequest
+                    .requestMatchers(
+                            "/users/logout"
+                    ).authenticated()
+                    .requestMatchers(
+                            "/",
+                            "/users/**",
+                            "/actuator/health",
 
-                    // Swagger 관련 경로 허용
-                    "/swagger-ui/**",
-                    "/v3/api-docs/**",
-                    "/swagger-resources/**",
-                    "/webjars/**"
-            ).permitAll();
+                            // Swagger 관련 경로 허용
+                            "/swagger-ui/**",
+                            "/v3/api-docs/**",
+                            "/swagger-resources/**",
+                            "/webjars/**"
+                    ).permitAll();
             authorizeRequest.anyRequest().authenticated();
         });
 
@@ -45,6 +51,11 @@ public class WebSecurityConfig {
         http.addFilterBefore(jwtExceptionFilter,jwtAuthenticationFilter.getClass());
 
         return http.build();
+    }
+
+    @Bean
+    public PasswordEncoder passwordEncoder(){
+        return new BCryptPasswordEncoder();
     }
 
 }

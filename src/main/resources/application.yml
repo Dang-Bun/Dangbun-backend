@@ -6,8 +6,6 @@ spring:
       local: db-local, port-local, common
       prod: db-prod, port-prod, common
 #    active: local
-
-
 ---
 
 # ?? DB
@@ -93,7 +91,7 @@ spring:
           writetimeout: 5000
           ssl:
             enable: true
-    auth-code-expiration-millis: 1800000
+    auth-code-expiration-millis: 180000
 
 
 
