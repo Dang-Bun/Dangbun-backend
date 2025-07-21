@@ -29,4 +29,10 @@ public class DutyControllerAdvice {
     public BaseErrorResponse handleDutyNotFoundException(DutyNotFoundException e) {
         return new BaseErrorResponse(DUTY_NOT_FOUND);
     }
+
+    @ExceptionHandler(MemberNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public BaseErrorResponse handleMemberNotFoundException(MemberNotFoundException e) {
+        return new BaseErrorResponse(MEMBER_NOT_FOUND, e.getMessage());
+    }
 }
