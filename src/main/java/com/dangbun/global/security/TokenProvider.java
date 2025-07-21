@@ -7,15 +7,20 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.security.Key;
+import java.time.Duration;
 import java.util.Date;
 
+@RequiredArgsConstructor
 @Service
 public class TokenProvider {
 
+    private final RedisTemplate redisTemplate;
     @Value("${jwt.secret}")
     private String SECRET;
     private Key key;
@@ -71,6 +76,10 @@ public class TokenProvider {
                 .compact();
     }
 
+    public void saveRefreshToken(Long userId ,String token){
+        redisTemplate.opsForValue()
+                .set("refreshToken:"+userId, token, Duration.ofMillis(REFRESH_VALIDATION_MS));
+    }
 
     public Claims parseClaims(String token){
         return Jwts.parserBuilder()
