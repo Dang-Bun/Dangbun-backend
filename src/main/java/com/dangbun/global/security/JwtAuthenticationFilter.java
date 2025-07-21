@@ -12,6 +12,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContext;
@@ -32,13 +33,13 @@ import java.util.Arrays;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final TokenProvider tokenProvider;
     private final UserRepository userRepository;
-    private final RefreshTokenRepository refreshTokenRepository;
+    private final RedisTemplate<Object, Object> redisTemplate;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         try {
 
-            String token = getAccessToken(request);
+            String token = parseAccessToken(request);
 
             log.info("jwt filter is running");
 
@@ -119,8 +120,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             if(!"refresh".equals(tokenType)) return false;
 
             String userId = refreshClaims.getSubject();
-            RefreshToken saved = refreshTokenRepository.findById(Long.valueOf(userId)).orElse(null);
-            return saved != null && saved.getToken().equals(refreshToken);
+            String saved = (String)redisTemplate.opsForValue().get("refreshToken:"+userId);
+            return saved != null && saved.equals(refreshToken);
 
         } catch (Exception e){
             log.error("RefreshToken 유효성 검사 중 오류",e);
@@ -143,7 +144,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         return authentication;
     }
 
-    private String getAccessToken(HttpServletRequest request) {
+    private String parseAccessToken(HttpServletRequest request) {
         String bearerToken = request.getHeader("Authorization");
 
         if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {

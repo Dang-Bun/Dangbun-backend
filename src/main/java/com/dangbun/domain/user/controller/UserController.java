@@ -36,14 +36,15 @@ public class UserController {
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody @Valid PostUserLoginRequest request) {
-        userService.login(request);
-        return ResponseEntity.ok(BaseResponse.ok(null));
+        BaseResponse<?> response = userService.login(request);
+        return ResponseEntity.ok(response);
     }
 
-    @PostMapping("/logout")
-    public BaseResponse<?> logout() {
 
-        return null;
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout(@RequestHeader("Authorization") String bearerToken) {
+        userService.logout(bearerToken);
+        return ResponseEntity.ok(BaseResponse.ok(null));
 
     }
 
@@ -59,8 +60,7 @@ public class UserController {
     public ResponseEntity<?> deleteCurrentUser(@AuthenticationPrincipal CustomUserDetails customUser,
                                                              @RequestBody DeleteUserAccountRequest request) {
         userService.deleteCurrentUser(customUser, request);
-        return null;
+        return ResponseEntity.ok(BaseResponse.ok(null));
     }
-
 
 }

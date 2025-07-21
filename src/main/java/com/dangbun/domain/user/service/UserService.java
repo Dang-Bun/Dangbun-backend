@@ -4,15 +4,20 @@ import com.dangbun.domain.user.dto.request.DeleteUserAccountRequest;
 import com.dangbun.domain.user.dto.request.PostUserLoginRequest;
 import com.dangbun.domain.user.dto.request.PostUserPasswordUpdateRequest;
 import com.dangbun.domain.user.dto.request.PostUserSignUpRequest;
+import com.dangbun.domain.user.dto.response.PostUserLoginResponse;
 import com.dangbun.domain.user.entity.CustomUserDetails;
 import com.dangbun.domain.user.entity.User;
 import com.dangbun.domain.user.exception.custom.*;
 import com.dangbun.domain.user.repository.UserRepository;
 import com.dangbun.global.email.EmailService;
 import com.dangbun.global.redis.RedisService;
+import com.dangbun.global.response.BaseResponse;
+import com.dangbun.global.security.JwtUtil;
+import com.dangbun.global.security.TokenProvider;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,8 +25,11 @@ import org.springframework.transaction.annotation.Transactional;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.time.Duration;
+import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.Optional;
 import java.util.Random;
+import java.util.concurrent.TimeUnit;
 
 import static com.dangbun.domain.user.exception.ErrorCode.*;
 
@@ -37,27 +45,12 @@ public class UserService {
     private final EmailService emailService;
     private final RedisService redisService;
     private final PasswordEncoder passwordEncoder;
+    private final TokenProvider tokenProvider;
+    private final JwtUtil jwtUtil;
+    private final RedisTemplate<Object, Object> redisTemplate;
 
     @Value("${spring.mail.auth-code-expiration-millis}")
     private Long authCodeExpirationMillis;
-
-    public void createUser(){
-
-    }
-
-
-
-    public void logout(){
-
-    }
-
-    public void createPassword(){
-
-    }
-
-
-
-
 
 
     public User findByEmail(String email){
@@ -162,12 +155,51 @@ public class UserService {
         throw new InvalidEmailException(INVALID_EMAIL);
     }
 
-    public void login(@Valid PostUserLoginRequest request) {
+    public BaseResponse<?> login(@Valid PostUserLoginRequest request) {
+
+
         User user = userRepository.findByEmail(request.email())
                 .orElseThrow(()->new UserNotFoundException(NO_SUCH_USER));
+
 
         if(!passwordEncoder.matches(request.password(), user.getPassword())){
             throw new InvalidPasswordException(INVALID_PASSWORD);
         }
+
+        final String accessToken = tokenProvider.createAccessToken(user);
+        final String refreshToken = tokenProvider.createRefreshToken(user);
+
+        tokenProvider.saveRefreshToken(user.getId(),refreshToken);
+
+        PostUserLoginResponse response = new PostUserLoginResponse(accessToken, refreshToken);
+
+        return BaseResponse.ok(response);
     }
+
+    public void logout(String bearerToken) {
+        String accessToken = jwtUtil.parseAccessToken(bearerToken);
+        String userId = tokenProvider.validateAndGetUserId(accessToken);
+
+        redisTemplate.delete("refreshToken:"+userId);
+
+        Date expiration = jwtUtil.getExpiration(accessToken);
+        Long now = System.currentTimeMillis();
+        Long expirationMs = expiration.getTime() - now;
+
+        redisTemplate.opsForValue()
+                .set("blacklist:"+accessToken,"logout",expirationMs, TimeUnit.MILLISECONDS);
+
+    }
+
+    public void testSignup() {
+        String password = passwordEncoder.encode("test");
+        User user = User.builder()
+                .email("test@test.com")
+                .password(password)
+                .name("test")
+                .build();
+
+        userRepository.save(user);
+    }
+
 }
