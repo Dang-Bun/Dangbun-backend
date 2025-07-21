@@ -69,6 +69,7 @@ jobs:
               -e PROD_DB_USER=${{ secrets.PROD_DB_USER }} \
               -e PROD_DB_PASSWORD=${{ secrets.PROD_DB_PASSWORD }} \
               -e JWT_SECRET=${{ secrets.JWT_SECRET }} \
+              -e MAIL_PASSWORD=${{ secrets.MAIL_PASSWORD }} \
               --name dangbun-server \
               ${{ secrets.ECR_REGISTRY }}/${{ secrets.ECR_REPOSITORY }}:latest
 
