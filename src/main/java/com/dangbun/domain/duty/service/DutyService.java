@@ -1,13 +1,18 @@
 package com.dangbun.domain.duty.service;
 
+import com.dangbun.domain.cleaning.entity.Cleaning;
+import com.dangbun.domain.cleaning.repository.CleaningRepository;
 import com.dangbun.domain.duty.dto.request.PostDutyCreateRequest;
 import com.dangbun.domain.duty.dto.request.PutDutyUpdateRequest;
+import com.dangbun.domain.duty.dto.response.GetDutyInfoResponse;
 import com.dangbun.domain.duty.dto.response.GetDutyListResponse;
 import com.dangbun.domain.duty.dto.response.PostDutyCreateResponse;
 import com.dangbun.domain.duty.dto.response.PutDutyUpdateResponse;
 import com.dangbun.domain.duty.entity.Duty;
 import com.dangbun.domain.duty.exception.custom.*;
 import com.dangbun.domain.duty.repository.DutyRepository;
+import com.dangbun.domain.memberduty.entity.MemberDuty;
+import com.dangbun.domain.memberduty.repository.MemberDutyRepository;
 import com.dangbun.domain.place.entity.Place;
 import com.dangbun.domain.place.repository.PlaceRepository;
 import jakarta.transaction.Transactional;
@@ -24,6 +29,8 @@ public class DutyService {
 
     private final DutyRepository dutyRepository;
     private final PlaceRepository placeRepository;
+    private final MemberDutyRepository memberDutyRepository;
+    private final CleaningRepository cleaningRepository;
 
     @Transactional
     public PostDutyCreateResponse createDuty(Long placeId, PostDutyCreateRequest request) {
@@ -76,4 +83,34 @@ public class DutyService {
     }
 
 
+    @Transactional()
+    public GetDutyInfoResponse getDutyInfo(Long dutyId) {
+        Duty duty = dutyRepository.findById(dutyId)
+                .orElseThrow(() -> new DutyNotFoundException(DUTY_NOT_FOUND));
+
+        List<MemberDuty> members = memberDutyRepository.findAllByDuty(duty);
+        List<GetDutyInfoResponse.MemberDto> memberInfos = members.stream()
+                .map(md -> new GetDutyInfoResponse.MemberDto(
+                        md.getMember().getMemberId(),
+                        md.getMember().getRole(),
+                        md.getMember().getUser().getName()
+                ))
+                .toList();
+
+        List<Cleaning> cleanings = cleaningRepository.findAllByDuty(duty);
+        List<GetDutyInfoResponse.CleaningDto> cleaningInfos = cleanings.stream()
+                .map(c -> new GetDutyInfoResponse.CleaningDto(
+                        c.getCleaningId(),
+                        c.getName()
+                ))
+                .toList();
+
+        return GetDutyInfoResponse.of(
+                duty.getDutyId(),
+                duty.getName(),
+                duty.getIcon(),
+                memberInfos,
+                cleaningInfos
+        );
+    }
 }
