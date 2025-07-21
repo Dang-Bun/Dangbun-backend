@@ -23,4 +23,10 @@ public class DutyControllerAdvice {
     public BaseErrorResponse handlePlaceNotFoundException(PlaceNotFoundException e) {
         return new BaseErrorResponse(PLACE_NOT_FOUND);
     }
+
+    @ExceptionHandler(DutyNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public BaseErrorResponse handleDutyNotFoundException(DutyNotFoundException e) {
+        return new BaseErrorResponse(DUTY_NOT_FOUND);
+    }
 }
