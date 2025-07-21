@@ -33,15 +33,6 @@ public class GlobalControllerAdvice {
         return new BaseErrorResponse(BAD_REQUEST);
     }
 
-
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    @ExceptionHandler( MethodArgumentNotValidException.class)
-    public BaseErrorResponse handle_ValidationException(MethodArgumentNotValidException e){
-        log.error("[handle_BadRequest]", e);
-        String errorMessage = Objects.requireNonNull(e.getBindingResult().getFieldError()).getDefaultMessage();
-        return new BaseErrorResponse(BAD_REQUEST,errorMessage);
-    }
-
     // 요청한 api가 없을 경우
     @ResponseStatus(HttpStatus.NOT_FOUND)
     @ExceptionHandler(NoHandlerFoundException.class)
