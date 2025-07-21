@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.NoHandlerFoundException;
 
+import java.util.Objects;
+
 import static com.dangbun.global.response.status.BaseExceptionResponse.*;
 
 @Order(Ordered.LOWEST_PRECEDENCE)
@@ -29,6 +31,15 @@ public class GlobalControllerAdvice {
     public BaseErrorResponse handle_BadRequest(Exception e){
         log.error("[handle_BadRequest]", e);
         return new BaseErrorResponse(BAD_REQUEST);
+    }
+
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler( MethodArgumentNotValidException.class)
+    public BaseErrorResponse handle_ValidationException(MethodArgumentNotValidException e){
+        log.error("[handle_BadRequest]", e);
+        String errorMessage = Objects.requireNonNull(e.getBindingResult().getFieldError()).getDefaultMessage();
+        return new BaseErrorResponse(BAD_REQUEST,errorMessage);
     }
 
     // 요청한 api가 없을 경우

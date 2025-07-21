@@ -6,8 +6,6 @@ spring:
       local: db-local, port-local, common
       prod: db-prod, port-prod, common
 #    active: local
-
-
 ---
 
 # ?? DB
