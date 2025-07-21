@@ -4,26 +4,28 @@ spring:
     driver-class-name: org.h2.Driver
     username: sa
     password:
+
   jpa:
     database-platform: org.hibernate.dialect.H2Dialect
     hibernate:
       ddl-auto: create-drop
+
   mail:
-    host: smtp.gmail.com
-    port: 587
-    username: kuitdangbun@gmail.com
-    password: ${MAIL_PASSWORD}
+    host: localhost
+    port: 1025
+    username: dummy@test.com
+    password: dummy-password
     properties:
       mail:
         smtp:
-          auth: true
+          auth: false
           starttls:
-            enable: true
-          connectiontimeout: 5000
-          timeout: 5000
-          writetimeout: 5000
+            enable: false
+          connectiontimeout: 1000
+          timeout: 1000
+          writetimeout: 1000
           ssl:
-            enable: true
+            enable: false
     auth-code-expiration-millis: 1800000
 
   data:
