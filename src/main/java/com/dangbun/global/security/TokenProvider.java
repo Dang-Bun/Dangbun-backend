@@ -25,8 +25,8 @@ public class TokenProvider {
     private String SECRET;
     private Key key;
 
-    public final static Long TOKEN_VALIDATION_MS = 1000L * 60;
-    public final static Long REFRESH_VALIDATION_MS = 1000L * 120;
+    public final static Long TOKEN_VALIDATION_MS = 1000L * 60 * 15;
+    public final static Long REFRESH_VALIDATION_MS = 1000L * 60 * 60 * 24 * 15;
 
 
     @PostConstruct

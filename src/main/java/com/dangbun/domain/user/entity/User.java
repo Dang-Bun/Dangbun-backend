@@ -3,7 +3,6 @@ package com.dangbun.domain.user.entity;
 
 import com.dangbun.global.BaseEntity;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -13,6 +12,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @AllArgsConstructor
+@NoArgsConstructor
 @Builder
 @Table(name = "users")
 public class User extends BaseEntity {
