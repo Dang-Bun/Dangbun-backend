@@ -30,7 +30,7 @@ import java.util.Optional;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
-import static com.dangbun.domain.user.exception.UserErrorCode.*;
+import static com.dangbun.domain.user.response.status.UserExceptionResponse.*;
 
 @Service
 @Transactional

@@ -10,7 +10,7 @@ import org.springframework.core.annotation.Order;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import static com.dangbun.domain.user.exception.UserErrorCode.*;
+import static com.dangbun.domain.user.response.status.UserExceptionResponse.*;
 
 @Order(Ordered.HIGHEST_PRECEDENCE)
 @Slf4j

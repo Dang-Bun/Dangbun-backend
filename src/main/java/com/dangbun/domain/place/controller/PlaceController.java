@@ -2,6 +2,7 @@ package com.dangbun.domain.place.controller;
 
 import com.dangbun.domain.place.dto.request.PostCreatePlaceRequest;
 import com.dangbun.domain.place.dto.response.GetPlaceListResponse;
+import com.dangbun.domain.place.dto.response.PostCreateInviteCodeResponse;
 import com.dangbun.domain.place.service.PlaceService;
 import com.dangbun.domain.user.entity.User;
 import com.dangbun.global.response.BaseResponse;
@@ -20,7 +21,7 @@ public class PlaceController {
 
     private final PlaceService placeService;
 
-    @Operation(summary = " 모든 플레이스 조회", description = "사용자의 모든 플레이스를 조회하기 위해 사용됩니다(플레이스 선택 화면)")
+    @Operation(summary = " 플레이스 목록 조회", description = "사용자의 모든 플레이스를 조회하기 위해 사용됩니다(플레이스 선택 화면)")
     @GetMapping()
     public ResponseEntity<?> getPlaces(@AuthenticationPrincipal(expression = "user") User user){
         List<GetPlaceListResponse> places = placeService.getPlaces(user.getId());
@@ -36,9 +37,17 @@ public class PlaceController {
         return ResponseEntity.ok(BaseResponse.ok(null));
     }
 
-    @Operation(summary = "참여코드 확인", description = "참여코드를 입력합니다. 성공적으로 입력할 시 정보 입력 창이 뜹니다.")
+    @Operation(summary = "참여코드 생성", description = "플레이스의 참여코드를 생성합니다.")
     @PostMapping("/{placeId}/invite-code")
-    public ResponseEntity<?> checkInviteCode(@PathVariable Long placeId){
+    public ResponseEntity<?> createInviteCode(@AuthenticationPrincipal(expression = "user") User user,
+                                              @PathVariable Long placeId){
+        PostCreateInviteCodeResponse data = placeService.createInviteCode(user.getId(), placeId);
+        return ResponseEntity.ok(BaseResponse.ok(data));
+    }
+
+    @Operation(summary = "참여코드 확인", description = "참여코드를 입력합니다. 성공적으로 입력할 시 정보 입력 창이 뜹니다.")
+    @PostMapping("/invite-code")
+    public ResponseEntity<?> checkInviteCode(){
 
     }
 

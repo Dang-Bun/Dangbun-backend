@@ -31,11 +31,20 @@ public class Place {
     @OneToMany(mappedBy = "place", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Duty> duties;
 
+
     private String code;
 
     @Builder
     public Place(String name, PlaceCategory category) {
         this.name = name;
         this.category = category;
+    }
+
+    public String createCode(String code){
+        if(this.code != null)
+            return this.code;
+
+        this.code = code;
+        return this.code;
     }
 }
