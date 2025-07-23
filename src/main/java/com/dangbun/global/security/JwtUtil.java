@@ -13,8 +13,8 @@ import java.util.Date;
 
 @Component
 public class JwtUtil {
-    public final static Long TOKEN_VALIDATION_MS = 1000L * 60;
-    public final static Long REFRESH_VALIDATION_MS = 1000L * 120;
+    public final static Long TOKEN_VALIDATION_MS = 1000L * 60 * 15;
+    public final static Long REFRESH_VALIDATION_MS = 1000L * 60 * 60 * 24 * 15;
 
     @Value("${jwt.secret}")
     private String SECRET;
@@ -27,8 +27,7 @@ public class JwtUtil {
     }
 
     public String parseAccessToken(String bearerToken) {
-        String accessToken = bearerToken.replace("Bearer ", "");
-        return null;
+        return bearerToken.replace("Bearer ", "");
     }
 
     public Claims parseClaims(String token){
