@@ -9,6 +9,7 @@ import com.dangbun.domain.place.service.PlaceService;
 import com.dangbun.domain.user.entity.User;
 import com.dangbun.global.response.BaseResponse;
 import io.swagger.v3.oas.annotations.Operation;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -33,7 +34,7 @@ public class PlaceController {
     @Operation(summary = "플레이스 생성", description = "플레이스를 생성합니다. 플레이스를 생성한 user는 매니저가 됩니다.")
     @PostMapping
     public ResponseEntity<?> createPlace(@AuthenticationPrincipal(expression = "user") User user,
-                                         @RequestBody PostCreatePlaceRequest request){
+                                         @Valid @RequestBody PostCreatePlaceRequest request){
 
         placeService.createPlaceWithManager(user.getId(), request);
         return ResponseEntity.ok(BaseResponse.ok(null));

@@ -2,9 +2,9 @@ package com.dangbun.domain.place.entity;
 
 
 import com.dangbun.domain.duty.entity.Duty;
-import com.dangbun.domain.duty.entity.DutyIcon;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 import java.util.List;
@@ -24,14 +24,15 @@ public class Place {
     @NotEmpty
     private String name;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "category", nullable = false, length = 100)
-    @NotEmpty
+    @NotNull
     private PlaceCategory category;
 
     @OneToMany(mappedBy = "place", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Duty> duties;
 
-
+    @Column(name = "invite_code")
     private String inviteCode;
 
     @Builder

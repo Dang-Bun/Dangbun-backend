@@ -13,11 +13,11 @@ import com.dangbun.domain.place.entity.Place;
 import com.dangbun.domain.place.entity.PlaceCategory;
 import com.dangbun.domain.place.exception.custom.InvalidInviteCodeException;
 import com.dangbun.domain.place.repository.PlaceRepository;
-import com.dangbun.domain.place.response.status.PlaceExceptionResponse;
 import com.dangbun.domain.user.exception.custom.UserNotFoundException;
 import com.dangbun.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.security.SecureRandom;
 import java.util.ArrayList;
@@ -31,6 +31,7 @@ import static com.dangbun.domain.user.response.status.UserExceptionResponse.NO_S
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class PlaceService {
 
 
@@ -58,13 +59,16 @@ public class PlaceService {
     }
 
     public void createPlaceWithManager(Long userId, PostCreatePlaceRequest request) {
-
+        
+        
         String placeName = request.placeName();
         String category = request.category();
         String memberName = request.memberName();
-        Map<String, String> info = request.memberInformation();
+        Map<String, String> info = request.information();
 
-
+        System.out.println("placeName = " + placeName);
+        System.out.println("memberName = " + memberName);
+        System.out.println("info = " + info);
         Place place = Place.builder()
                 .name(placeName)
                 .category(PlaceCategory.findCategory(category))
@@ -77,6 +81,7 @@ public class PlaceService {
                 .place(savedPlace)
                 .information(info)
                 .role(MemberRole.MANAGER)
+                .status(true)
                 .user(userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(NO_SUCH_USER)))
                 .build();
 
