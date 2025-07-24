@@ -1,6 +1,7 @@
 package com.dangbun.domain.member.repository;
 
 import com.dangbun.domain.member.entity.Member;
+import com.dangbun.domain.place.entity.Place;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -13,5 +14,8 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
 
     @Query("select m from Member m join fetch m.place where m.user.id = :userId and m.place.placeId = :placeId")
     Member findWithPlaceByUserIdAndPlaceId(Long userId, Long placeId);
+
+
+    Member findFirstByPlace(Place place);
 
 }

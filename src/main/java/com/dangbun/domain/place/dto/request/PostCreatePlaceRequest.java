@@ -5,8 +5,8 @@ import jakarta.validation.constraints.NotEmpty;
 import java.util.Map;
 
 public record PostCreatePlaceRequest (
-        @NotEmpty String placeName,
-        @NotEmpty String category,
-        @NotEmpty String memberName,
+        String placeName,
+        String category,
+        String memberName,
         Map<String, String > memberInformation
         ){}

@@ -4,13 +4,16 @@ import com.dangbun.domain.member.entity.Member;
 import com.dangbun.domain.member.entity.MemberRole;
 import com.dangbun.domain.member.exception.custom.InvalidRoleException;
 import com.dangbun.domain.member.repository.MemberRepository;
-import com.dangbun.domain.member.service.MemberService;
+import com.dangbun.domain.place.dto.request.PostCheckInviteCodeRequest;
 import com.dangbun.domain.place.dto.request.PostCreatePlaceRequest;
 import com.dangbun.domain.place.dto.response.GetPlaceListResponse;
+import com.dangbun.domain.place.dto.response.PostCheckInviteCodeResponse;
 import com.dangbun.domain.place.dto.response.PostCreateInviteCodeResponse;
 import com.dangbun.domain.place.entity.Place;
 import com.dangbun.domain.place.entity.PlaceCategory;
+import com.dangbun.domain.place.exception.custom.InvalidInviteCodeException;
 import com.dangbun.domain.place.repository.PlaceRepository;
+import com.dangbun.domain.place.response.status.PlaceExceptionResponse;
 import com.dangbun.domain.user.exception.custom.UserNotFoundException;
 import com.dangbun.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -20,8 +23,10 @@ import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static com.dangbun.domain.member.response.status.MemberExceptionResponse.INVALID_ROLE;
+import static com.dangbun.domain.place.response.status.PlaceExceptionResponse.*;
 import static com.dangbun.domain.user.response.status.UserExceptionResponse.NO_SUCH_USER;
 
 @Service
@@ -90,6 +95,20 @@ public class PlaceService {
         return new PostCreateInviteCodeResponse(code);
     }
 
+
+
+    public PostCheckInviteCodeResponse checkInviteCode(PostCheckInviteCodeRequest request) {
+
+        Place place = placeRepository.findByInviteCode(request.inviteCode());
+        if(place == null){
+            throw new InvalidInviteCodeException(NO_SUCH_INVITE_CODE);
+        }
+        Member member = memberRepository.findFirstByPlace(place);
+        Set<String> information = member.getInformation().keySet();
+        List<String> iList = information.stream().toList();
+
+        return PostCheckInviteCodeResponse.of(request.inviteCode(), iList);
+    }
 
     public static String generateCode() {
         StringBuilder sb = new StringBuilder(CODE_LENGTH);

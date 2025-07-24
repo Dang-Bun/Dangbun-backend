@@ -1,7 +1,9 @@
 package com.dangbun.domain.place.controller;
 
+import com.dangbun.domain.place.dto.request.PostCheckInviteCodeRequest;
 import com.dangbun.domain.place.dto.request.PostCreatePlaceRequest;
 import com.dangbun.domain.place.dto.response.GetPlaceListResponse;
+import com.dangbun.domain.place.dto.response.PostCheckInviteCodeResponse;
 import com.dangbun.domain.place.dto.response.PostCreateInviteCodeResponse;
 import com.dangbun.domain.place.service.PlaceService;
 import com.dangbun.domain.user.entity.User;
@@ -47,7 +49,11 @@ public class PlaceController {
 
     @Operation(summary = "참여코드 확인", description = "참여코드를 입력합니다. 성공적으로 입력할 시 정보 입력 창이 뜹니다.")
     @PostMapping("/invite-code")
-    public ResponseEntity<?> checkInviteCode(){
+    public ResponseEntity<?> checkInviteCode(@AuthenticationPrincipal(expression = "user") User user,
+                                             @RequestBody PostCheckInviteCodeRequest request){
+
+       PostCheckInviteCodeResponse response = placeService.checkInviteCode(request);
+       return ResponseEntity.ok(BaseResponse.ok(response));
 
     }
 

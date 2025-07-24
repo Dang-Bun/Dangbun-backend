@@ -32,7 +32,7 @@ public class Place {
     private List<Duty> duties;
 
 
-    private String code;
+    private String inviteCode;
 
     @Builder
     public Place(String name, PlaceCategory category) {
@@ -41,10 +41,10 @@ public class Place {
     }
 
     public String createCode(String code){
-        if(this.code != null)
-            return this.code;
+        if(this.inviteCode != null)
+            return this.inviteCode;
 
-        this.code = code;
-        return this.code;
+        this.inviteCode = code;
+        return this.inviteCode;
     }
 }
