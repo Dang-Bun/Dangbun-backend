@@ -25,13 +25,12 @@ import org.springframework.transaction.annotation.Transactional;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.time.Duration;
-import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.Optional;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
-import static com.dangbun.domain.user.exception.ErrorCode.*;
+import static com.dangbun.domain.user.response.status.UserExceptionResponse.*;
 
 @Service
 @Transactional
@@ -189,17 +188,6 @@ public class UserService {
         redisTemplate.opsForValue()
                 .set("blacklist:"+accessToken,"logout",expirationMs, TimeUnit.MILLISECONDS);
 
-    }
-
-    public void testSignup() {
-        String password = passwordEncoder.encode("test");
-        User user = User.builder()
-                .email("test@test.com")
-                .password(password)
-                .name("test")
-                .build();
-
-        userRepository.save(user);
     }
 
 }
