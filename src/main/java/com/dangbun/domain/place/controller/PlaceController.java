@@ -2,6 +2,7 @@ package com.dangbun.domain.place.controller;
 
 import com.dangbun.domain.place.dto.request.PostCheckInviteCodeRequest;
 import com.dangbun.domain.place.dto.request.PostCreatePlaceRequest;
+import com.dangbun.domain.place.dto.request.PostRegisterPlaceRequest;
 import com.dangbun.domain.place.dto.response.GetPlaceListResponse;
 import com.dangbun.domain.place.dto.response.PostCheckInviteCodeResponse;
 import com.dangbun.domain.place.dto.response.PostCreateInviteCodeResponse;
@@ -53,16 +54,17 @@ public class PlaceController {
     public ResponseEntity<?> checkInviteCode(@AuthenticationPrincipal(expression = "user") User user,
                                              @RequestBody PostCheckInviteCodeRequest request){
 
-       PostCheckInviteCodeResponse response = placeService.checkInviteCode(request);
+       PostCheckInviteCodeResponse response = placeService.checkInviteCode(user,request);
        return ResponseEntity.ok(BaseResponse.ok(response));
 
     }
 
     @Operation(summary = "참여 신청", description = "플레이스에 참가 신청합니다. 플레이스가 요구한 정보들을 입력해야합니다.")
     @PostMapping("/join-requests")
-    public ResponseEntity<?> registerPlace(@AuthenticationPrincipal(expression = "user") User user
-                                           ){
+    public ResponseEntity<?> registerPlace(@AuthenticationPrincipal(expression = "user") User user,
+                                           @RequestBody PostRegisterPlaceRequest request){
 
+        placeService.joinRequest(user, request);
         return ResponseEntity.ok(BaseResponse.ok(null));
     }
 }

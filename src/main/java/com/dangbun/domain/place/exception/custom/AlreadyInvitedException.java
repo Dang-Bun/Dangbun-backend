@@ -4,11 +4,11 @@ import com.dangbun.global.response.status.ResponseStatus;
 import lombok.Getter;
 
 @Getter
-public class InvalidInviteCodeException extends RuntimeException {
+public class AlreadyInvitedException extends RuntimeException {
 
-    private final ResponseStatus exceptionStatus;
+  private final ResponseStatus exceptionStatus;
 
-    public InvalidInviteCodeException(ResponseStatus status) {
+  public AlreadyInvitedException(ResponseStatus status) {
         super(status.getMessage());
         this.exceptionStatus = status;
     }

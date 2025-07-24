@@ -6,15 +6,20 @@ import com.dangbun.domain.member.exception.custom.InvalidRoleException;
 import com.dangbun.domain.member.repository.MemberRepository;
 import com.dangbun.domain.place.dto.request.PostCheckInviteCodeRequest;
 import com.dangbun.domain.place.dto.request.PostCreatePlaceRequest;
+import com.dangbun.domain.place.dto.request.PostRegisterPlaceRequest;
 import com.dangbun.domain.place.dto.response.GetPlaceListResponse;
 import com.dangbun.domain.place.dto.response.PostCheckInviteCodeResponse;
 import com.dangbun.domain.place.dto.response.PostCreateInviteCodeResponse;
 import com.dangbun.domain.place.entity.Place;
 import com.dangbun.domain.place.entity.PlaceCategory;
+import com.dangbun.domain.place.exception.custom.AlreadyInvitedException;
+import com.dangbun.domain.place.exception.custom.InvalidInformationException;
 import com.dangbun.domain.place.exception.custom.InvalidInviteCodeException;
 import com.dangbun.domain.place.repository.PlaceRepository;
+import com.dangbun.domain.user.entity.User;
 import com.dangbun.domain.user.exception.custom.UserNotFoundException;
 import com.dangbun.domain.user.repository.UserRepository;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -44,6 +49,7 @@ public class PlaceService {
     private static final int CODE_LENGTH = 6;
     private static final SecureRandom RANDOM = new SecureRandom();
 
+    @Transactional(readOnly = true)
     public List<GetPlaceListResponse> getPlaces(Long userId) {
 
         List<Member> members = memberRepository.findWithPlaceByUserId(userId);
@@ -102,11 +108,14 @@ public class PlaceService {
 
 
 
-    public PostCheckInviteCodeResponse checkInviteCode(PostCheckInviteCodeRequest request) {
-
+    @Transactional(readOnly = true)
+    public PostCheckInviteCodeResponse checkInviteCode(User user, PostCheckInviteCodeRequest request) {
         Place place = placeRepository.findByInviteCode(request.inviteCode());
         if(place == null){
-            throw new InvalidInviteCodeException(NO_SUCH_INVITE_CODE);
+            throw new InvalidInviteCodeException(NO_SUCH_INVITE);
+        }
+        if(memberRepository.findByPlaceAndUser(place,user).isPresent()){
+            throw new AlreadyInvitedException(ALREADY_INVITED);
         }
         Member member = memberRepository.findFirstByPlace(place);
         Set<String> information = member.getInformation().keySet();
@@ -124,4 +133,27 @@ public class PlaceService {
         return sb.toString();
     }
 
+    public void joinRequest(User user, PostRegisterPlaceRequest request) {
+
+
+        Member tempMember = memberRepository.findFirstWithPlaceByInviteCode(request.inviteCode())
+                .orElseThrow(()->new EntityNotFoundException("Invalid Invite Code"));
+
+        Place place = tempMember.getPlace();
+
+        if(!tempMember.getInformation().keySet().equals(request.information().keySet())){
+            throw new InvalidInformationException(INVALID_INFORMATION);
+        }
+
+        Member member = Member.builder()
+                .user(user)
+                .role(MemberRole.MEMBER)
+                .status(false)
+                .place(place)
+                .name(request.name())
+                .information(request.information())
+                .build();
+
+        memberRepository.save(member);
+    }
 }
