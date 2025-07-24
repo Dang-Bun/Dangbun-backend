@@ -3,11 +3,15 @@ package com.dangbun.domain.member.entity;
 import com.dangbun.domain.duty.entity.DutyIcon;
 import com.dangbun.domain.place.entity.Place;
 import com.dangbun.domain.user.entity.User;
+import com.dangbun.global.converter.MapToJsonConverter;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.boot.context.properties.bind.DefaultValue;
+
+import java.util.Map;
 
 @Entity
 @Table(name = "member")
@@ -23,10 +27,14 @@ public class Member {
     private MemberRole role;
 
     @Column(nullable = false)
+    private String name;
+
+    @Column(nullable = false)
     private Boolean status;
 
+    @Convert(converter = MapToJsonConverter.class)
     @Column(columnDefinition = "json")
-    private String information;
+    private Map<String, String> information;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "place_id", nullable = false)
@@ -37,8 +45,9 @@ public class Member {
     private User user;
 
     @Builder
-    public Member(MemberRole role, Boolean status, String information, Place place, User user) {
+    public Member(MemberRole role,String name, Boolean status, Map information, Place place, User user) {
        this.role = role;
+       this.name = name;
        this.status = status;
        this.information = information;
        this.place = place;
