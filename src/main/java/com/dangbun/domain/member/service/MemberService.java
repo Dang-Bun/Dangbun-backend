@@ -81,7 +81,7 @@ public class MemberService {
     }
 
     private void checkMemberRoleWithUserAndPlaceId(User user, Long placeId) {
-        Member runner = memberRepository.findByUser_IdAndPlace_PlaceId(user.getId(), placeId)
+        Member runner = memberRepository.findByUser_UserIdAndPlace_PlaceId(user.getUserId(), placeId)
                 .orElseThrow(() -> new NoSuchElementException("해당하는 맴버가 존재하지 않습니다."));
         if (!runner.getRole().equals(MemberRole.MANAGER)) {
             throw new InvalidRoleException(INVALID_ROLE);

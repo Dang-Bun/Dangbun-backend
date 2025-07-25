@@ -47,7 +47,7 @@ public class PlaceMembershipAspect {
             throw new IllegalArgumentException("placeId 파라미터가 존재하지 않거나 Long 타입이 아닙니다.");
         }
 
-        boolean exists = memberRepository.existsByUserIdAndPlaceId(userDetails.getUser().getId(), placeId);
+        boolean exists = memberRepository.existsByUserIdAndPlaceId(userDetails.getUser().getUserId(), placeId);
 
         if (!exists) {
             throw new AccessDeniedException("해당 플레이스에 소속된 유저가 아닙니다.");
