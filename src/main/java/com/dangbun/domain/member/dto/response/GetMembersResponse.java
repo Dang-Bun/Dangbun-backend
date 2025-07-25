@@ -13,6 +13,7 @@ public record GetMembersResponse (
     public static GetMembersResponse of(Map<Member,List<String>> memberMap){
         List<MemberDto> memberDtos = memberMap.entrySet().stream()
                 .map(entry -> new MemberDto(
+                        entry.getKey().getMemberId(),
                         entry.getKey().getRole().getDisplayName(),
                         entry.getKey().getName(),
                         entry.getValue()
@@ -21,6 +22,7 @@ public record GetMembersResponse (
     }
 
     public record MemberDto(
+            Long memberId,
             String role,
             String name,
             List<String> dutyName

@@ -56,10 +56,11 @@ public class PlaceService {
         List<GetPlaceListResponse> result = new ArrayList<>();
         for (Member member : members) {
             Place place = member.getPlace();
+            Long placeId = place.getPlaceId();
             String name = place.getName();
             String role = member.getRole().getDisplayName();
             // Todo cleaning과 알림창과의 연동 필요
-            result.add(new GetPlaceListResponse(name, 0, 0, role, 0));
+            result.add(new GetPlaceListResponse(placeId, name, 0, 0, role, 0));
         }
         return result;
     }
