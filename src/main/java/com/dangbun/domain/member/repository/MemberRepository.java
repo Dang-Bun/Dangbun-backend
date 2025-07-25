@@ -6,7 +6,6 @@ import com.dangbun.domain.user.entity.User;
 import io.lettuce.core.dynamic.annotation.Param;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.security.core.parameters.P;
 
 import java.util.List;
 import java.util.Optional;
@@ -26,11 +25,14 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     @Query("select m from Member m join fetch m.place p where p.inviteCode = :inviteCode")
     Optional<Member> findFirstWithPlaceByInviteCode(@Param("inviteCode") String inviteCode);
 
-    @Query("select m from Member m where m.place.placeId = :placeId")
-    List<Member> findByPlace_PlaceId(Long placeId);
+    List<Member> findByPlace_PlaceIdAndStatusIsTrue(Long placeId);
 
     @Query("select count(m)>0 from Member m where m.user.id = :userId and m.place.placeId = :placeId")
     boolean existsByUserIdAndPlaceId(@Param("userId") Long userid, @Param("placeId") Long placeId);
 
     Optional<Member> findByPlace_PlaceIdAndMemberId(Long placePlaceId, Long memberId);
+
+    Optional<Member> findByUser_IdAndPlace_PlaceId(Long userId, Long placePlaceId);
+
+    List<Member> findByPlace_PlaceIdAndStatusIsFalse(Long placeId);
 }

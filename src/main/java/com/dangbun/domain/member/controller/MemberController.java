@@ -29,13 +29,15 @@ public class MemberController {
 
     @Operation(summary = "대기 맴버 목록 조회", description = "현재 플레이스 참가를 대기하고 있는 맴버들을 조회합니다.(매니저용)")
     @GetMapping("/waiting")
-    public ResponseEntity<?> getWaitingMembers(@PathVariable("placeId") Long placeId) {
-        return null;
+    public ResponseEntity<?> getWaitingMembers(@AuthenticationPrincipal(expression = "user") User user,
+                                               @PathVariable("placeId") Long placeId) {
+        return ResponseEntity.ok(BaseResponse.ok(memberService.getWaitingMembers(user, placeId)));
     }
 
     @Operation(summary = "맴버 수락", description = "대기중인 맴버의 참가를 수락합니다.(매니저용)")
-    @PostMapping("/accept")
-    public ResponseEntity<?> registerMember(@PathVariable("placeId") Long placeId) {
+    @PostMapping("/{memberId}/accept")
+    public ResponseEntity<?> registerMember(@PathVariable("placeId") Long placeId,
+                                            @PathVariable("memberId") Long memberId) {
         return null;
     }
 
