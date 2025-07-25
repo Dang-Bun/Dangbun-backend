@@ -1,6 +1,8 @@
 package com.dangbun.domain.member.service;
 
 import com.dangbun.domain.duty.entity.Duty;
+import com.dangbun.domain.duty.repository.DutyRepository;
+import com.dangbun.domain.member.dto.request.DeleteMemberRequest;
 import com.dangbun.domain.member.dto.request.DeleteSelfFromPlaceRequest;
 import com.dangbun.domain.member.dto.response.GetMemberResponse;
 import com.dangbun.domain.member.dto.response.GetMembersResponse;
@@ -14,6 +16,7 @@ import com.dangbun.domain.memberduty.entity.MemberDuty;
 import com.dangbun.domain.memberduty.repository.MemberDutyRepository;
 import com.dangbun.domain.user.entity.User;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.web.firewall.RequestRejectedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,6 +31,7 @@ public class MemberService {
 
     private final MemberRepository memberRepository;
     private final MemberDutyRepository memberDutyRepository;
+    private final DutyRepository dutyRepository;
 
 
     @Transactional(readOnly = true)
@@ -86,7 +90,7 @@ public class MemberService {
         member.activate();
     }
 
-    public void removeMember(User user, Long placeId, Long memberId) {
+    public void removeWaitingMember(User user, Long placeId, Long memberId) {
 
         if(getMemberByUserAndPlace(user.getUserId(), placeId).getRole() != MemberRole.MANAGER){
             throw new InvalidRoleException(INVALID_ROLE);
@@ -107,7 +111,23 @@ public class MemberService {
         memberRepository.delete(member);
     }
 
+    public void removeMember(User user, Long placeId, Long memberId, DeleteMemberRequest request) {
 
+        if(getMemberByUserAndPlace(user.getUserId(), placeId).getRole() != MemberRole.MANAGER){
+            throw new InvalidRoleException(INVALID_ROLE);
+        }
+        Member member = memberRepository.findByMemberId(memberId)
+                .orElseThrow(()-> new MemberNotFoundException(NO_SUCH_MEMBER));
+
+        if(!member.getName().equals(request.memberName())){
+            throw new RequestRejectedException("삭제하고자 하는 맴버와 이름이 일치하지 않습니다");
+        }
+
+        List<MemberDuty> memberDuties = memberDutyRepository.findAllByMember(member);
+        memberDutyRepository.deleteAll(memberDuties);
+
+        memberRepository.delete(member);
+    }
 
     private Member getMemberByUserAndPlace(Long userId, Long placeId) {
         return memberRepository.findByUser_UserIdAndPlace_PlaceId(userId, placeId)
@@ -118,6 +138,7 @@ public class MemberService {
         return memberRepository.findByMemberIdAndPlace_PlaceId(memberId, placeId)
                 .orElseThrow(() -> new MemberNotFoundException(NO_SUCH_MEMBER));
     }
+
 
 
 }
