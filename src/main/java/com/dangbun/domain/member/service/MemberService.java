@@ -54,7 +54,7 @@ public class MemberService {
 
         List<MemberDuty> memberDuties = memberDutyRepository.findAllByMember(member);
         List<Duty> duties = new ArrayList<>();
-        for (MemberDuty memberDuty : memberDuties){
+        for (MemberDuty memberDuty : memberDuties) {
             Duty duty = memberDuty.getDuty();
             duties.add(duty);
         }
@@ -64,15 +64,29 @@ public class MemberService {
 
     @Transactional(readOnly = true)
     public GetWaitingMembersResponse getWaitingMembers(User user, Long placeId) {
-        Member runner = memberRepository.findByUser_IdAndPlace_PlaceId(user.getId(), placeId)
-                .orElseThrow(()->new NoSuchElementException("해당하는 맴버가 존재하지 않습니다."));
-        if(!runner.getRole().equals(MemberRole.MANAGER)){
-            throw new InvalidRoleException(INVALID_ROLE);
-        }
+        checkMemberRoleWithUserAndPlaceId(user, placeId);
 
         List<Member> members = memberRepository.findByPlace_PlaceIdAndStatusIsFalse(placeId);
 
         return GetWaitingMembersResponse.of(members);
 
     }
+
+    public void registerMember(User user, Long placeId, Long memberId) {
+        checkMemberRoleWithUserAndPlaceId(user, placeId);
+
+        Member member = memberRepository.findByMemberIdAndPlace_PlaceId(memberId, placeId).orElseThrow(
+                () -> new NoSuchElementException("해당하는 맴버가 존재하지 않습니다."));
+        member.activate();
+    }
+
+    private void checkMemberRoleWithUserAndPlaceId(User user, Long placeId) {
+        Member runner = memberRepository.findByUser_IdAndPlace_PlaceId(user.getId(), placeId)
+                .orElseThrow(() -> new NoSuchElementException("해당하는 맴버가 존재하지 않습니다."));
+        if (!runner.getRole().equals(MemberRole.MANAGER)) {
+            throw new InvalidRoleException(INVALID_ROLE);
+        }
+    }
+
+
 }

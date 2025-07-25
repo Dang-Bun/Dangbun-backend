@@ -54,4 +54,8 @@ public class Member extends BaseEntity {
        this.user = user;
     }
 
+    public void activate(){
+        this.status = true;
+    }
+
 }

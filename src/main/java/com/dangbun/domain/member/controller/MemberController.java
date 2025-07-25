@@ -36,9 +36,12 @@ public class MemberController {
 
     @Operation(summary = "맴버 수락", description = "대기중인 맴버의 참가를 수락합니다.(매니저용)")
     @PostMapping("/{memberId}/accept")
-    public ResponseEntity<?> registerMember(@PathVariable("placeId") Long placeId,
+    public ResponseEntity<?> registerMember(@AuthenticationPrincipal(expression = "user") User user,
+                                            @PathVariable("placeId") Long placeId,
                                             @PathVariable("memberId") Long memberId) {
-        return null;
+        memberService.registerMember(user,placeId, memberId);
+
+        return ResponseEntity.ok(BaseResponse.ok(null));
     }
 
     @Operation(summary = "맴버 거절", description = "대기중인 맴버의 참가를 거절합니다.(매니저용)")
