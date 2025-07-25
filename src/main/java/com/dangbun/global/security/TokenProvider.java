@@ -36,11 +36,11 @@ public class TokenProvider {
 
     public String createAccessToken(User user){
 
-        return buildToken(user.getId(), "dangbun app", "access");
+        return buildToken(user.getUserId(), "dangbun app", "access");
     }
 
     public String createRefreshToken(User user){
-        return buildToken(user.getId(), "dangbun app", "refresh");
+        return buildToken(user.getUserId(), "dangbun app", "refresh");
     }
 
     public String validateAndGetUserId(String token){
