@@ -1,7 +1,10 @@
 package com.dangbun.domain.member.controller;
 
+import com.dangbun.domain.member.dto.response.GetMembersResponse;
 import com.dangbun.domain.member.entity.Member;
+import com.dangbun.domain.member.service.MemberService;
 import com.dangbun.domain.user.entity.User;
+import com.dangbun.global.response.BaseResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -15,15 +18,19 @@ import java.util.List;
 @RestController
 public class MemberController {
 
+    private final MemberService memberService;
+
     @Operation(summary = "맴버 목록 조회",description = "플레이스에 참가한 맴버를 조회합니다." )
     @GetMapping
     public ResponseEntity<?> getMembers(@PathVariable("placeId") Long placeId){
-        return null;
+        GetMembersResponse response = memberService.getMembers(placeId);
+        return ResponseEntity.ok(BaseResponse.ok(response));
     }
 
     @Operation(summary = "대기 맴버 목록 조회",description = "현재 플레이스 참가를 대기하고 있는 맴버들을 조회합니다.(매니저용)")
     @GetMapping("/waiting")
     public ResponseEntity<?> getWaitingMembers(@PathVariable("placeId") Long placeId){
+
         return null;
     }
 
