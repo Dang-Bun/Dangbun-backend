@@ -118,7 +118,6 @@ public class DutyService {
         );
     }
 
-    // DutyService.java (추가)
     @Transactional
     public PostAddMembersResponse addMembers(Long dutyId, PostAddMembersRequest request) {
         Duty duty = dutyRepository.findById(dutyId)
@@ -136,7 +135,7 @@ public class DutyService {
                 .toList();
 
         if (!notFoundIds.isEmpty()) {
-            throw new MemberNotFoundException(MEMBER_NOT_FOUND, "존재하지 않는 멤버 ID: " + notFoundIds);
+            throw new MemberNotFoundException(MEMBER_NOT_FOUND);
         }
 
 

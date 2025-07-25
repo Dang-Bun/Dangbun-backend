@@ -7,8 +7,8 @@ import lombok.Getter;
 public class MemberNotFoundException extends RuntimeException {
     private final ResponseStatus exceptionStatus;
 
-    public MemberNotFoundException(ResponseStatus exceptionStatus, String message) {
-        super(message);
+    public MemberNotFoundException(ResponseStatus exceptionStatus) {
+        super(exceptionStatus.getMessage());
         this.exceptionStatus = exceptionStatus;
     }
 
