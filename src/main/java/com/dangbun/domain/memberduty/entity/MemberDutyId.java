@@ -11,11 +11,17 @@ import java.util.Objects;
 @Getter
 @NoArgsConstructor
 public class MemberDutyId implements Serializable {
-    @Column(name = "duty_id")
-    private Long dutyId;
 
     @Column(name = "member_id")
     private Long memberId;
+
+    @Column(name = "duty_id")
+    private Long dutyId;
+
+    public MemberDutyId(Long memberId, Long dutyId) {
+        this.memberId = memberId;
+        this.dutyId = dutyId;
+    }
 
     @Override
     public boolean equals(Object o) {

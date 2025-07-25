@@ -37,6 +37,9 @@ public class WebSecurityConfig {
                             "/",
                             "/users/**",
                             "/actuator/health",
+                            "/duties/**",
+                            "/cleanigs/**",
+                            "/places/**",
 
                             // Swagger 관련 경로 허용
                             "/swagger-ui/**",
