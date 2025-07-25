@@ -1,17 +1,18 @@
 package com.dangbun.domain.member.service;
 
 import com.dangbun.domain.duty.entity.Duty;
+import com.dangbun.domain.member.dto.request.DeleteSelfFromPlaceRequest;
 import com.dangbun.domain.member.dto.response.GetMemberResponse;
 import com.dangbun.domain.member.dto.response.GetMembersResponse;
 import com.dangbun.domain.member.dto.response.GetWaitingMembersResponse;
 import com.dangbun.domain.member.entity.Member;
 import com.dangbun.domain.member.entity.MemberRole;
 import com.dangbun.domain.member.exception.custom.InvalidRoleException;
+import com.dangbun.domain.member.exception.custom.MemberNotFoundException;
 import com.dangbun.domain.member.repository.MemberRepository;
 import com.dangbun.domain.memberduty.entity.MemberDuty;
 import com.dangbun.domain.memberduty.repository.MemberDutyRepository;
 import com.dangbun.domain.user.entity.User;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -49,8 +50,7 @@ public class MemberService {
 
     @Transactional(readOnly = true)
     public GetMemberResponse getMember(Long placeId, Long memberId) {
-        Member member = memberRepository.findByPlace_PlaceIdAndMemberId(placeId, memberId)
-                .orElseThrow(() -> new EntityNotFoundException("해당하는 맴버가 존재하지 않습니다"));
+        Member member = getMemberByMemberIdAndPlaceId(memberId,placeId);
 
         List<MemberDuty> memberDuties = memberDutyRepository.findAllByMember(member);
         List<Duty> duties = new ArrayList<>();
@@ -64,7 +64,10 @@ public class MemberService {
 
     @Transactional(readOnly = true)
     public GetWaitingMembersResponse getWaitingMembers(User user, Long placeId) {
-        checkMemberRoleWithUserAndPlaceId(user, placeId);
+
+        if(getMemberByUserAndPlace(user.getUserId(), placeId).getRole() != MemberRole.MANAGER){
+            throw new InvalidRoleException(INVALID_ROLE);
+        }
 
         List<Member> members = memberRepository.findByPlace_PlaceIdAndStatusIsFalse(placeId);
 
@@ -73,19 +76,47 @@ public class MemberService {
     }
 
     public void registerMember(User user, Long placeId, Long memberId) {
-        checkMemberRoleWithUserAndPlaceId(user, placeId);
 
-        Member member = memberRepository.findByMemberIdAndPlace_PlaceId(memberId, placeId).orElseThrow(
-                () -> new NoSuchElementException("해당하는 맴버가 존재하지 않습니다."));
+        if(getMemberByUserAndPlace(user.getUserId(), placeId).getRole() != MemberRole.MANAGER){
+            throw new InvalidRoleException(INVALID_ROLE);
+        }
+
+        Member member = getMemberByMemberIdAndPlaceId(memberId,placeId);
+
         member.activate();
     }
 
-    private void checkMemberRoleWithUserAndPlaceId(User user, Long placeId) {
-        Member runner = memberRepository.findByUser_UserIdAndPlace_PlaceId(user.getUserId(), placeId)
-                .orElseThrow(() -> new NoSuchElementException("해당하는 맴버가 존재하지 않습니다."));
-        if (!runner.getRole().equals(MemberRole.MANAGER)) {
+    public void removeMember(User user, Long placeId, Long memberId) {
+
+        if(getMemberByUserAndPlace(user.getUserId(), placeId).getRole() != MemberRole.MANAGER){
             throw new InvalidRoleException(INVALID_ROLE);
         }
+        Member member = getMemberByMemberIdAndPlaceId(memberId,placeId);
+
+        memberRepository.delete(member);
+    }
+
+    public void exitPlace(User user, Long placeId, DeleteSelfFromPlaceRequest request) {
+        Member member = memberRepository.findByUser_UserIdAndPlace_PlaceId(user.getUserId(), placeId)
+                .orElseThrow(() -> new MemberNotFoundException(NO_SUCH_MEMBER));
+
+        if (member.getRole() == MemberRole.MANAGER) {
+            throw new InvalidRoleException(INVALID_ROLE);
+        }
+
+        memberRepository.delete(member);
+    }
+
+
+
+    private Member getMemberByUserAndPlace(Long userId, Long placeId) {
+        return memberRepository.findByUser_UserIdAndPlace_PlaceId(userId, placeId)
+                .orElseThrow(() -> new MemberNotFoundException(NO_SUCH_MEMBER));
+    }
+
+    private Member getMemberByMemberIdAndPlaceId(Long memberId, Long placeId){
+        return memberRepository.findByMemberIdAndPlace_PlaceId(memberId, placeId)
+                .orElseThrow(() -> new MemberNotFoundException(NO_SUCH_MEMBER));
     }
 
 

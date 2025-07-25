@@ -1,6 +1,7 @@
 package com.dangbun.domain.member.controller;
 
 import com.dangbun.domain.member.CheckPlaceMembership;
+import com.dangbun.domain.member.dto.request.DeleteSelfFromPlaceRequest;
 import com.dangbun.domain.member.dto.response.GetMembersResponse;
 import com.dangbun.domain.member.service.MemberService;
 import com.dangbun.domain.user.entity.User;
@@ -46,10 +47,12 @@ public class MemberController {
 
     @Operation(summary = "맴버 거절", description = "대기중인 맴버의 참가를 거절합니다.(매니저용)")
     @DeleteMapping("/{memberId}")
-    public ResponseEntity<?> removeMember(@PathVariable("placeId") Long placeId,
+    public ResponseEntity<?> removeMember(@AuthenticationPrincipal(expression = "user") User user,
+                                          @PathVariable("placeId") Long placeId,
                                           @PathVariable("memberId") Long memberId) {
 
-        return null;
+        memberService.removeMember(user, placeId, memberId);
+        return ResponseEntity.ok(BaseResponse.ok(null));
     }
 
     @Operation(summary = "맴버 정보 조회", description = "한 맴버에 대한 정보를 조회합니다.")
@@ -63,9 +66,10 @@ public class MemberController {
     @Operation(summary = "플레이스 나가기", description = "플레이스에서 나갑니다")
     @DeleteMapping("/me")
     public ResponseEntity<?> removeSelfFromPlace(@AuthenticationPrincipal(expression = "user") User user,
-                                                 @PathVariable("placeId") Long placeId) {
-
-        return null;
+                                                 @PathVariable("placeId") Long placeId,
+                                                 @RequestBody DeleteSelfFromPlaceRequest request) {
+        memberService.exitPlace(user, placeId, request);
+        return ResponseEntity.ok(BaseResponse.ok(null));
     }
 
 }
