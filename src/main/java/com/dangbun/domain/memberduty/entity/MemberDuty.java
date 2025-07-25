@@ -2,31 +2,35 @@ package com.dangbun.domain.memberduty.entity;
 import com.dangbun.domain.duty.entity.Duty;
 import com.dangbun.domain.duty.entity.DutyIcon;
 import com.dangbun.domain.member.entity.Member;
+import com.dangbun.domain.membercleaning.entity.MemberCleaningId;
 import com.dangbun.domain.place.entity.Place;
 import jakarta.persistence.*;
 import lombok.*;
 
 
 @Entity
+@Table(name="member_duty")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class MemberDuty {
     @EmbeddedId
     private MemberDutyId id;
 
-    @MapsId("dutyId") // 복합키 클래스의 필드명
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "duty_id", nullable = false)
-    private Duty duty;
-
     @MapsId("memberId")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id", nullable = false)
     private Member member;
 
+    @MapsId("dutyId") // 복합키 클래스의 필드명
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "duty_id", nullable = false)
+    private Duty duty;
+
+
     @Builder
-    public MemberDuty(Duty duty, Member member) {
-        this.duty = duty;
+    public MemberDuty(Member member, Duty duty) {
         this.member = member;
+        this.duty = duty;
+        this.id = new MemberDutyId(member.getMemberId(), duty.getDutyId());
     }
 }
