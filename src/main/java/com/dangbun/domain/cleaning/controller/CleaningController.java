@@ -1,18 +1,18 @@
 package com.dangbun.domain.cleaning.controller;
 
+import com.dangbun.domain.cleaning.dto.request.*;
 import com.dangbun.domain.cleaning.dto.response.*;
 import com.dangbun.domain.cleaning.response.status.CleaningExceptionResponse;
 import com.dangbun.domain.cleaning.service.CleaningService;
 import com.dangbun.global.docs.DocumentedApiErrors;
+import com.dangbun.global.response.BaseResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -36,14 +36,26 @@ public class CleaningController {
     }
 
     @Operation(summary = "특정 당번의 선택 멤버가 참여 중인 청소 목록 조회", description = "특정 당번 옆의 버튼을 누르면 전달된 memberIds 중 한명이라도 참여한 청소 목록을 필터링하여 반환합니다.")
+    @GetMapping("/duties/{dutyId}/cleanings")
     @DocumentedApiErrors(
             value = {CleaningExceptionResponse.class},
             includes = {"DUTY_NOT_FOUND"}
     )
-    @GetMapping("/duties/{dutyId}/cleanings")
     public ResponseEntity<List<GetCleaningDetailListResponse>> getCleaningDetailList(
             @PathVariable Long dutyId, @RequestParam List<Long> memberIds) {
         return ResponseEntity.ok(cleaningService.getCleaningDetailList(dutyId, memberIds));
     }
+
+    @Operation(summary = "당번별 청소 생성", description = "입력한 정보들을 바탕으로 새로운 청소를 생성합니다.")
+    @PostMapping("/cleanings")
+    @DocumentedApiErrors(
+            value = {CleaningExceptionResponse.class},
+            includes = {"DUTY_NOT_FOUND", "INVALID_DATE_FORMAT", "CLEANING_ALREADY_EXISTS"}
+    )
+    public ResponseEntity<BaseResponse<PostCleaningResponse>> createCleaning(@RequestBody @Valid PostCleaningRequest request) {
+
+        return ResponseEntity.ok(BaseResponse.ok(cleaningService.createCleaning(request)));
+    }
+
 
 }
