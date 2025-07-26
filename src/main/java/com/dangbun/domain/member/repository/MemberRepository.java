@@ -6,17 +6,16 @@ import com.dangbun.domain.user.entity.User;
 import io.lettuce.core.dynamic.annotation.Param;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.security.core.parameters.P;
 
 import java.util.List;
 import java.util.Optional;
 
 public interface MemberRepository extends JpaRepository<Member, Long> {
 
-    @Query("SELECT m FROM Member m JOIN FETCH m.place WHERE m.user.id = :userId")
+    @Query("SELECT m FROM Member m JOIN FETCH m.place WHERE m.user.userId = :userId")
     List<Member> findWithPlaceByUserId(Long userId);
 
-    @Query("select m from Member m join fetch m.place where m.user.id = :userId and m.place.placeId = :placeId")
+    @Query("select m from Member m join fetch m.place where m.user.userId = :userId and m.place.placeId = :placeId")
     Member findWithPlaceByUserIdAndPlaceId(Long userId, Long placeId);
 
     Optional<Member> findByPlaceAndUser(Place place, User user);
@@ -27,5 +26,19 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     Optional<Member> findFirstWithPlaceByInviteCode(@Param("inviteCode") String inviteCode);
 
     List<Member> findAllByNameIn(List<String> names);
+
+    List<Member> findByPlace_PlaceIdAndStatusIsTrue(Long placeId);
+
+    @Query("select count(m)>0 from Member m where m.user.userId = :userId and m.place.placeId = :placeId")
+    boolean existsByUserIdAndPlaceId(@Param("userId") Long userId, @Param("placeId") Long placeId);
+
+
+    Optional<Member> findByUser_UserIdAndPlace_PlaceId(Long userId, Long placePlaceId);
+
+    List<Member> findByPlace_PlaceIdAndStatusIsFalse(Long placeId);
+
+    Optional<Member> findByMemberIdAndPlace_PlaceId(Long memberId, Long placeId);
+
+    Optional<Member> findByMemberId(Long memberId);
 
 }

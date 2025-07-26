@@ -168,7 +168,7 @@ public class UserService {
         final String accessToken = tokenProvider.createAccessToken(user);
         final String refreshToken = tokenProvider.createRefreshToken(user);
 
-        tokenProvider.saveRefreshToken(user.getId(),refreshToken);
+        tokenProvider.saveRefreshToken(user.getUserId(),refreshToken);
 
         PostUserLoginResponse response = new PostUserLoginResponse(accessToken, refreshToken);
 

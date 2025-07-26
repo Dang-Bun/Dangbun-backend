@@ -3,13 +3,13 @@ package com.dangbun.domain.member.entity;
 import com.dangbun.domain.duty.entity.DutyIcon;
 import com.dangbun.domain.place.entity.Place;
 import com.dangbun.domain.user.entity.User;
+import com.dangbun.global.BaseEntity;
 import com.dangbun.global.converter.MapToJsonConverter;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.boot.context.properties.bind.DefaultValue;
 
 import java.util.Map;
 
@@ -17,7 +17,7 @@ import java.util.Map;
 @Table(name = "member")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Member {
+public class Member extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "member_id")
@@ -52,6 +52,10 @@ public class Member {
        this.information = information;
        this.place = place;
        this.user = user;
+    }
+
+    public void activate(){
+        this.status = true;
     }
 
 }

@@ -28,7 +28,7 @@ public class PlaceController {
     @Operation(summary = " 플레이스 목록 조회", description = "사용자의 모든 플레이스를 조회하기 위해 사용됩니다(플레이스 선택 화면)")
     @GetMapping()
     public ResponseEntity<?> getPlaces(@AuthenticationPrincipal(expression = "user") User user){
-        List<GetPlaceListResponse> places = placeService.getPlaces(user.getId());
+        List<GetPlaceListResponse> places = placeService.getPlaces(user.getUserId());
         return ResponseEntity.ok(BaseResponse.ok(places));
     }
 
@@ -37,7 +37,7 @@ public class PlaceController {
     public ResponseEntity<?> createPlace(@AuthenticationPrincipal(expression = "user") User user,
                                          @Valid @RequestBody PostCreatePlaceRequest request){
 
-        placeService.createPlaceWithManager(user.getId(), request);
+        placeService.createPlaceWithManager(user.getUserId(), request);
         return ResponseEntity.ok(BaseResponse.ok(null));
     }
 
@@ -45,7 +45,7 @@ public class PlaceController {
     @PostMapping("/{placeId}/invite-code")
     public ResponseEntity<?> createInviteCode(@AuthenticationPrincipal(expression = "user") User user,
                                               @PathVariable Long placeId){
-        PostCreateInviteCodeResponse data = placeService.createInviteCode(user.getId(), placeId);
+        PostCreateInviteCodeResponse data = placeService.createInviteCode(user.getUserId(), placeId);
         return ResponseEntity.ok(BaseResponse.ok(data));
     }
 
