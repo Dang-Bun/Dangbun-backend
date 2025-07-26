@@ -26,4 +26,6 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     @Query("select m from Member m join fetch m.place p where p.inviteCode = :inviteCode")
     Optional<Member> findFirstWithPlaceByInviteCode(@Param("inviteCode") String inviteCode);
 
+    List<Member> findAllByNameIn(List<String> names);
+
 }

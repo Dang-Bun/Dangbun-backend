@@ -16,4 +16,7 @@ public interface CleaningRepository extends JpaRepository<Cleaning, Long> {
     WHERE c.duty.dutyId = :dutyId AND mc.member.memberId IN :memberIds
     """)
     List<Cleaning> findByDutyIdAndMemberIds(Long dutyId, List<Long> memberIds);
+
+    boolean existsByNameAndDuty(String name, Duty duty);
+
 }
