@@ -13,6 +13,7 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
+@Table(name="member_cleaning")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class MemberCleaning {
     @EmbeddedId
