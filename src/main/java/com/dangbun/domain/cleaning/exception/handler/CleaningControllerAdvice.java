@@ -1,6 +1,8 @@
 package com.dangbun.domain.cleaning.exception.handler;
 
+import com.dangbun.domain.cleaning.exception.custom.CleaningAlreadyExistsException;
 import com.dangbun.domain.cleaning.exception.custom.DutyNotFoundException;
+import com.dangbun.domain.cleaning.exception.custom.InvalidDateFormatException;
 import com.dangbun.global.response.BaseErrorResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -18,4 +20,15 @@ public class CleaningControllerAdvice {
         return new BaseErrorResponse(DUTY_NOT_FOUND);
     }
 
+    @ExceptionHandler(InvalidDateFormatException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public BaseErrorResponse handleInvalidDateFormatException(InvalidDateFormatException e) {
+        return new BaseErrorResponse(INVALID_DATE_FORMAT);
+    }
+
+    @ExceptionHandler(CleaningAlreadyExistsException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public BaseErrorResponse handleCleaningAlreadyExistsException(CleaningAlreadyExistsException e) {
+        return new BaseErrorResponse(CLEANING_ALREADY_EXISTS);
+    }
 }

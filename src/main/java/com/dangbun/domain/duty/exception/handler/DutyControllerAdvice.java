@@ -33,6 +33,6 @@ public class DutyControllerAdvice {
     @ExceptionHandler(MemberNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public BaseErrorResponse handleMemberNotFoundException(MemberNotFoundException e) {
-        return new BaseErrorResponse(MEMBER_NOT_FOUND, e.getMessage());
+        return new BaseErrorResponse(MEMBER_NOT_FOUND);
     }
 }
