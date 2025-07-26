@@ -25,6 +25,8 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     @Query("select m from Member m join fetch m.place p where p.inviteCode = :inviteCode")
     Optional<Member> findFirstWithPlaceByInviteCode(@Param("inviteCode") String inviteCode);
 
+    List<Member> findAllByNameIn(List<String> names);
+
     List<Member> findByPlace_PlaceIdAndStatusIsTrue(Long placeId);
 
     @Query("select count(m)>0 from Member m where m.user.userId = :userId and m.place.placeId = :placeId")
@@ -38,4 +40,5 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     Optional<Member> findByMemberIdAndPlace_PlaceId(Long memberId, Long placeId);
 
     Optional<Member> findByMemberId(Long memberId);
+
 }

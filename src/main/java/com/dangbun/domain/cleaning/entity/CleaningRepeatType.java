@@ -5,7 +5,7 @@ import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
-enum CleaningRepeatType {
+public enum CleaningRepeatType {
     DAILY("매일"),
     WEEKLY("매주 요일마다"),
     MONTHLY_FIRST("매달 첫 날"),
