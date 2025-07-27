@@ -2,15 +2,12 @@ package com.dangbun.domain.member.service;
 
 import com.dangbun.domain.duty.entity.Duty;
 import com.dangbun.domain.duty.repository.DutyRepository;
-import com.dangbun.domain.member.dto.request.DeleteMemberRequest;
-import com.dangbun.domain.member.dto.request.DeleteSelfFromPlaceRequest;
-import com.dangbun.domain.member.dto.response.GetMemberResponse;
-import com.dangbun.domain.member.dto.response.GetMembersResponse;
-import com.dangbun.domain.member.dto.response.GetWaitingMembersResponse;
+import com.dangbun.domain.member.dto.request.*;
+import com.dangbun.domain.member.dto.response.*;
+
 import com.dangbun.domain.member.entity.Member;
 import com.dangbun.domain.member.entity.MemberRole;
-import com.dangbun.domain.member.exception.custom.InvalidRoleException;
-import com.dangbun.domain.member.exception.custom.MemberNotFoundException;
+import com.dangbun.domain.member.exception.custom.*;
 import com.dangbun.domain.member.repository.MemberRepository;
 import com.dangbun.domain.memberduty.entity.MemberDuty;
 import com.dangbun.domain.memberduty.repository.MemberDutyRepository;
@@ -139,6 +136,14 @@ public class MemberService {
                 .orElseThrow(() -> new MemberNotFoundException(NO_SUCH_MEMBER));
     }
 
+    public GetMemberSearchResponse searchByNameInPlace(User user, Long placeId, String name) {
+        if(getMemberByUserAndPlace(user.getUserId(), placeId).getRole() != MemberRole.MANAGER){
+            throw new InvalidRoleException(INVALID_ROLE);
+        }
 
+        return memberRepository.findByPlace_PlaceIdAndName(placeId, name)
+            .map(member -> GetMemberSearchResponse.of(member.getMemberId(), member.getName()))
+                    .orElse(GetMemberSearchResponse.of(null, null));
+    }
 
 }
