@@ -10,6 +10,8 @@ import com.dangbun.domain.duty.exception.custom.*;
 import com.dangbun.domain.duty.repository.DutyRepository;
 import com.dangbun.domain.member.entity.Member;
 import com.dangbun.domain.member.repository.MemberRepository;
+import com.dangbun.domain.membercleaning.entity.MemberCleaning;
+import com.dangbun.domain.membercleaning.repository.MemberCleaningRepository;
 import com.dangbun.domain.memberduty.entity.MemberDuty;
 import com.dangbun.domain.memberduty.repository.MemberDutyRepository;
 import com.dangbun.domain.place.entity.Place;
@@ -22,7 +24,6 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.dangbun.domain.duty.response.status.DutyExceptionResponse.*;
-import static java.util.stream.Collectors.toList;
 
 @Service
 @RequiredArgsConstructor
@@ -34,6 +35,7 @@ public class DutyService {
     private final CleaningRepository cleaningRepository;
     private final MemberRepository memberRepository;
     private final CleaningDateRepository cleaningDateRepository;
+    private final MemberCleaningRepository memberCleaningRepository;
 
     @Transactional
     public PostDutyCreateResponse createDuty(Long placeId, PostDutyCreateRequest request) {
@@ -202,5 +204,36 @@ public class DutyService {
         }
     }
 
+    @Transactional
+    public List<GetCleaningListResponse> getCleaningList(Long dutyId) {
+        Duty duty = dutyRepository.findById(dutyId)
+                .orElseThrow(() -> new DutyNotFoundException(DUTY_NOT_FOUND));
 
+        List<Cleaning> cleanings = cleaningRepository.findAllByDuty(duty);
+        int dutyMemberCount = memberDutyRepository.findMembersByDuty(duty).size();
+
+        return cleanings.stream()
+                .map(cleaning -> {
+                    List<MemberCleaning> mappings = memberCleaningRepository.findAllByCleaning(cleaning);
+                    List<Member> members = mappings.stream()
+                            .map(MemberCleaning::getMember)
+                            .toList();
+
+                    List<String> displayednames = members.stream()
+                            .map(Member::getName)
+                            .limit(2)
+                            .toList();
+
+                    boolean isCommon = members.size() == dutyMemberCount;
+
+                    return GetCleaningListResponse.of(
+                            cleaning.getCleaningId(),
+                            cleaning.getName(),
+                            displayednames,
+                            members.size(),
+                            isCommon
+                    );
+                })
+                .toList();
+    }
 }
