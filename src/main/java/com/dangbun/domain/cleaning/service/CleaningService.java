@@ -1,6 +1,7 @@
 package com.dangbun.domain.cleaning.service;
 
-import com.dangbun.domain.cleaning.dto.request.PostCleaningRequest;
+import com.dangbun.domain.cleaning.dto.request.PostCleaningCreateRequest;
+import com.dangbun.domain.cleaning.dto.request.PutCleaningUpdateRequest;
 import com.dangbun.domain.cleaning.dto.response.*;
 import com.dangbun.domain.cleaning.entity.Cleaning;
 
@@ -21,16 +22,9 @@ import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.time.DayOfWeek;
 import java.time.LocalDate;
-import java.time.YearMonth;
 import java.time.format.DateTimeParseException;
-import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 import static com.dangbun.domain.cleaning.entity.CleaningRepeatType.*;
 import static com.dangbun.domain.cleaning.response.status.CleaningExceptionResponse.*;
@@ -65,24 +59,22 @@ public class CleaningService {
 
         List<Cleaning> cleanings = (memberIds == null || memberIds.isEmpty())
                 ? cleaningRepository.findAllByDuty(duty)
-                : cleaningRepository.findByDutyIdAndMemberIds(dutyId, memberIds);
+                : cleaningRepository.findByDutyIdAndMemberIdsWithMembersJoin(dutyId, memberIds);
 
         return cleanings.stream()
                 .map(cleaning -> {
-                    List<Member> members = memberCleaningRepository.findMembersByCleaningId(cleaning.getCleaningId());
-                    List<String> names = members.stream()
-                            .map(Member::getName)
+                    List<String> names = cleaning.getMemberCleanings().stream()
+                            .map(mc -> mc.getMember().getName())
                             .toList();
 
                     List<String> displayed = names.stream().limit(2).toList();
-
-                    return GetCleaningDetailListResponse.of(cleaning.getName(), displayed, members.size());
+                    return GetCleaningDetailListResponse.of(cleaning.getName(), displayed, names.size());
                 })
                 .toList();
     }
 
     @Transactional()
-    public PostCleaningResponse createCleaning(PostCleaningRequest request) {
+    public PostCleaningResponse createCleaning(PostCleaningCreateRequest request) {
         Duty duty = null;
         if (request.dutyName() != null) {
             duty = dutyRepository.findByName(request.dutyName())
@@ -106,7 +98,6 @@ public class CleaningService {
                 .needPhoto(request.needPhoto())
                 .build();
 
-        cleaningRepository.save(cleaning);
 
         if (request.members() != null && !request.members().isEmpty()) {
             List<Member> members = memberRepository.findAllByNameIn((request.members()));
@@ -115,9 +106,11 @@ public class CleaningService {
                         .member(member)
                         .cleaning(cleaning)
                         .build();
-                memberCleaningRepository.save(mc);
+                cleaning.getMemberCleanings().add(mc);
             }
         }
+
+        cleaningRepository.save(cleaning);
 
         List<LocalDate> parsedDates = request.detailDates().stream()
                 .map(dateStr -> {
@@ -140,4 +133,57 @@ public class CleaningService {
 
         return PostCleaningResponse.of(cleaning.getCleaningId());
     }
+
+    @Transactional
+    public void updateCleaning(Long cleaningId, PutCleaningUpdateRequest request) {
+        Cleaning cleaning = cleaningRepository.findWithDutyNullableById(cleaningId)
+                .orElseThrow(() -> new CleaningNotFoundException(CLEANING_NOT_FOUND));
+
+        Duty duty = null;
+        if (request.dutyName() != null) {
+            duty = dutyRepository.findByName(request.dutyName())
+                    .orElseThrow(() -> new DutyNotFoundException(DUTY_NOT_FOUND));
+        }
+
+        if (cleaningRepository.existsByNameAndDutyAndCleaningIdNot(request.cleaningName(), duty, cleaningId)) {
+            throw new CleaningAlreadyExistsException(CLEANING_ALREADY_EXISTS);
+        }
+
+        cleaning.updateInfo(
+                request.cleaningName(),
+                request.needPhoto(),
+                request.repeatType(),
+                request.repeatType() == WEEKLY && request.repeatDays() != null
+                        ? String.join(",", request.repeatDays())
+                        : null,
+                duty
+        );
+        cleaning.updateMembers(memberRepository.findAllByNameIn(request.members()));
+        cleaningRepository.save(cleaning);
+
+
+        cleaningDateRepository.deleteAllByCleaning_CleaningId(cleaningId);
+
+        List<LocalDate> parsedDates = request.detailDates().stream()
+                .map(dateStr -> {
+                    try {
+                        return LocalDate.parse(dateStr);
+                    } catch (DateTimeParseException e) {
+                        throw new InvalidDateFormatException(INVALID_DATE_FORMAT);
+                    }
+                })
+                .toList();
+
+        List<CleaningDate> cleaningDates = parsedDates.stream()
+                .map(date -> CleaningDate.builder()
+                        .date(date)
+                        .cleaning(cleaning)
+                        .build())
+                .toList();
+
+        cleaningDateRepository.saveAll(cleaningDates);
+
+    }
+
+
 }
