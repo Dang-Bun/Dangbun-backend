@@ -1,12 +1,9 @@
 package com.dangbun.domain.duty.controller;
 
-import com.dangbun.domain.duty.dto.request.PostAddMembersRequest;
-import com.dangbun.domain.duty.dto.request.PostDutyCreateRequest;
-import com.dangbun.domain.duty.dto.request.PutDutyUpdateRequest;
+import com.dangbun.domain.duty.dto.request.*;
 import com.dangbun.domain.duty.dto.response.*;
 import com.dangbun.domain.duty.response.status.DutyExceptionResponse;
 import com.dangbun.domain.duty.service.DutyService;
-import com.dangbun.domain.user.response.status.UserExceptionResponse;
 import com.dangbun.global.docs.DocumentedApiErrors;
 import com.dangbun.global.response.BaseResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -99,5 +96,21 @@ public class DutyController {
     ) {
         return ResponseEntity.ok(BaseResponse.ok(dutyService.addMembers(dutyId, request)));
     }
+
+    @Operation(summary = "당번 역할 분담 (공통/랜덤/직접)")
+    @PatchMapping("/duties/{dutyId}/cleanings/members")
+    @DocumentedApiErrors(
+            value = {DutyExceptionResponse.class},
+            includes = {"DUTY_NOT_FOUND", "CLEANING_NOT_FOUND", "MEMBER_NOT_EXISTS"}
+    )
+    public ResponseEntity<BaseResponse<Void>> assignMember(
+            @PathVariable Long dutyId,
+            @RequestBody @Valid PatchAssignMemberRequest request
+    ) {
+        dutyService.assignMember(dutyId, request);
+        return ResponseEntity.ok(BaseResponse.ok(null));
+    }
+
+
 
 }
