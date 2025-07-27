@@ -118,7 +118,7 @@ public class DutyController {
             includes = {"DUTY_NOT_FOUND"}
     )
     @GetMapping("/duties/{dutyId}/cleanings")
-    public ResponseEntity<BaseResponse<List<GetCleaningListResponse>>> getCleaningList(
+    public ResponseEntity<BaseResponse<List<GetCleanigListResponse>>> getCleaningList(
             @PathVariable Long dutyId) {
         return ResponseEntity.ok(BaseResponse.ok(dutyService.getCleaningList(dutyId)));
     }
