@@ -1,6 +1,7 @@
 package com.dangbun.domain.cleaning.exception.handler;
 
 import com.dangbun.domain.cleaning.exception.custom.CleaningAlreadyExistsException;
+import com.dangbun.domain.cleaning.exception.custom.CleaningNotFoundException;
 import com.dangbun.domain.cleaning.exception.custom.DutyNotFoundException;
 import com.dangbun.domain.cleaning.exception.custom.InvalidDateFormatException;
 import com.dangbun.global.response.BaseErrorResponse;
@@ -30,5 +31,11 @@ public class CleaningControllerAdvice {
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public BaseErrorResponse handleCleaningAlreadyExistsException(CleaningAlreadyExistsException e) {
         return new BaseErrorResponse(CLEANING_ALREADY_EXISTS);
+    }
+
+    @ExceptionHandler(CleaningNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public BaseErrorResponse handleCleaningNotFoundException(CleaningNotFoundException e) {
+        return new BaseErrorResponse(CLEANING_NOT_FOUND);
     }
 }
