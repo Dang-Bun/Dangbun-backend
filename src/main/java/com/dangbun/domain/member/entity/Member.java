@@ -1,6 +1,7 @@
 package com.dangbun.domain.member.entity;
 
 import com.dangbun.domain.duty.entity.DutyIcon;
+import com.dangbun.domain.membercleaning.entity.MemberCleaning;
 import com.dangbun.domain.place.entity.Place;
 import com.dangbun.domain.user.entity.User;
 import com.dangbun.global.BaseEntity;
@@ -11,6 +12,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 @Entity
@@ -43,6 +46,10 @@ public class Member extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
+
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<MemberCleaning> memberCleanings = new ArrayList<>();
+
 
     @Builder
     public Member(MemberRole role,String name, Boolean status, Map information, Place place, User user) {

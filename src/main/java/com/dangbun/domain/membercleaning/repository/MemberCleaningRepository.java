@@ -19,11 +19,4 @@ public interface MemberCleaningRepository extends JpaRepository<MemberCleaning, 
     """)
     List<Duty> findDistinctDutiesByMemberIds(List<Long> memberIds);
 
-    @Query("""
-    SELECT mc.member FROM MemberCleaning mc
-    JOIN FETCH mc.member.user
-    WHERE mc.cleaning.cleaningId = :cleaningId
-    """)
-    List<Member> findMembersByCleaningId(Long cleaningId);
-
 }

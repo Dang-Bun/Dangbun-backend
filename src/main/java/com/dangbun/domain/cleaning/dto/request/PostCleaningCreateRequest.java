@@ -1,6 +1,5 @@
 package com.dangbun.domain.cleaning.dto.request;
 
-import com.dangbun.domain.cleaning.dto.response.GetCleaningDetailListResponse;
 import com.dangbun.domain.cleaning.entity.CleaningRepeatType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotEmpty;
@@ -8,7 +7,7 @@ import jakarta.validation.constraints.NotNull;
 
 import java.util.List;
 
-public record PostCleaningRequest (
+public record PostCleaningCreateRequest(
         @Schema(description = "청소 이름", example = "바닥 쓸기")
         @NotEmpty
         String cleaningName,

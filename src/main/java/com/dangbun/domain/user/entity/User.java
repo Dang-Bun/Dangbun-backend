@@ -13,7 +13,6 @@ import lombok.NoArgsConstructor;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
 @Table(name = "users")
 public class User extends BaseEntity {
 
@@ -32,7 +31,7 @@ public class User extends BaseEntity {
     @NotNull
     private String password;
 
-    private boolean enabled = true;
+    private Boolean enabled = true;
 
     public void updatePassword( String password) {
         this.password = password;
@@ -44,6 +43,14 @@ public class User extends BaseEntity {
 
     public void activate(){
         this.enabled = true;
+    }
+
+    @Builder
+    public User(String name, String email, String password, Boolean enabled) {
+        this.name = name;
+        this.email = email;
+        this.password = password;
+        this.enabled = enabled;
     }
 
 
