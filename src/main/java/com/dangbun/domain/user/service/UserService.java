@@ -105,7 +105,8 @@ public class UserService {
 
         String encodePassword = passwordEncoder.encode(rawPassword);
 
-        User user = User.builder().name(name)
+        User user = User.builder().
+                name(name)
                 .password(encodePassword)
                 .email(email)
                 .build();
