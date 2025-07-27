@@ -34,7 +34,6 @@ public class WebSecurityConfig {
                             "/users/logout"
                     ).authenticated()
                     .requestMatchers(
-                            "/",
                             "/users/**",
                             "/actuator/health",
                             "/duties/**",
