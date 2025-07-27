@@ -3,9 +3,12 @@ package com.dangbun.domain.member.controller;
 import com.dangbun.domain.member.CheckPlaceMembership;
 import com.dangbun.domain.member.dto.request.DeleteMemberRequest;
 import com.dangbun.domain.member.dto.request.DeleteSelfFromPlaceRequest;
+import com.dangbun.domain.member.dto.response.GetMemberSearchResponse;
 import com.dangbun.domain.member.dto.response.GetMembersResponse;
+import com.dangbun.domain.member.response.status.MemberExceptionResponse;
 import com.dangbun.domain.member.service.MemberService;
 import com.dangbun.domain.user.entity.User;
+import com.dangbun.global.docs.DocumentedApiErrors;
 import com.dangbun.global.response.BaseResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
@@ -81,6 +84,19 @@ public class MemberController {
                                           @RequestBody DeleteMemberRequest request){
         memberService.removeMember(user, placeId, memberId, request);
         return ResponseEntity.ok(BaseResponse.ok(null));
+    }
+
+    @Operation(summary = "당번에 멤버 추가 - 플레이스에 속한 멤버 검색", description = "해당 플레이스에서 이름이 정확히 일치하는 멤버를 검색합니다.")
+    @DocumentedApiErrors(
+            value = MemberExceptionResponse.class,
+            includes = {"INVALID_ROLE"}
+    )
+    @GetMapping("/search")
+    public ResponseEntity<BaseResponse<GetMemberSearchResponse>> searchMemberInPlace(
+            @AuthenticationPrincipal(expression = "user") User user,
+            @PathVariable("placeId") Long placeId,
+            @RequestParam String name) {
+        return ResponseEntity.ok(BaseResponse.ok(memberService.searchByNameInPlace(user, placeId, name)));
     }
 
 }
