@@ -1,8 +1,12 @@
 package com.dangbun.domain.duty.entity;
 
+import com.dangbun.domain.memberduty.entity.MemberDuty;
 import com.dangbun.domain.place.entity.Place;
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "duty")
@@ -24,6 +28,9 @@ public class Duty {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "place_id", nullable = false)
     private Place place;
+
+    @OneToMany(mappedBy = "duty", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<MemberDuty> memberDuties = new ArrayList<>();
 
     @Builder
     public Duty(String name, DutyIcon icon, Place place) {

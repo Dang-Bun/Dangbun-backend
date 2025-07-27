@@ -2,6 +2,7 @@ package com.dangbun.domain.member.entity;
 
 import com.dangbun.domain.duty.entity.DutyIcon;
 import com.dangbun.domain.membercleaning.entity.MemberCleaning;
+import com.dangbun.domain.memberduty.entity.MemberDuty;
 import com.dangbun.domain.place.entity.Place;
 import com.dangbun.domain.user.entity.User;
 import com.dangbun.global.BaseEntity;
@@ -50,6 +51,8 @@ public class Member extends BaseEntity {
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<MemberCleaning> memberCleanings = new ArrayList<>();
 
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<MemberDuty> memberDuties = new ArrayList<>();
 
     @Builder
     public Member(MemberRole role,String name, Boolean status, Map information, Place place, User user) {
