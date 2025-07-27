@@ -1,5 +1,6 @@
 package com.dangbun.domain.member.repository;
 
+import com.dangbun.domain.duty.entity.Duty;
 import com.dangbun.domain.member.entity.Member;
 import com.dangbun.domain.place.entity.Place;
 import com.dangbun.domain.user.entity.User;

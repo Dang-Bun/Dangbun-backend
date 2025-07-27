@@ -35,4 +35,16 @@ public class DutyControllerAdvice {
     public BaseErrorResponse handleMemberNotFoundException(MemberNotFoundException e) {
         return new BaseErrorResponse(MEMBER_NOT_FOUND);
     }
+
+    @ExceptionHandler(CleaningNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public BaseErrorResponse handleCleaningNotFoundException(CleaningNotFoundException e) {
+        return new BaseErrorResponse(CLEANING_NOT_FOUND);
+    }
+
+    @ExceptionHandler(MemberNotExistsException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public BaseErrorResponse handleMemberNotExistsException(MemberNotExistsException e) {
+        return new BaseErrorResponse(MEMBER_NOT_EXISTS);
+    }
 }

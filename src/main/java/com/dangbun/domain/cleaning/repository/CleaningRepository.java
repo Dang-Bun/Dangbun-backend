@@ -30,4 +30,9 @@ public interface CleaningRepository extends JpaRepository<Cleaning, Long> {
 
     @Query("SELECT c FROM Cleaning c LEFT JOIN FETCH c.duty WHERE c.cleaningId = :cleaningId")
     Optional<Cleaning> findWithDutyNullableById(Long cleaningId);
+
+    void deleteAllByDuty(Duty duty);
+
+    Optional<Cleaning> findByCleaningIdAndDuty_DutyId(Long cleaningId, Long dutyId);
+
 }

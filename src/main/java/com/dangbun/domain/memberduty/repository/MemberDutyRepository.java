@@ -18,4 +18,7 @@ public interface MemberDutyRepository extends JpaRepository<MemberDuty, MemberDu
 
     boolean existsByDutyAndMember(Duty duty, Member member);
 
+    @Query("SELECT md.member FROM MemberDuty md WHERE md.duty = :duty")
+    List<Member> findMembersByDuty(Duty duty);
+
 }
