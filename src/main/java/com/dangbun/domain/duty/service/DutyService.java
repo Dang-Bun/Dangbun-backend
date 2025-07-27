@@ -2,9 +2,8 @@ package com.dangbun.domain.duty.service;
 
 import com.dangbun.domain.cleaning.entity.Cleaning;
 import com.dangbun.domain.cleaning.repository.CleaningRepository;
-import com.dangbun.domain.duty.dto.request.PostAddMembersRequest;
-import com.dangbun.domain.duty.dto.request.PostDutyCreateRequest;
-import com.dangbun.domain.duty.dto.request.PutDutyUpdateRequest;
+import com.dangbun.domain.cleaningdate.repository.CleaningDateRepository;
+import com.dangbun.domain.duty.dto.request.*;
 import com.dangbun.domain.duty.dto.response.*;
 import com.dangbun.domain.duty.entity.Duty;
 import com.dangbun.domain.duty.exception.custom.*;
@@ -19,12 +18,11 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.dangbun.domain.duty.response.status.DutyExceptionResponse.*;
+import static java.util.stream.Collectors.toList;
 
 @Service
 @RequiredArgsConstructor
@@ -35,6 +33,7 @@ public class DutyService {
     private final MemberDutyRepository memberDutyRepository;
     private final CleaningRepository cleaningRepository;
     private final MemberRepository memberRepository;
+    private final CleaningDateRepository cleaningDateRepository;
 
     @Transactional
     public PostDutyCreateResponse createDuty(Long placeId, PostDutyCreateRequest request) {
@@ -83,6 +82,9 @@ public class DutyService {
         Duty duty = dutyRepository.findById(dutyId)
                 .orElseThrow(() -> new DutyNotFoundException(DUTY_NOT_FOUND));
 
+        List<Cleaning> cleanings = cleaningRepository.findAllByDuty(duty);
+        cleaningDateRepository.deleteAllByCleaningIn(cleanings);
+        cleaningRepository.deleteAllByDuty(duty);
         dutyRepository.delete(duty);
     }
 
@@ -154,5 +156,51 @@ public class DutyService {
 
         return PostAddMembersResponse.of(addedMemberIds);
     }
+
+    @Transactional
+    public void assignMember(Long dutyId, PatchAssignMemberRequest request) {
+        Duty duty = dutyRepository.findById(dutyId)
+                .orElseThrow(() -> new DutyNotFoundException(DUTY_NOT_FOUND));
+
+        List<Cleaning> cleanings = cleaningRepository.findAllByDuty(duty);
+        List<Member> allMembers = memberDutyRepository.findMembersByDuty(duty);
+
+        switch (request.assignType()) {
+
+            case CUSTOM -> {
+                Cleaning cleaning = cleaningRepository.findByCleaningIdAndDuty_DutyId(request.cleaningId(), dutyId)
+                        .orElseThrow(() -> new CleaningNotFoundException(CLEANING_NOT_FOUND));
+
+                List<Member> selectedMembers = memberRepository.findAllById(request.memberIds());
+                cleaning.updateMembers(selectedMembers);
+                cleaningRepository.save(cleaning);
+            }
+
+            case COMMON -> {
+                if (allMembers.isEmpty()) {
+                    throw new MemberNotExistsException(MEMBER_NOT_EXISTS);
+                }
+                for (Cleaning cleaning : cleanings) {
+                    cleaning.updateMembers(allMembers);
+                }
+                cleaningRepository.saveAll(cleanings);
+            }
+
+            case RANDOM -> {
+                Random random = new Random();
+                for (Cleaning cleaning : cleanings) {
+
+                    List<Member> shuffled = new ArrayList<>(allMembers);
+                    Collections.shuffle(shuffled, random);
+                    List<Member> assigned = shuffled.stream()
+                            .limit(request.assignCount())
+                            .toList();
+                    cleaning.updateMembers(assigned);
+                }
+                cleaningRepository.saveAll(cleanings);
+            }
+        }
+    }
+
 
 }
