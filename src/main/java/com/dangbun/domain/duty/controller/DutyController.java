@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-import static com.dangbun.domain.duty.response.status.DutyExceptionResponse.PLACE_NOT_FOUND;
+
 
 @Validated
 @Tag(name = "Duty", description = "DutyController - 당번 관련 API")
@@ -97,7 +97,7 @@ public class DutyController {
         return ResponseEntity.ok(BaseResponse.ok(dutyService.addMembers(dutyId, request)));
     }
 
-    @Operation(summary = "당번 역할 분담 (공통/랜덤/직접)")
+    @Operation(summary = "당번 역할 분담 (공통/랜덤/직접)", description = "해당 당번에 해당하는 청소에 멤버를 지정합니다.")
     @PatchMapping("/duties/{dutyId}/cleanings/members")
     @DocumentedApiErrors(
             value = {DutyExceptionResponse.class},
@@ -109,6 +109,18 @@ public class DutyController {
     ) {
         dutyService.assignMember(dutyId, request);
         return ResponseEntity.ok(BaseResponse.ok(null));
+    }
+
+
+    @Operation(summary = "당번 역할 분담 - 청소 목록 조회", description = "해당 당번에 해당하는 청소 목록을 조회합니다.")
+    @DocumentedApiErrors(
+            value = {DutyExceptionResponse.class},
+            includes = {"DUTY_NOT_FOUND"}
+    )
+    @GetMapping("/duties/{dutyId}/cleanings")
+    public ResponseEntity<BaseResponse<List<GetCleanigListResponse>>> getCleaningList(
+            @PathVariable Long dutyId) {
+        return ResponseEntity.ok(BaseResponse.ok(dutyService.getCleaningList(dutyId)));
     }
 
 

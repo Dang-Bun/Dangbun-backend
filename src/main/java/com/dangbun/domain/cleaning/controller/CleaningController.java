@@ -36,7 +36,7 @@ public class CleaningController {
     }
 
     @Operation(summary = "특정 당번의 선택 멤버가 참여 중인 청소 목록 조회", description = "특정 당번 옆의 버튼을 누르면 전달된 memberIds 중 한명이라도 참여한 청소 목록을 필터링하여 반환합니다.")
-    @GetMapping("/duties/{dutyId}/cleanings")
+    @GetMapping("/duties/{dutyId}/cleanings/filter-by-members")
     @DocumentedApiErrors(
             value = {CleaningExceptionResponse.class},
             includes = {"DUTY_NOT_FOUND"}
