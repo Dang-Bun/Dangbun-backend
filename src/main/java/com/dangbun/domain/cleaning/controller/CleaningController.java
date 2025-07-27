@@ -52,10 +52,25 @@ public class CleaningController {
             value = {CleaningExceptionResponse.class},
             includes = {"DUTY_NOT_FOUND", "INVALID_DATE_FORMAT", "CLEANING_ALREADY_EXISTS"}
     )
-    public ResponseEntity<BaseResponse<PostCleaningResponse>> createCleaning(@RequestBody @Valid PostCleaningRequest request) {
+    public ResponseEntity<BaseResponse<PostCleaningResponse>> createCleaning(@RequestBody @Valid PostCleaningCreateRequest request) {
 
         return ResponseEntity.ok(BaseResponse.ok(cleaningService.createCleaning(request)));
     }
+
+    @Operation(summary = "당번별 청소 수정", description = "입력한 정보들을 바탕으로 청소를 수정합니다.")
+    @DocumentedApiErrors(
+            value = {CleaningExceptionResponse.class},
+            includes = {"CLEANING_NOT_FOUND", "DUTY_NOT_FOUND", "INVALID_DATE_FORMAT", "CLEANING_ALREADY_EXISTS"}
+    )
+    @PutMapping("/cleanings/{cleaningId}")
+    public ResponseEntity<BaseResponse<Void>> updateCleaning(
+            @PathVariable Long cleaningId,
+            @Valid @RequestBody PutCleaningUpdateRequest request
+    ) {
+        cleaningService.updateCleaning(cleaningId, request);
+        return ResponseEntity.ok(BaseResponse.ok(null));
+    }
+
 
 
 }
