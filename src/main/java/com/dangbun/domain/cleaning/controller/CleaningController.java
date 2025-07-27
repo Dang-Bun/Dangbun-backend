@@ -71,6 +71,16 @@ public class CleaningController {
         return ResponseEntity.ok(BaseResponse.ok(null));
     }
 
+    @Operation(summary = "청소 삭제", description = "청소 항목을 삭제합니다.")
+    @DocumentedApiErrors(
+            value = {CleaningExceptionResponse.class},
+            includes = {"CLEANING_NOT_FOUND"}
+    )
+    @DeleteMapping("/cleanings/{cleaningId}")
+    public ResponseEntity<BaseResponse<Void>> deleteCleaning(@PathVariable Long cleaningId) {
+        cleaningService.deleteCleaning(cleaningId);
+        return ResponseEntity.ok(BaseResponse.ok(null));
+    }
 
 
 }
