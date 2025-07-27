@@ -40,7 +40,6 @@ public class CleaningService {
     private final CleaningDateRepository cleaningDateRepository;
 
 
-    @Transactional()
     public List<GetCleaningListResponse> getCleaningList(List<Long> memberIds) {
         List<Duty> duties = (memberIds == null || memberIds.isEmpty())
                 ? dutyRepository.findAll()
@@ -51,7 +50,6 @@ public class CleaningService {
                 .toList();
     }
 
-    @Transactional()
     public List<GetCleaningDetailListResponse> getCleaningDetailList(Long dutyId, List<Long> memberIds) {
 
         Duty duty = dutyRepository.findById(dutyId)
@@ -183,6 +181,17 @@ public class CleaningService {
 
         cleaningDateRepository.saveAll(cleaningDates);
 
+    }
+
+
+    @Transactional
+    public void deleteCleaning(Long cleaningId) {
+        Cleaning cleaning = cleaningRepository.findById(cleaningId)
+                .orElseThrow(() -> new DutyNotFoundException(DUTY_NOT_FOUND));
+
+        cleaningDateRepository.deleteAllByCleaning_CleaningId(cleaningId);
+
+        cleaningRepository.delete(cleaning);
     }
 
 
