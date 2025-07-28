@@ -2,12 +2,14 @@ package com.dangbun.global.exception.handler;
 
 
 import com.dangbun.global.exception.BadRequestException;
+import com.dangbun.global.exception.InvalidRefreshJWTException;
 import com.dangbun.global.response.BaseErrorResponse;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.TypeMismatchException;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
+import org.springframework.expression.spel.SpelEvaluationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
@@ -15,8 +17,6 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.NoHandlerFoundException;
-
-import java.util.Objects;
 
 import static com.dangbun.global.response.status.BaseExceptionResponse.*;
 
@@ -62,5 +62,13 @@ public class GlobalControllerAdvice {
     @ExceptionHandler(ConstraintViolationException.class)
     public BaseErrorResponse handleConstraintViolation(Exception e) {
         return new BaseErrorResponse(REQUIRED_FIELD_MISSING);
+    }
+
+    // 런타임 시 표현식 구문 오류, 변수 또는 속성 접근 실패 시 발생
+    // (@AuthenticationPrincipal(expression="user")에서 토큰 만료 시 발생 가능
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    @ExceptionHandler(SpelEvaluationException.class)
+    public void handleSpelEvaluation(Exception e){
+        log.error("[handle_SpelEvaluationException]",e);
     }
 }

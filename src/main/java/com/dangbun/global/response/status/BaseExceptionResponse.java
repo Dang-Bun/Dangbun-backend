@@ -10,8 +10,9 @@ public enum BaseExceptionResponse implements ResponseStatus {
     NOT_FOUND(40400, "존재하지 않는 API입니다."),
     INTERNAL_SERVER_ERROR(50000, "서버 내부 오류입니다."),
 
-    REQUIRED_FIELD_MISSING(10000, "필수 입력값이 누락되었습니다.")
-    ;
+    REQUIRED_FIELD_MISSING(10000, "필수 입력값이 누락되었습니다."),
+    INVALID_JWT(40001,"유효하지 않은 JWT입니다."),
+    INVALID_REFRESH_TOKEN(40002,"REFRESH TOKEN이 유효하지 않습니다.");
 
     private final int code;
     private final String message;
