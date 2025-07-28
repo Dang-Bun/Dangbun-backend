@@ -3,6 +3,7 @@ package com.dangbun.global.security;
 import com.dangbun.domain.user.entity.CustomUserDetails;
 import com.dangbun.domain.user.entity.User;
 import com.dangbun.domain.user.repository.UserRepository;
+import com.dangbun.global.exception.InvalidRefreshJWTException;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
@@ -26,6 +27,8 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 import java.util.Arrays;
 
+import static com.dangbun.global.response.status.BaseExceptionResponse.*;
+
 
 @Component
 @Slf4j
@@ -46,11 +49,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             if (token != null && !token.equalsIgnoreCase("null")) {
                 authenticate(request, response, token);
             }
-
+            filterChain.doFilter(request, response);
         } catch (RuntimeException e) {
             logger.error(e);
         }
-        filterChain.doFilter(request, response);
     }
 
     private void authenticate(HttpServletRequest request, HttpServletResponse response, String accessToken) {
@@ -71,21 +73,19 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             expiredCookie.setHttpOnly(true);
             response.addCookie(expiredCookie);
 
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             response.setContentType("application/json;charset=UTF-8");
             try {
-                response.getWriter().write("{\"code\":\"TOKEN_EXPIRED\",\"message\":\"토큰이 만료되었습니다. 다시 로그인해주세요.\"}");
+                response.getWriter().write("{\"code\":"+INVALID_JWT.getCode()+",\"message\":\"토큰이 만료되었습니다. 다시 로그인해주세요.\"}");
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
-
             refreshAuthentication(request, response);
 
             return;
         }
     }
 
-    private void refreshAuthentication(HttpServletRequest request, HttpServletResponse response) {
+    private void  refreshAuthentication(HttpServletRequest request, HttpServletResponse response)  {
         try {
             String refreshToken = getRefreshToken(request);
             Claims claims = tokenProvider.parseClaims(refreshToken);
@@ -111,6 +111,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
             SecurityContextHolder.clearContext();
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            throw new InvalidRefreshJWTException(INVALID_REFRESH_TOKEN);
         }
     }
 
