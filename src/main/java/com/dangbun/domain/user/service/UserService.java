@@ -63,7 +63,7 @@ public class UserService {
             emailService.sendEmail(toEmail, title, certCode);
             redisService.setValues(CERT_CODE_PREFIX + toEmail, certCode, Duration.ofMillis(this.authCodeExpirationMillis));
         }else{
-            throw new RuntimeException("email already exist");
+            throw new ExistEmailException(EXIST_EMAIL);
         }
     }
 
@@ -151,7 +151,6 @@ public class UserService {
             userRepository.save(user);
             return;
         }
-
         throw new InvalidEmailException(INVALID_EMAIL);
     }
 
