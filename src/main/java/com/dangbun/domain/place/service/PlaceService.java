@@ -25,7 +25,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.security.SecureRandom;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -50,19 +49,12 @@ public class PlaceService {
     private static final SecureRandom RANDOM = new SecureRandom();
 
     @Transactional(readOnly = true)
-    public List<GetPlaceListResponse> getPlaces(Long userId) {
+    public GetPlaceListResponse getPlaces(Long userId) {
 
+        // Todo totalCleaning, endCleaning, notification 로직 처리
         List<Member> members = memberRepository.findWithPlaceByUserId(userId);
-        List<GetPlaceListResponse> result = new ArrayList<>();
-        for (Member member : members) {
-            Place place = member.getPlace();
-            Long placeId = place.getPlaceId();
-            String name = place.getName();
-            String role = member.getRole().getDisplayName();
-            // Todo cleaning과 알림창과의 연동 필요
-            result.add(new GetPlaceListResponse(placeId, name, 0, 0, role, 0));
-        }
-        return result;
+
+        return GetPlaceListResponse.of(members);
     }
 
     public void createPlaceWithManager(Long userId, PostCreatePlaceRequest request) {
@@ -70,12 +62,9 @@ public class PlaceService {
         
         String placeName = request.placeName();
         String category = request.category();
-        String memberName = request.memberName();
+        String memberName = request.managerName();
         Map<String, String> info = request.information();
 
-        System.out.println("placeName = " + placeName);
-        System.out.println("memberName = " + memberName);
-        System.out.println("info = " + info);
         Place place = Place.builder()
                 .name(placeName)
                 .category(PlaceCategory.findCategory(category))
@@ -138,7 +127,7 @@ public class PlaceService {
 
 
         Member tempMember = memberRepository.findFirstWithPlaceByInviteCode(request.inviteCode())
-                .orElseThrow(()->new EntityNotFoundException("Invalid Invite Code"));
+                .orElseThrow(()->new InvalidInviteCodeException(NO_SUCH_INVITE));
 
         Place place = tempMember.getPlace();
 
