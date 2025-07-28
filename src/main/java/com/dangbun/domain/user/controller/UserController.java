@@ -1,6 +1,7 @@
 package com.dangbun.domain.user.controller;
 
 import com.dangbun.domain.user.dto.request.*;
+import com.dangbun.domain.user.dto.response.PostUserLoginResponse;
 import com.dangbun.domain.user.entity.CustomUserDetails;
 import com.dangbun.domain.user.response.status.UserExceptionResponse;
 import com.dangbun.domain.user.service.UserService;
@@ -32,7 +33,7 @@ public class UserController {
             value = {UserExceptionResponse.class},
             includes = {"EXIST_EMAIL"}
     )
-    public ResponseEntity<?> generateAuthCode(@RequestBody PostUserCertCodeRequest request) {
+    public ResponseEntity<BaseResponse<?>> generateAuthCode(@RequestBody PostUserCertCodeRequest request) {
         String email = request.email();
         userService.sendAuthCode(email);
         return ResponseEntity.ok(BaseResponse.ok(null));
@@ -43,7 +44,7 @@ public class UserController {
             value = {UserExceptionResponse.class},
             includes = {"EXIST_EMAIL","INVALID_PASSWORD"}
     )
-    public ResponseEntity<?> signUp(@RequestBody PostUserSignUpRequest request) {
+    public ResponseEntity<BaseResponse<?>> signUp(@RequestBody PostUserSignUpRequest request) {
         userService.signup(request);
         return ResponseEntity.ok(BaseResponse.ok(null));
     }
@@ -51,11 +52,10 @@ public class UserController {
     @PostMapping("/login")
     @DocumentedApiErrors(
             value = {UserExceptionResponse.class},
-            includes = {"INVALID_PASSWORD"}
+            includes = {"NO_SUCH_USER","INVALID_PASSWORD"}
     )
-    public ResponseEntity<?> login(@RequestBody PostUserLoginRequest request) {
-        BaseResponse<?> response = userService.login(request);
-        return ResponseEntity.ok(response);
+    public ResponseEntity<BaseResponse<PostUserLoginResponse>> login(@RequestBody PostUserLoginRequest request) {
+        return ResponseEntity.ok(BaseResponse.ok(userService.login(request)));
     }
 
 
@@ -64,7 +64,7 @@ public class UserController {
             value = {},
             includes = {""}
     )
-    public ResponseEntity<?> logout(@RequestHeader("Authorization") String bearerToken) {
+    public ResponseEntity<BaseResponse<?>> logout(@RequestHeader("Authorization") String bearerToken) {
         userService.logout(bearerToken);
         return ResponseEntity.ok(BaseResponse.ok(null));
 
@@ -87,7 +87,7 @@ public class UserController {
             value = {UserExceptionResponse.class},
             includes = {"INVALID_PASSWORD"}
     )
-    public ResponseEntity<?> deleteCurrentUser(@AuthenticationPrincipal CustomUserDetails customUser,
+    public ResponseEntity<BaseResponse<?>> deleteCurrentUser(@AuthenticationPrincipal CustomUserDetails customUser,
                                                              @RequestBody DeleteUserAccountRequest request) {
         userService.deleteCurrentUser(customUser, request);
         return ResponseEntity.ok(BaseResponse.ok(null));

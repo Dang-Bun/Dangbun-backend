@@ -154,7 +154,7 @@ public class UserService {
         throw new InvalidEmailException(INVALID_EMAIL);
     }
 
-    public BaseResponse<?> login(@Valid PostUserLoginRequest request) {
+    public PostUserLoginResponse login(@Valid PostUserLoginRequest request) {
 
 
         User user = userRepository.findByEmail(request.email())
@@ -172,7 +172,7 @@ public class UserService {
 
         PostUserLoginResponse response = new PostUserLoginResponse(accessToken, refreshToken);
 
-        return BaseResponse.ok(response);
+        return response;
     }
 
     public void logout(String bearerToken) {
