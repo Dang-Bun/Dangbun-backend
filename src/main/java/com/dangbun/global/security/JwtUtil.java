@@ -13,7 +13,7 @@ import java.util.Date;
 
 @Component
 public class JwtUtil {
-    public final static Long TOKEN_VALIDATION_MS = 1000L * 60 * 15;
+    public final static Long TOKEN_VALIDATION_MS = 1000L * 60 * 60 * 24 * 15;
     public final static Long REFRESH_VALIDATION_MS = 1000L * 60 * 60 * 24 * 15;
 
     @Value("${jwt.secret}")
