@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 public record GetMembersResponse (
-        @Schema(description = "맴버", example = "매니저, 김철수, 탕비실 청소 당번") List<MemberDto> members
+        @Schema(description = "맴버 리스트") List<MemberDto> members
 ){
     public static GetMembersResponse of(Map<Member,List<String>> memberMap){
         List<MemberDto> memberDtos = memberMap.entrySet().stream()
@@ -21,10 +21,15 @@ public record GetMembersResponse (
         return new GetMembersResponse(memberDtos);
     }
 
+    @Schema(name = "GetMembersResponse.MemberDto", description = "맴버 DTO")
     public record MemberDto(
+            @Schema(description = "맴버 ID", example = "1")
             Long memberId,
+            @Schema(description = "맴버 역할", example = "MEMBER")
             String role,
+            @Schema(description = "맴버 이름", example = "홍길동")
             String name,
+            @Schema(description = "당번 이름", example = "[\"화장실 청소\", \"바닥 청소\"]")
             List<String> dutyName
     ){}
 

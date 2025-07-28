@@ -117,7 +117,7 @@ public class MemberService {
                 .orElseThrow(()-> new MemberNotFoundException(NO_SUCH_MEMBER));
 
         if(!member.getName().equals(request.memberName())){
-            throw new RequestRejectedException("삭제하고자 하는 맴버와 이름이 일치하지 않습니다");
+            throw new NameNotMatchedException(NAME_NOT_MATCHED);
         }
 
         List<MemberDuty> memberDuties = memberDutyRepository.findAllByMember(member);
