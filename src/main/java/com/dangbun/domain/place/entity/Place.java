@@ -8,6 +8,8 @@ import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 
 @Entity
@@ -35,6 +37,12 @@ public class Place extends BaseEntity {
 
     @Column(name = "invite_code")
     private String inviteCode;
+
+    @Column(name = "start_time")
+    private LocalTime startTime = LocalTime.MIDNIGHT;
+
+    @Column(name = "end_time")
+    private LocalTime endTime = LocalTime.MAX;
 
     @Builder
     public Place(String name, PlaceCategory category) {

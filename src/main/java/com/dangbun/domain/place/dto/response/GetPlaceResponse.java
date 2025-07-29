@@ -1,0 +1,118 @@
+package com.dangbun.domain.place.dto.response;
+
+import com.dangbun.domain.checkList.entity.CheckList;
+import com.dangbun.domain.cleaning.entity.Cleaning;
+import com.dangbun.domain.member.entity.Member;
+import com.dangbun.domain.membercleaning.entity.MemberCleaning;
+import com.dangbun.domain.memberduty.entity.MemberDuty;
+import com.dangbun.domain.place.entity.Place;
+import com.dangbun.domain.user.entity.User;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import io.swagger.v3.oas.annotations.media.Schema;
+
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+public record GetPlaceResponse(
+        @Schema(description = "본인 맴버 ID", example = "1")
+        Long memberId,
+        @Schema(description = "플레이스 이름", example = "메가박스")
+        String placeName,
+
+        @Schema(description = "청소 마감 시간", example = "23:59")
+        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm")
+        LocalTime endTime,
+
+        @Schema(description = "당번 리스트")
+        List<DutyDto> duties
+) {
+
+    public static GetPlaceResponse of(User user, Place place, Map<MemberDuty, List<CheckList>> cleaningMap, List<MemberCleaning> memberCleanings) {
+
+        MemberDuty memberDuty = cleaningMap.keySet().stream().filter(md -> md.getMember().getUser().getUserId().equals(user.getUserId()))
+                .findAny().orElseThrow(() -> new RuntimeException("GetPlaceResponse 에러"));
+
+        Long memberId = memberDuty.getMember().getMemberId();
+        String placeName = place.getName();
+        LocalTime endTime = place.getEndTime();
+
+        List<DutyDto> duties = new ArrayList<>();
+        for (Map.Entry<MemberDuty, List<CheckList>> mdc : cleaningMap.entrySet()) {
+            MemberDuty md = mdc.getKey();
+            List<CleaningDto> cleanings = new ArrayList<>();
+            for (CheckList checkList : mdc.getValue()) {
+
+                Cleaning cleaning = checkList.getCleaning();
+
+                List<Member> members = new ArrayList<>();
+                for(MemberCleaning mc : memberCleanings){
+                    if(mc.getCleaning().equals(cleaning)){
+                        members.add(mc.getMember());
+                    }
+                }
+                cleanings.add(CleaningDto.of(checkList, members));
+            }
+
+            duties.add(DutyDto.of(md.getDuty().getName(), cleanings));
+        }
+
+        return new GetPlaceResponse(memberId, placeName,endTime, duties);
+    }
+
+
+    @Schema(name = "GetPlaceResponse.DutyDto", description = "당번 DTO")
+    public record DutyDto(
+            @Schema(description = "당번 이름", example = "로비 청소")
+            String dutyName,
+
+            @Schema(description = "청소 리스트")
+            List<CleaningDto> checkLists
+    ) {
+        public static DutyDto of(String dutyName, List<CleaningDto> cleanings){
+            return new DutyDto(dutyName,cleanings);
+        }
+    }
+
+    @Schema(name = "GetPlaceResponse.CleaningDto", description = "청소 DTO")
+    public record CleaningDto(
+            @Schema(description = "체크리스트 ID", example = "1")
+            Long checkListId,
+
+            @Schema(description = "청소 담당 맴버")
+            List<MemberDto> members,
+
+            @Schema(description = "청소 이름", example = "복도 바닥 쓸기")
+            String cleaningName,
+
+            @Schema(description = "청소 완료 시간(null일 시 미완료)", example = "23:47")
+            @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm")
+            LocalDateTime completeTime,
+
+            @Schema(description = "사진 필요 여부", example = "false")
+            Boolean needPhoto
+
+    ) {
+        public static CleaningDto of(CheckList checkList, List<Member> members){
+
+            List<MemberDto> memberDtos = members.stream()
+                    .map(MemberDto::of).toList();
+            return new CleaningDto(checkList.getCheckListId(), memberDtos ,checkList.getCleaning().getName(),null,checkList.getCleaning().getNeedPhoto());
+        }
+    }
+
+    @Schema(name = "GetPlaceResponse.MemberDto", description = "맴버 DTO")
+    public record MemberDto(
+            @Schema(description = "청소 담당 맴버 ID", example = "1")
+            Long memberId,
+
+            @Schema(description = "청소 담당 맴버 이름", example = "맴버 A")
+            String memberName
+    ) {
+        public static MemberDto of(Member member){
+            return new MemberDto(member.getMemberId(), member.getName());
+        }
+    }
+}

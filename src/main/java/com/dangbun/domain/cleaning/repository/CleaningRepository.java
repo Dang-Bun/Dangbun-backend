@@ -35,4 +35,5 @@ public interface CleaningRepository extends JpaRepository<Cleaning, Long> {
 
     Optional<Cleaning> findByCleaningIdAndDuty_DutyId(Long cleaningId, Long dutyId);
 
+    List<Cleaning> findByDuty_DutyId(Long dutyId);
 }

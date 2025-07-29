@@ -1,11 +1,11 @@
 package com.dangbun.domain.place.controller;
 
-import com.dangbun.domain.member.exception.custom.InvalidRoleException;
 import com.dangbun.domain.member.response.status.MemberExceptionResponse;
 import com.dangbun.domain.place.dto.request.PostCheckInviteCodeRequest;
 import com.dangbun.domain.place.dto.request.PostCreatePlaceRequest;
 import com.dangbun.domain.place.dto.request.PostRegisterPlaceRequest;
 import com.dangbun.domain.place.dto.response.GetPlaceListResponse;
+import com.dangbun.domain.place.dto.response.GetPlaceResponse;
 import com.dangbun.domain.place.dto.response.PostCheckInviteCodeResponse;
 import com.dangbun.domain.place.dto.response.PostCreateInviteCodeResponse;
 import com.dangbun.domain.place.response.status.PlaceExceptionResponse;
@@ -16,15 +16,16 @@ import com.dangbun.global.docs.DocumentedApiErrors;
 import com.dangbun.global.response.BaseResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
+@Validated
 @RequestMapping("/places")
 @Tag(name = "Place", description = "PlaceController - 플레이스 관련 API")
 @RequiredArgsConstructor
@@ -49,7 +50,7 @@ public class PlaceController {
     )
     @PostMapping
     public ResponseEntity<BaseResponse<?>> createPlace(@AuthenticationPrincipal(expression = "user") User user,
-                                         @Valid @RequestBody PostCreatePlaceRequest request){
+                                                       @RequestBody PostCreatePlaceRequest request){
 
         placeService.createPlaceWithManager(user.getUserId(), request);
         return ResponseEntity.ok(BaseResponse.ok(null));
@@ -58,7 +59,7 @@ public class PlaceController {
     @Operation(summary = "참여코드 생성", description = "플레이스의 참여코드를 생성합니다.")
     @DocumentedApiErrors(
             value = {MemberExceptionResponse.class},
-            includes = {"INVALID_ROLE"}
+            includes = {"INVALID_ROLE","NO_SUCH_MEMBER"}
     )
     @PostMapping("/{placeId}/invite-code")
     public ResponseEntity<BaseResponse<PostCreateInviteCodeResponse>> createInviteCode(@AuthenticationPrincipal(expression = "user") User user,
@@ -88,9 +89,20 @@ public class PlaceController {
     )
     @PostMapping("/join-requests")
     public ResponseEntity<BaseResponse<?>> registerPlace(@AuthenticationPrincipal(expression = "user") User user,
-                                           @RequestBody PostRegisterPlaceRequest request){
+                                                         @RequestBody PostRegisterPlaceRequest request){
 
         placeService.joinRequest(user, request);
         return ResponseEntity.ok(BaseResponse.ok(null));
+    }
+
+    @Operation(summary = "플레이스 조회", description = "플레이스를 조회합니다(홈화면)")
+    @DocumentedApiErrors(
+            value = {MemberExceptionResponse.class},
+            includes = {"NO_SUCH_MEMBER"}
+    )
+    @GetMapping("/{placeId}")
+    public ResponseEntity<BaseResponse<GetPlaceResponse>> getPlace(@AuthenticationPrincipal(expression = "user") User user,
+                                                                   @PathVariable Long placeId){
+        return ResponseEntity.ok(BaseResponse.ok(placeService.getPlace(user, placeId)));
     }
 }

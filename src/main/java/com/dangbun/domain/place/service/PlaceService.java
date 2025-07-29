@@ -1,13 +1,24 @@
 package com.dangbun.domain.place.service;
 
+import com.dangbun.domain.checkList.entity.CheckList;
+import com.dangbun.domain.checkList.repository.CheckListRepository;
+import com.dangbun.domain.cleaning.entity.Cleaning;
+import com.dangbun.domain.cleaning.repository.CleaningRepository;
+import com.dangbun.domain.duty.repository.DutyRepository;
 import com.dangbun.domain.member.entity.Member;
 import com.dangbun.domain.member.entity.MemberRole;
 import com.dangbun.domain.member.exception.custom.InvalidRoleException;
+import com.dangbun.domain.member.exception.custom.MemberNotFoundException;
 import com.dangbun.domain.member.repository.MemberRepository;
+import com.dangbun.domain.membercleaning.entity.MemberCleaning;
+import com.dangbun.domain.membercleaning.repository.MemberCleaningRepository;
+import com.dangbun.domain.memberduty.entity.MemberDuty;
+import com.dangbun.domain.memberduty.repository.MemberDutyRepository;
 import com.dangbun.domain.place.dto.request.PostCheckInviteCodeRequest;
 import com.dangbun.domain.place.dto.request.PostCreatePlaceRequest;
 import com.dangbun.domain.place.dto.request.PostRegisterPlaceRequest;
 import com.dangbun.domain.place.dto.response.GetPlaceListResponse;
+import com.dangbun.domain.place.dto.response.GetPlaceResponse;
 import com.dangbun.domain.place.dto.response.PostCheckInviteCodeResponse;
 import com.dangbun.domain.place.dto.response.PostCreateInviteCodeResponse;
 import com.dangbun.domain.place.entity.Place;
@@ -15,21 +26,21 @@ import com.dangbun.domain.place.entity.PlaceCategory;
 import com.dangbun.domain.place.exception.custom.AlreadyInvitedException;
 import com.dangbun.domain.place.exception.custom.InvalidInformationException;
 import com.dangbun.domain.place.exception.custom.InvalidInviteCodeException;
+import com.dangbun.domain.place.exception.custom.NoSuchPlaceException;
 import com.dangbun.domain.place.repository.PlaceRepository;
 import com.dangbun.domain.user.entity.User;
 import com.dangbun.domain.user.exception.custom.UserNotFoundException;
 import com.dangbun.domain.user.repository.UserRepository;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.security.SecureRandom;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.dangbun.domain.member.response.status.MemberExceptionResponse.INVALID_ROLE;
+import static com.dangbun.domain.member.response.status.MemberExceptionResponse.NO_SUCH_MEMBER;
 import static com.dangbun.domain.place.response.status.PlaceExceptionResponse.*;
 import static com.dangbun.domain.user.response.status.UserExceptionResponse.NO_SUCH_USER;
 
@@ -47,6 +58,9 @@ public class PlaceService {
     private static final String CHARACTERS = "abcdefghijklmnopqrstuvwxyz0123456789";
     private static final int CODE_LENGTH = 6;
     private static final SecureRandom RANDOM = new SecureRandom();
+    private final MemberDutyRepository memberDutyRepository;
+    private final MemberCleaningRepository memberCleaningRepository;
+    private final CheckListRepository checkListRepository;
 
     @Transactional(readOnly = true)
     public GetPlaceListResponse getPlaces(Long userId) {
@@ -58,8 +72,8 @@ public class PlaceService {
     }
 
     public void createPlaceWithManager(Long userId, PostCreatePlaceRequest request) {
-        
-        
+
+
         String placeName = request.placeName();
         String category = request.category();
         String memberName = request.managerName();
@@ -85,8 +99,9 @@ public class PlaceService {
     }
 
     public PostCreateInviteCodeResponse createInviteCode(Long userId, Long placeId) {
-        Member member = memberRepository.findWithPlaceByUserIdAndPlaceId(userId, placeId);
-        if(member.getRole().equals(MemberRole.MEMBER)){
+        Member member = memberRepository.findWithPlaceByUserIdAndPlaceId(userId, placeId)
+                .orElseThrow(() -> new MemberNotFoundException(NO_SUCH_MEMBER));
+        if (member.getRole().equals(MemberRole.MEMBER)) {
             throw new InvalidRoleException(INVALID_ROLE);
         }
 
@@ -97,14 +112,13 @@ public class PlaceService {
     }
 
 
-
     @Transactional(readOnly = true)
     public PostCheckInviteCodeResponse checkInviteCode(User user, PostCheckInviteCodeRequest request) {
         Place place = placeRepository.findByInviteCode(request.inviteCode());
-        if(place == null){
-            throw new InvalidInviteCodeException(NO_SUCH_INVITE);
+        if (place == null) {
+            throw new InvalidInviteCodeException(NO_SUCH_INVITE_CODE);
         }
-        if(memberRepository.findByPlaceAndUser(place,user).isPresent()){
+        if (memberRepository.findByPlaceAndUser(place, user).isPresent()) {
             throw new AlreadyInvitedException(ALREADY_INVITED);
         }
         Member member = memberRepository.findFirstByPlace(place);
@@ -127,11 +141,11 @@ public class PlaceService {
 
 
         Member tempMember = memberRepository.findFirstWithPlaceByInviteCode(request.inviteCode())
-                .orElseThrow(()->new InvalidInviteCodeException(NO_SUCH_INVITE));
+                .orElseThrow(() -> new InvalidInviteCodeException(NO_SUCH_INVITE_CODE));
 
         Place place = tempMember.getPlace();
 
-        if(!tempMember.getInformation().keySet().equals(request.information().keySet())){
+        if (!tempMember.getInformation().keySet().equals(request.information().keySet())) {
             throw new InvalidInformationException(INVALID_INFORMATION);
         }
 
@@ -145,5 +159,28 @@ public class PlaceService {
                 .build();
 
         memberRepository.save(member);
+    }
+
+    @Transactional(readOnly = true)
+    public GetPlaceResponse getPlace(User user, Long placeId) {
+
+        Place place = placeRepository.findById(placeId)
+                .orElseThrow(() -> new NoSuchPlaceException(NO_SUCH_PLACE));
+
+        List<MemberDuty> memberDuties = memberDutyRepository.findAllWithMemberAndPlaceByPlaceId(placeId);
+
+        List<MemberCleaning> memberCleanings = new ArrayList<>();
+        for (MemberDuty memberDuty : memberDuties) {
+            memberCleanings.addAll(memberCleaningRepository.findAllByMember(memberDuty.getMember()));
+        }
+
+        Map<MemberDuty, List<CheckList>> cleaningMap = memberDuties.stream()
+                .collect(Collectors.toMap(
+                        md -> md,
+                        md -> checkListRepository.findWithCleaningByDutyId(md.getDuty().getDutyId())
+                ));
+
+
+        return GetPlaceResponse.of(user, place, cleaningMap, memberCleanings);
     }
 }

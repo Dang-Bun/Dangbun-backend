@@ -16,7 +16,7 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     List<Member> findWithPlaceByUserId(Long userId);
 
     @Query("select m from Member m join fetch m.place where m.user.userId = :userId and m.place.placeId = :placeId")
-    Member findWithPlaceByUserIdAndPlaceId(Long userId, Long placeId);
+    Optional<Member> findWithPlaceByUserIdAndPlaceId(Long userId, Long placeId);
 
     Optional<Member> findByPlaceAndUser(Place place, User user);
 
