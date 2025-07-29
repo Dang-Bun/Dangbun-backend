@@ -4,12 +4,15 @@ import com.dangbun.domain.checkList.entity.CheckList;
 import com.dangbun.domain.checkList.repository.CheckListRepository;
 import com.dangbun.domain.cleaning.entity.Cleaning;
 import com.dangbun.domain.cleaning.repository.CleaningRepository;
+import com.dangbun.domain.duty.entity.Duty;
 import com.dangbun.domain.duty.repository.DutyRepository;
+import com.dangbun.domain.duty.service.DutyService;
 import com.dangbun.domain.member.entity.Member;
 import com.dangbun.domain.member.entity.MemberRole;
 import com.dangbun.domain.member.exception.custom.InvalidRoleException;
 import com.dangbun.domain.member.exception.custom.MemberNotFoundException;
 import com.dangbun.domain.member.repository.MemberRepository;
+import com.dangbun.domain.member.service.MemberService;
 import com.dangbun.domain.membercleaning.entity.MemberCleaning;
 import com.dangbun.domain.membercleaning.repository.MemberCleaningRepository;
 import com.dangbun.domain.memberduty.entity.MemberDuty;
@@ -61,6 +64,9 @@ public class PlaceService {
     private final MemberDutyRepository memberDutyRepository;
     private final MemberCleaningRepository memberCleaningRepository;
     private final CheckListRepository checkListRepository;
+    private final DutyRepository dutyRepository;
+    private final DutyService dutyService;
+    private final MemberService memberService;
 
     @Transactional(readOnly = true)
     public GetPlaceListResponse getPlaces(Long userId) {
@@ -182,5 +188,27 @@ public class PlaceService {
 
 
         return GetPlaceResponse.of(user, place, cleaningMap, memberCleanings);
+    }
+
+    public void deletePlace(User user, Long placeId) {
+        Member runner = memberRepository.findWithPlaceByUserIdAndPlaceId(user.getUserId(), placeId)
+                .orElseThrow(() -> new MemberNotFoundException(NO_SUCH_MEMBER));
+
+        if(!runner.getRole().equals(MemberRole.MANAGER)){
+            throw new InvalidRoleException(INVALID_ROLE);
+        }
+
+        Place place = runner.getPlace();
+        List<Duty> duties = dutyRepository.findByPlace_PlaceId(placeId);
+        for(Duty duty : duties){
+            dutyService.deleteDuty(duty.getDutyId());
+        }
+
+        List<Member> members = memberRepository.findAllByPlace(place);
+        memberRepository.deleteAll(members);
+
+
+        placeRepository.delete(place);
+
     }
 }

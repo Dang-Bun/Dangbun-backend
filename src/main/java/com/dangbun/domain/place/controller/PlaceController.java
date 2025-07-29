@@ -105,4 +105,16 @@ public class PlaceController {
                                                                    @PathVariable Long placeId){
         return ResponseEntity.ok(BaseResponse.ok(placeService.getPlace(user, placeId)));
     }
+
+    @Operation(summary = "플레이스 삭제", description = "플레이스를 삭제합니다(매니저)")
+    @DocumentedApiErrors(
+            value = {MemberExceptionResponse.class},
+            includes = {"NO_SUCH_MEMBER","INVALID_ROLE"}
+    )
+    @DeleteMapping("/{placeId}")
+    public ResponseEntity<BaseResponse<?>> deletePlace(@AuthenticationPrincipal(expression = "user") User user,
+                                                       @PathVariable Long placeId){
+        placeService.deletePlace(user, placeId);
+        return ResponseEntity.ok(BaseResponse.ok(null));
+    }
 }

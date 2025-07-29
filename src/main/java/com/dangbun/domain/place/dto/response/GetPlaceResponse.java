@@ -19,6 +19,10 @@ import java.util.Map;
 public record GetPlaceResponse(
         @Schema(description = "본인 맴버 ID", example = "1")
         Long memberId,
+
+        @Schema(description = "플레이스 ID", example = "1")
+        Long placeId,
+
         @Schema(description = "플레이스 이름", example = "메가박스")
         String placeName,
 
@@ -36,6 +40,7 @@ public record GetPlaceResponse(
                 .findAny().orElseThrow(() -> new RuntimeException("GetPlaceResponse 에러"));
 
         Long memberId = memberDuty.getMember().getMemberId();
+        Long placeId = place.getPlaceId();
         String placeName = place.getName();
         LocalTime endTime = place.getEndTime();
 
@@ -48,8 +53,8 @@ public record GetPlaceResponse(
                 Cleaning cleaning = checkList.getCleaning();
 
                 List<Member> members = new ArrayList<>();
-                for(MemberCleaning mc : memberCleanings){
-                    if(mc.getCleaning().equals(cleaning)){
+                for (MemberCleaning mc : memberCleanings) {
+                    if (mc.getCleaning().equals(cleaning)) {
                         members.add(mc.getMember());
                     }
                 }
@@ -59,7 +64,7 @@ public record GetPlaceResponse(
             duties.add(DutyDto.of(md.getDuty().getName(), cleanings));
         }
 
-        return new GetPlaceResponse(memberId, placeName,endTime, duties);
+        return new GetPlaceResponse(memberId, placeId, placeName, endTime, duties);
     }
 
 
@@ -71,8 +76,8 @@ public record GetPlaceResponse(
             @Schema(description = "청소 리스트")
             List<CleaningDto> checkLists
     ) {
-        public static DutyDto of(String dutyName, List<CleaningDto> cleanings){
-            return new DutyDto(dutyName,cleanings);
+        public static DutyDto of(String dutyName, List<CleaningDto> cleanings) {
+            return new DutyDto(dutyName, cleanings);
         }
     }
 
@@ -95,11 +100,11 @@ public record GetPlaceResponse(
             Boolean needPhoto
 
     ) {
-        public static CleaningDto of(CheckList checkList, List<Member> members){
+        public static CleaningDto of(CheckList checkList, List<Member> members) {
 
             List<MemberDto> memberDtos = members.stream()
                     .map(MemberDto::of).toList();
-            return new CleaningDto(checkList.getCheckListId(), memberDtos ,checkList.getCleaning().getName(),null,checkList.getCleaning().getNeedPhoto());
+            return new CleaningDto(checkList.getCheckListId(), memberDtos, checkList.getCleaning().getName(), null, checkList.getCleaning().getNeedPhoto());
         }
     }
 
@@ -111,7 +116,7 @@ public record GetPlaceResponse(
             @Schema(description = "청소 담당 맴버 이름", example = "맴버 A")
             String memberName
     ) {
-        public static MemberDto of(Member member){
+        public static MemberDto of(Member member) {
             return new MemberDto(member.getMemberId(), member.getName());
         }
     }
