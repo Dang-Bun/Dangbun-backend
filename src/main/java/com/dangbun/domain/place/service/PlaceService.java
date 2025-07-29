@@ -205,7 +205,9 @@ public class PlaceService {
         }
 
         List<Member> members = memberRepository.findAllByPlace(place);
-        memberRepository.deleteAll(members);
+        for(Member member : members){
+            memberService.deleteMember(member);
+        }
 
 
         placeRepository.delete(place);

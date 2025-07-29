@@ -9,6 +9,7 @@ import com.dangbun.domain.member.entity.Member;
 import com.dangbun.domain.member.entity.MemberRole;
 import com.dangbun.domain.member.exception.custom.*;
 import com.dangbun.domain.member.repository.MemberRepository;
+import com.dangbun.domain.membercleaning.repository.MemberCleaningRepository;
 import com.dangbun.domain.memberduty.entity.MemberDuty;
 import com.dangbun.domain.memberduty.repository.MemberDutyRepository;
 import com.dangbun.domain.user.entity.User;
@@ -29,6 +30,7 @@ public class MemberService {
     private final MemberRepository memberRepository;
     private final MemberDutyRepository memberDutyRepository;
     private final DutyRepository dutyRepository;
+    private final MemberCleaningRepository memberCleaningRepository;
 
 
     @Transactional(readOnly = true)
@@ -146,4 +148,10 @@ public class MemberService {
                     .orElse(GetMemberSearchResponse.of(null, null));
     }
 
+    public void deleteMember(Member member) {
+        memberCleaningRepository.deleteAllByMember(member);
+        memberDutyRepository.deleteAllByMember(member);
+
+        memberRepository.delete(member);
+    }
 }

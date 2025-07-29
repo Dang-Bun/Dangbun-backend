@@ -24,4 +24,5 @@ public interface MemberCleaningRepository extends JpaRepository<MemberCleaning, 
 
     List<MemberCleaning> findAllByMember(Member member);
 
+    void deleteAllByMember(Member member);
 }
