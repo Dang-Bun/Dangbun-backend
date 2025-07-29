@@ -13,5 +13,5 @@ public interface CheckListRepository extends JpaRepository<CheckList, Long> {
     @Query("select ch from CheckList ch join fetch Cleaning c where c.duty.dutyId = :dutyId")
     List<CheckList> findWithCleaningByDutyId(Long dutyId);
 
-    List<CheckList> findWithCleaning_CleaningId(Long cleaningId);
+    List<CheckList> findByCleaning_CleaningId(Long cleaningId);
 }

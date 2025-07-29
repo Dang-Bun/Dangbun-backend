@@ -10,7 +10,6 @@ import com.dangbun.domain.user.entity.User;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.v3.oas.annotations.media.Schema;
 
-import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -47,7 +46,7 @@ public record GetPlaceResponse(
         List<DutyDto> duties = new ArrayList<>();
         for (Map.Entry<MemberDuty, List<CheckList>> mdc : cleaningMap.entrySet()) {
             MemberDuty md = mdc.getKey();
-            List<CleaningDto> cleanings = new ArrayList<>();
+            List<CheckListDto> checkListDtos = new ArrayList<>();
             for (CheckList checkList : mdc.getValue()) {
 
                 Cleaning cleaning = checkList.getCleaning();
@@ -58,10 +57,10 @@ public record GetPlaceResponse(
                         members.add(mc.getMember());
                     }
                 }
-                cleanings.add(CleaningDto.of(checkList, members));
+                checkListDtos.add(CheckListDto.of(checkList, members));
             }
 
-            duties.add(DutyDto.of(md.getDuty().getName(), cleanings));
+            duties.add(DutyDto.of(md.getDuty().getName(), checkListDtos));
         }
 
         return new GetPlaceResponse(memberId, placeId, placeName, endTime, duties);
@@ -74,15 +73,15 @@ public record GetPlaceResponse(
             String dutyName,
 
             @Schema(description = "청소 리스트")
-            List<CleaningDto> checkLists
+            List<CheckListDto> checkLists
     ) {
-        public static DutyDto of(String dutyName, List<CleaningDto> cleanings) {
-            return new DutyDto(dutyName, cleanings);
+        public static DutyDto of(String dutyName, List<CheckListDto> checkLists) {
+            return new DutyDto(dutyName, checkLists);
         }
     }
 
-    @Schema(name = "GetPlaceResponse.CleaningDto", description = "청소 DTO")
-    public record CleaningDto(
+    @Schema(name = "GetPlaceResponse.CheckListDto", description = "청소 DTO")
+    public record CheckListDto(
             @Schema(description = "체크리스트 ID", example = "1")
             Long checkListId,
 
@@ -94,17 +93,17 @@ public record GetPlaceResponse(
 
             @Schema(description = "청소 완료 시간(null일 시 미완료)", example = "23:47")
             @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm")
-            LocalDateTime completeTime,
+            LocalTime completeTime,
 
             @Schema(description = "사진 필요 여부", example = "false")
             Boolean needPhoto
 
     ) {
-        public static CleaningDto of(CheckList checkList, List<Member> members) {
+        public static CheckListDto of(CheckList checkList, List<Member> members) {
 
             List<MemberDto> memberDtos = members.stream()
                     .map(MemberDto::of).toList();
-            return new CleaningDto(checkList.getCheckListId(), memberDtos, checkList.getCleaning().getName(), null, checkList.getCleaning().getNeedPhoto());
+            return new CheckListDto(checkList.getCheckListId(), memberDtos, checkList.getCleaning().getName(), null, checkList.getCleaning().getNeedPhoto());
         }
     }
 

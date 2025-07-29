@@ -196,7 +196,7 @@ public class CleaningService {
 
         cleaningDateRepository.deleteAllByCleaning_CleaningId(cleaningId);
 
-        List<CheckList> checkLists = checkListRepository.findWithCleaning_CleaningId(cleaningId);
+        List<CheckList> checkLists = checkListRepository.findByCleaning_CleaningId(cleaningId);
         for(CheckList checkList : checkLists) {
             checkListService.deleteCheckList(checkList.getCheckListId());
         }
