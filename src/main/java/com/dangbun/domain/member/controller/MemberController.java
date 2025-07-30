@@ -37,9 +37,8 @@ public class MemberController {
             includes = {"NO_SUCH_MEMBER"}
     )
     @GetMapping
-    public ResponseEntity<BaseResponse<GetMembersResponse>> getMembers(@AuthenticationPrincipal(expression = "user") User user,
-                                                                       @PathVariable("placeId") Long placeId) {
-        GetMembersResponse response = memberService.getMembers(user, placeId);
+    public ResponseEntity<BaseResponse<GetMembersResponse>> getMembers(@PathVariable("placeId") Long placeId) {
+        GetMembersResponse response = memberService.getMembers(placeId);
         return ResponseEntity.ok(BaseResponse.ok(response));
     }
 
@@ -50,9 +49,8 @@ public class MemberController {
             includes = {"INVALID_ROLE"}
     )
     @GetMapping("/waiting")
-    public ResponseEntity<BaseResponse<GetWaitingMembersResponse>> getWaitingMembers(@AuthenticationPrincipal(expression = "user") User user,
-                                                                                     @PathVariable("placeId") Long placeId) {
-        return ResponseEntity.ok(BaseResponse.ok(memberService.getWaitingMembers(user, placeId)));
+    public ResponseEntity<BaseResponse<GetWaitingMembersResponse>> getWaitingMembers(@PathVariable("placeId") Long placeId) {
+        return ResponseEntity.ok(BaseResponse.ok(memberService.getWaitingMembers(placeId)));
     }
 
     @Operation(summary = "맴버 수락", description = "대기중인 맴버의 참가를 수락합니다.(매니저용)")
@@ -61,10 +59,9 @@ public class MemberController {
             includes = {"INVALID_ROLE"}
     )
     @PostMapping("/{memberId}/accept")
-    public ResponseEntity<?> registerMember(@AuthenticationPrincipal(expression = "user") User user,
-                                            @PathVariable("placeId") Long placeId,
+    public ResponseEntity<?> registerMember(@PathVariable("placeId") Long placeId,
                                             @PathVariable("memberId") Long memberId) {
-        memberService.registerMember(user,placeId, memberId);
+        memberService.registerMember(placeId, memberId);
 
         return ResponseEntity.ok(BaseResponse.ok(null));
     }
@@ -75,11 +72,10 @@ public class MemberController {
             includes = {"INVALID_ROLE"}
     )
     @DeleteMapping("/waiting/{memberId}")
-    public ResponseEntity<?> removeWaitingMember(@AuthenticationPrincipal(expression = "user") User user,
-                                          @PathVariable("placeId") Long placeId,
-                                          @PathVariable("memberId") Long memberId) {
+    public ResponseEntity<?> removeWaitingMember(@PathVariable("placeId") Long placeId,
+                                                 @PathVariable("memberId") Long memberId) {
 
-        memberService.removeWaitingMember(user, placeId, memberId);
+        memberService.removeWaitingMember(placeId, memberId);
         return ResponseEntity.ok(BaseResponse.ok(null));
     }
 
@@ -98,27 +94,23 @@ public class MemberController {
     @Operation(summary = "플레이스 나가기", description = "플레이스에서 나갑니다")
     @DocumentedApiErrors(
             value = MemberExceptionResponse.class,
-            includes = {"NO_SUCH_USER","INVALID_ROLE"}
+            includes = {"NO_SUCH_USER", "INVALID_ROLE"}
     )
     @DeleteMapping("/me")
-    public ResponseEntity<?> removeSelfFromPlace(@AuthenticationPrincipal(expression = "user") User user,
-                                                 @PathVariable("placeId") Long placeId,
-                                                 @RequestBody DeleteSelfFromPlaceRequest request) {
-        memberService.exitPlace(user, placeId, request);
+    public ResponseEntity<?> removeSelfFromPlace(@RequestBody DeleteSelfFromPlaceRequest request) {
+        memberService.exitPlace(request);
         return ResponseEntity.ok(BaseResponse.ok(null));
     }
 
     @Operation(summary = "맴버 추방", description = "현재 플레이스에 속해있는 맴버를 추방합니다")
     @DocumentedApiErrors(
             value = MemberExceptionResponse.class,
-            includes = {"INVALID_ROLE","NO_SUCH_USER","NAME_NOT_MATCHED"}
+            includes = {"INVALID_ROLE", "NO_SUCH_USER", "NAME_NOT_MATCHED"}
     )
     @DeleteMapping("/{memberId}")
-    public ResponseEntity<?> removeMember(@AuthenticationPrincipal(expression = "user") User user,
-                                          @PathVariable("placeId") Long placeId,
-                                          @PathVariable("memberId") Long memberId,
-                                          @RequestBody DeleteMemberRequest request){
-        memberService.removeMember(user, placeId, memberId, request);
+    public ResponseEntity<?> removeMember(@PathVariable("memberId") Long memberId,
+                                          @RequestBody DeleteMemberRequest request) {
+        memberService.removeMember(memberId, request);
         return ResponseEntity.ok(BaseResponse.ok(null));
     }
 
@@ -129,10 +121,9 @@ public class MemberController {
     )
     @GetMapping("/search")
     public ResponseEntity<BaseResponse<GetMemberSearchResponse>> searchMemberInPlace(
-            @AuthenticationPrincipal(expression = "user") User user,
             @PathVariable("placeId") Long placeId,
             @RequestParam String name) {
-        return ResponseEntity.ok(BaseResponse.ok(memberService.searchByNameInPlace(user, placeId, name)));
+        return ResponseEntity.ok(BaseResponse.ok(memberService.searchByNameInPlace(placeId, name)));
     }
 
 }

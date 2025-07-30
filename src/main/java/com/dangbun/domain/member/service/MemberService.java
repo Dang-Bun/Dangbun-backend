@@ -2,6 +2,7 @@ package com.dangbun.domain.member.service;
 
 import com.dangbun.domain.duty.entity.Duty;
 import com.dangbun.domain.duty.repository.DutyRepository;
+import com.dangbun.domain.member.MemberContext;
 import com.dangbun.domain.member.dto.request.*;
 import com.dangbun.domain.member.dto.response.*;
 
@@ -13,8 +14,8 @@ import com.dangbun.domain.membercleaning.repository.MemberCleaningRepository;
 import com.dangbun.domain.memberduty.entity.MemberDuty;
 import com.dangbun.domain.memberduty.repository.MemberDutyRepository;
 import com.dangbun.domain.user.entity.User;
+import com.dangbun.global.exception.BadRequestException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.web.firewall.RequestRejectedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,10 +35,9 @@ public class MemberService {
 
 
     @Transactional(readOnly = true)
-    public GetMembersResponse getMembers(User user, Long placeId) {
+    public GetMembersResponse getMembers(Long placeId) {
 
-        Member me = memberRepository.findByUser_UserIdAndPlace_PlaceId(user.getUserId(), placeId)
-                .orElseThrow(()->new MemberNotFoundException(NO_SUCH_MEMBER));
+        Member me = MemberContext.get();
 
         Map<Member, List<String>> memberMap = new HashMap<>();
 
@@ -46,7 +46,7 @@ public class MemberService {
         Integer waitingMemberNumber = 0;
 
         for (Member member : members) {
-            if(member.getStatus()) {
+            if (member.getStatus()) {
                 List<MemberDuty> memberDuties = memberDutyRepository.findAllByMember(member);
                 List<String> dutyNames = new ArrayList<>();
                 for (MemberDuty memberDuty : memberDuties) {
@@ -54,12 +54,12 @@ public class MemberService {
                 }
                 memberMap.put(member, dutyNames);
             }
-            if(!member.getStatus()){
+            if (!member.getStatus()) {
                 waitingMemberNumber++;
             }
         }
 
-        if(me.getRole().equals(MemberRole.MEMBER)){
+        if (me.getRole().equals(MemberRole.MEMBER)) {
             waitingMemberNumber = null;
         }
 
@@ -69,7 +69,7 @@ public class MemberService {
 
     @Transactional(readOnly = true)
     public GetMemberResponse getMember(Long placeId, Long memberId) {
-        Member member = getMemberByMemberIdAndPlaceId(memberId,placeId);
+        Member member = getMemberByMemberIdAndPlaceId(memberId, placeId);
 
         List<MemberDuty> memberDuties = memberDutyRepository.findAllByMember(member);
         List<Duty> duties = new ArrayList<>();
@@ -82,9 +82,11 @@ public class MemberService {
     }
 
     @Transactional(readOnly = true)
-    public GetWaitingMembersResponse getWaitingMembers(User user, Long placeId) {
+    public GetWaitingMembersResponse getWaitingMembers(Long placeId) {
 
-        if(getMemberByUserAndPlace(user.getUserId(), placeId).getRole() != MemberRole.MANAGER){
+        Member me = MemberContext.get();
+
+        if (me.getRole() != MemberRole.MANAGER) {
             throw new InvalidRoleException(INVALID_ROLE);
         }
 
@@ -94,47 +96,57 @@ public class MemberService {
 
     }
 
-    public void registerMember(User user, Long placeId, Long memberId) {
+    public void registerMember(Long placeId, Long memberId) {
 
-        if(getMemberByUserAndPlace(user.getUserId(), placeId).getRole() != MemberRole.MANAGER){
+
+        Member me = MemberContext.get();
+
+        if (me.getRole() != MemberRole.MANAGER) {
             throw new InvalidRoleException(INVALID_ROLE);
         }
 
-        Member member = getMemberByMemberIdAndPlaceId(memberId,placeId);
+        Member member = getMemberByMemberIdAndPlaceId(memberId, placeId);
 
         member.activate();
     }
 
-    public void removeWaitingMember(User user, Long placeId, Long memberId) {
+    public void removeWaitingMember(Long placeId, Long memberId) {
 
-        if(getMemberByUserAndPlace(user.getUserId(), placeId).getRole() != MemberRole.MANAGER){
+        Member me = MemberContext.get();
+
+        if (me.getRole() != MemberRole.MANAGER) {
             throw new InvalidRoleException(INVALID_ROLE);
         }
-        Member member = getMemberByMemberIdAndPlaceId(memberId,placeId);
+
+        Member member = getMemberByMemberIdAndPlaceId(memberId, placeId);
 
         memberRepository.delete(member);
     }
 
-    public void exitPlace(User user, Long placeId, DeleteSelfFromPlaceRequest request) {
-        Member member = memberRepository.findByUser_UserIdAndPlace_PlaceId(user.getUserId(), placeId)
-                .orElseThrow(() -> new MemberNotFoundException(NO_SUCH_MEMBER));
+    public void exitPlace(DeleteSelfFromPlaceRequest request) {
+        Member me = MemberContext.get();
 
-        if (member.getRole() == MemberRole.MANAGER) {
+        if (me.getRole() == MemberRole.MANAGER) {
             throw new InvalidRoleException(INVALID_ROLE);
         }
 
-        memberRepository.delete(member);
+        if (!me.getPlace().getName().equals(request.placeName())) {
+            throw new BadRequestException(PLACE_NAME_NOT_MATCHED);
+        }
+
+        memberRepository.delete(me);
     }
 
-    public void removeMember(User user, Long placeId, Long memberId, DeleteMemberRequest request) {
+    public void removeMember(Long memberId, DeleteMemberRequest request) {
 
-        if(getMemberByUserAndPlace(user.getUserId(), placeId).getRole() != MemberRole.MANAGER){
+        Member me = MemberContext.get();
+        if (me.getRole() != MemberRole.MANAGER) {
             throw new InvalidRoleException(INVALID_ROLE);
         }
         Member member = memberRepository.findByMemberId(memberId)
-                .orElseThrow(()-> new MemberNotFoundException(NO_SUCH_MEMBER));
+                .orElseThrow(() -> new MemberNotFoundException(NO_SUCH_MEMBER));
 
-        if(!member.getName().equals(request.memberName())){
+        if (!member.getName().equals(request.memberName())) {
             throw new NameNotMatchedException(NAME_NOT_MATCHED);
         }
 
@@ -144,24 +156,21 @@ public class MemberService {
         memberRepository.delete(member);
     }
 
-    private Member getMemberByUserAndPlace(Long userId, Long placeId) {
-        return memberRepository.findByUser_UserIdAndPlace_PlaceId(userId, placeId)
-                .orElseThrow(() -> new MemberNotFoundException(NO_SUCH_MEMBER));
-    }
 
-    private Member getMemberByMemberIdAndPlaceId(Long memberId, Long placeId){
+    private Member getMemberByMemberIdAndPlaceId(Long memberId, Long placeId) {
         return memberRepository.findByMemberIdAndPlace_PlaceId(memberId, placeId)
                 .orElseThrow(() -> new MemberNotFoundException(NO_SUCH_MEMBER));
     }
 
-    public GetMemberSearchResponse searchByNameInPlace(User user, Long placeId, String name) {
-        if(getMemberByUserAndPlace(user.getUserId(), placeId).getRole() != MemberRole.MANAGER){
+    public GetMemberSearchResponse searchByNameInPlace(Long placeId, String name) {
+        Member me = MemberContext.get();
+        if (me.getRole() != MemberRole.MANAGER) {
             throw new InvalidRoleException(INVALID_ROLE);
         }
 
         return memberRepository.findByPlace_PlaceIdAndName(placeId, name)
-            .map(member -> GetMemberSearchResponse.of(member.getMemberId(), member.getName()))
-                    .orElse(GetMemberSearchResponse.of(null, null));
+                .map(member -> GetMemberSearchResponse.of(member.getMemberId(), member.getName()))
+                .orElse(GetMemberSearchResponse.of(null, null));
     }
 
     /**
