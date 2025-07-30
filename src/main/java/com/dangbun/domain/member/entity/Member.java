@@ -1,6 +1,5 @@
 package com.dangbun.domain.member.entity;
 
-import com.dangbun.domain.duty.entity.DutyIcon;
 import com.dangbun.domain.membercleaning.entity.MemberCleaning;
 import com.dangbun.domain.memberduty.entity.MemberDuty;
 import com.dangbun.domain.place.entity.Place;
