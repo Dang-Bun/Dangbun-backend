@@ -38,7 +38,7 @@ public record GetPlaceResponse(
         MemberDuty memberDuty = cleaningMap.keySet().stream().filter(md -> md.getMember().getUser().getUserId().equals(user.getUserId()))
                 .findAny().orElseThrow(() -> new RuntimeException("GetPlaceResponse 에러"));
 
-        Long memberId = memberDuty.getMember().getMemberId();
+        Member member = memberDuty.getMember();
         Long placeId = place.getPlaceId();
         String placeName = place.getName();
         LocalTime endTime = place.getEndTime();
@@ -63,7 +63,11 @@ public record GetPlaceResponse(
             duties.add(DutyDto.of(md.getDuty().getName(), checkListDtos));
         }
 
-        return new GetPlaceResponse(memberId, placeId, placeName, endTime, duties);
+        return new GetPlaceResponse(member.getMemberId(),
+                placeId,
+                placeName,
+                endTime,
+                duties);
     }
 
 

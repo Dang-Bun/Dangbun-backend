@@ -2,8 +2,6 @@ package com.dangbun.domain.place.service;
 
 import com.dangbun.domain.checkList.entity.CheckList;
 import com.dangbun.domain.checkList.repository.CheckListRepository;
-import com.dangbun.domain.cleaning.entity.Cleaning;
-import com.dangbun.domain.cleaning.repository.CleaningRepository;
 import com.dangbun.domain.duty.entity.Duty;
 import com.dangbun.domain.duty.repository.DutyRepository;
 import com.dangbun.domain.duty.service.DutyService;
@@ -20,10 +18,7 @@ import com.dangbun.domain.memberduty.repository.MemberDutyRepository;
 import com.dangbun.domain.place.dto.request.PostCheckInviteCodeRequest;
 import com.dangbun.domain.place.dto.request.PostCreatePlaceRequest;
 import com.dangbun.domain.place.dto.request.PostRegisterPlaceRequest;
-import com.dangbun.domain.place.dto.response.GetPlaceListResponse;
-import com.dangbun.domain.place.dto.response.GetPlaceResponse;
-import com.dangbun.domain.place.dto.response.PostCheckInviteCodeResponse;
-import com.dangbun.domain.place.dto.response.PostCreateInviteCodeResponse;
+import com.dangbun.domain.place.dto.response.*;
 import com.dangbun.domain.place.entity.Place;
 import com.dangbun.domain.place.entity.PlaceCategory;
 import com.dangbun.domain.place.exception.custom.AlreadyInvitedException;
@@ -143,7 +138,7 @@ public class PlaceService {
         return sb.toString();
     }
 
-    public void joinRequest(User user, PostRegisterPlaceRequest request) {
+    public PostRegisterPlaceResponse joinRequest(User user, PostRegisterPlaceRequest request) {
 
 
         Member tempMember = memberRepository.findFirstWithPlaceByInviteCode(request.inviteCode())
@@ -165,6 +160,8 @@ public class PlaceService {
                 .build();
 
         memberRepository.save(member);
+
+        return PostRegisterPlaceResponse.of(place.getPlaceId());
     }
 
     @Transactional(readOnly = true)
@@ -172,6 +169,13 @@ public class PlaceService {
 
         Place place = placeRepository.findById(placeId)
                 .orElseThrow(() -> new NoSuchPlaceException(NO_SUCH_PLACE));
+
+        Member member = memberRepository.findByUser_UserIdAndPlace_PlaceId(user.getUserId(), placeId)
+                .orElseThrow(() -> new MemberNotFoundException(NO_SUCH_MEMBER));
+
+        if(!member.getStatus()){
+            return new GetPlaceResponse(member.getMemberId(),placeId, place.getName(), null, null);
+        }
 
         List<MemberDuty> memberDuties = memberDutyRepository.findAllWithMemberAndPlaceByPlaceId(placeId);
 
@@ -194,23 +198,30 @@ public class PlaceService {
         Member runner = memberRepository.findWithPlaceByUserIdAndPlaceId(user.getUserId(), placeId)
                 .orElseThrow(() -> new MemberNotFoundException(NO_SUCH_MEMBER));
 
-        if(!runner.getRole().equals(MemberRole.MANAGER)){
+        if (!runner.getRole().equals(MemberRole.MANAGER)) {
             throw new InvalidRoleException(INVALID_ROLE);
         }
 
         Place place = runner.getPlace();
         List<Duty> duties = dutyRepository.findByPlace_PlaceId(placeId);
-        for(Duty duty : duties){
+        for (Duty duty : duties) {
             dutyService.deleteDuty(duty.getDutyId());
         }
 
         List<Member> members = memberRepository.findAllByPlace(place);
-        for(Member member : members){
+        for (Member member : members) {
             memberService.deleteMember(member);
         }
 
 
         placeRepository.delete(place);
 
+    }
+
+    public void cancelRegister(User user, Long placeId) {
+        Member member = memberRepository.findByUser_UserIdAndPlace_PlaceId(user.getUserId(), placeId)
+                .orElseThrow(() -> new MemberNotFoundException(NO_SUCH_MEMBER));
+
+        memberRepository.delete(member);
     }
 }

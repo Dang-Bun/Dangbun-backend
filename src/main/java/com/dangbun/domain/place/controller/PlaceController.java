@@ -4,10 +4,7 @@ import com.dangbun.domain.member.response.status.MemberExceptionResponse;
 import com.dangbun.domain.place.dto.request.PostCheckInviteCodeRequest;
 import com.dangbun.domain.place.dto.request.PostCreatePlaceRequest;
 import com.dangbun.domain.place.dto.request.PostRegisterPlaceRequest;
-import com.dangbun.domain.place.dto.response.GetPlaceListResponse;
-import com.dangbun.domain.place.dto.response.GetPlaceResponse;
-import com.dangbun.domain.place.dto.response.PostCheckInviteCodeResponse;
-import com.dangbun.domain.place.dto.response.PostCreateInviteCodeResponse;
+import com.dangbun.domain.place.dto.response.*;
 import com.dangbun.domain.place.response.status.PlaceExceptionResponse;
 import com.dangbun.domain.place.service.PlaceService;
 import com.dangbun.domain.user.entity.User;
@@ -39,7 +36,7 @@ public class PlaceController {
             includes = {""}
     )
     @GetMapping()
-    public ResponseEntity<BaseResponse<GetPlaceListResponse>> getPlaces(@AuthenticationPrincipal(expression = "user") User user){
+    public ResponseEntity<BaseResponse<GetPlaceListResponse>> getPlaces(@AuthenticationPrincipal(expression = "user") User user) {
         return ResponseEntity.ok(BaseResponse.ok(placeService.getPlaces(user.getUserId())));
     }
 
@@ -50,7 +47,7 @@ public class PlaceController {
     )
     @PostMapping
     public ResponseEntity<BaseResponse<?>> createPlace(@AuthenticationPrincipal(expression = "user") User user,
-                                                       @RequestBody PostCreatePlaceRequest request){
+                                                       @RequestBody PostCreatePlaceRequest request) {
 
         placeService.createPlaceWithManager(user.getUserId(), request);
         return ResponseEntity.ok(BaseResponse.ok(null));
@@ -59,11 +56,11 @@ public class PlaceController {
     @Operation(summary = "참여코드 생성", description = "플레이스의 참여코드를 생성합니다.")
     @DocumentedApiErrors(
             value = {MemberExceptionResponse.class},
-            includes = {"INVALID_ROLE","NO_SUCH_MEMBER"}
+            includes = {"INVALID_ROLE", "NO_SUCH_MEMBER"}
     )
     @PostMapping("/{placeId}/invite-code")
     public ResponseEntity<BaseResponse<PostCreateInviteCodeResponse>> createInviteCode(@AuthenticationPrincipal(expression = "user") User user,
-                                              @PathVariable Long placeId){
+                                                                                       @PathVariable Long placeId) {
         PostCreateInviteCodeResponse data = placeService.createInviteCode(user.getUserId(), placeId);
         return ResponseEntity.ok(BaseResponse.ok(data));
     }
@@ -71,27 +68,34 @@ public class PlaceController {
     @Operation(summary = "참여코드 확인", description = "참여코드를 입력합니다. 성공적으로 입력할 시 정보 입력 창이 뜹니다.")
     @DocumentedApiErrors(
             value = {PlaceExceptionResponse.class},
-            includes = {"ALREADY_INVITED","NO_SUCH_INVITE"}
+            includes = {"ALREADY_INVITED", "NO_SUCH_INVITE"}
     )
     @PostMapping("/invite-code")
     public ResponseEntity<BaseResponse<PostCheckInviteCodeResponse>> checkInviteCode(@AuthenticationPrincipal(expression = "user") User user,
-                                             @RequestBody PostCheckInviteCodeRequest request){
+                                                                                     @RequestBody PostCheckInviteCodeRequest request) {
 
-       PostCheckInviteCodeResponse response = placeService.checkInviteCode(user,request);
-       return ResponseEntity.ok(BaseResponse.ok(response));
+        PostCheckInviteCodeResponse response = placeService.checkInviteCode(user, request);
+        return ResponseEntity.ok(BaseResponse.ok(response));
 
     }
 
     @Operation(summary = "참여 신청", description = "플레이스에 참가 신청합니다. 플레이스가 요구한 정보들을 입력해야합니다.")
     @DocumentedApiErrors(
             value = {PlaceExceptionResponse.class},
-            includes = {"NO_SUCH_INVITE","INVALID_INFORMATION"}
+            includes = {"NO_SUCH_INVITE", "INVALID_INFORMATION"}
     )
     @PostMapping("/join-requests")
-    public ResponseEntity<BaseResponse<?>> registerPlace(@AuthenticationPrincipal(expression = "user") User user,
-                                                         @RequestBody PostRegisterPlaceRequest request){
+    public ResponseEntity<BaseResponse<PostRegisterPlaceResponse>> registerPlace(@AuthenticationPrincipal(expression = "user") User user,
+                                                                                 @RequestBody PostRegisterPlaceRequest request) {
 
-        placeService.joinRequest(user, request);
+        return ResponseEntity.ok(BaseResponse.ok(placeService.joinRequest(user, request)));
+    }
+
+    @Operation(summary = "참여 취소",description = "대기중인 플레이스의 참여 신청을 철회합니다")
+    @DeleteMapping("/{placeId}")
+    public ResponseEntity<BaseResponse<?>> deleteRegisterPlace(@AuthenticationPrincipal(expression = "user") User user,
+                                                               @PathVariable Long placeId){
+        placeService.cancelRegister(user,placeId);
         return ResponseEntity.ok(BaseResponse.ok(null));
     }
 
@@ -102,18 +106,18 @@ public class PlaceController {
     )
     @GetMapping("/{placeId}")
     public ResponseEntity<BaseResponse<GetPlaceResponse>> getPlace(@AuthenticationPrincipal(expression = "user") User user,
-                                                                   @PathVariable Long placeId){
+                                                                   @PathVariable Long placeId) {
         return ResponseEntity.ok(BaseResponse.ok(placeService.getPlace(user, placeId)));
     }
 
     @Operation(summary = "플레이스 삭제", description = "플레이스를 삭제합니다(매니저)")
     @DocumentedApiErrors(
             value = {MemberExceptionResponse.class},
-            includes = {"NO_SUCH_MEMBER","INVALID_ROLE"}
+            includes = {"NO_SUCH_MEMBER", "INVALID_ROLE"}
     )
     @DeleteMapping("/{placeId}")
     public ResponseEntity<BaseResponse<?>> deletePlace(@AuthenticationPrincipal(expression = "user") User user,
-                                                       @PathVariable Long placeId){
+                                                       @PathVariable Long placeId) {
         placeService.deletePlace(user, placeId);
         return ResponseEntity.ok(BaseResponse.ok(null));
     }

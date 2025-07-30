@@ -44,4 +44,6 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     Optional<Member> findByPlace_PlaceIdAndName(Long placeId, String name);
 
     List<Member> findAllByPlace(Place place);
+
+    List<Member> findByUser(User user);
 }
