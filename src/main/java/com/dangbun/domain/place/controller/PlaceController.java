@@ -1,6 +1,7 @@
 package com.dangbun.domain.place.controller;
 
 import com.dangbun.domain.member.response.status.MemberExceptionResponse;
+import com.dangbun.domain.place.dto.request.PatchUpdateTimeRequest;
 import com.dangbun.domain.place.dto.request.PostCheckInviteCodeRequest;
 import com.dangbun.domain.place.dto.request.PostCreatePlaceRequest;
 import com.dangbun.domain.place.dto.request.PostRegisterPlaceRequest;
@@ -92,7 +93,7 @@ public class PlaceController {
     }
 
     @Operation(summary = "참여 취소",description = "대기중인 플레이스의 참여 신청을 철회합니다")
-    @DeleteMapping("/{placeId}")
+    @DeleteMapping("/{placeId}/join-requests")
     public ResponseEntity<BaseResponse<?>> deleteRegisterPlace(@AuthenticationPrincipal(expression = "user") User user,
                                                                @PathVariable Long placeId){
         placeService.cancelRegister(user,placeId);
@@ -119,6 +120,21 @@ public class PlaceController {
     public ResponseEntity<BaseResponse<?>> deletePlace(@AuthenticationPrincipal(expression = "user") User user,
                                                        @PathVariable Long placeId) {
         placeService.deletePlace(user, placeId);
+        return ResponseEntity.ok(BaseResponse.ok(null));
+    }
+
+
+    //Todo "INVALID_ROLE"도 추가해야함
+    @Operation(summary = "체크리스트 시간 설정", description = "플레이스의 체크리스트 시작시간/종료시간을 설정합니다.")
+    @DocumentedApiErrors(
+            value = {PlaceExceptionResponse.class},
+            includes = {"INVALID_TIME"}
+    )
+    @PatchMapping("/{placeId}/settings/time")
+    public ResponseEntity<BaseResponse<?>> updateTime(@AuthenticationPrincipal(expression = "user") User user,
+                                                      @PathVariable Long placeId,
+                                                      @RequestBody PatchUpdateTimeRequest request){
+        placeService.updateTime(user, placeId, request);
         return ResponseEntity.ok(BaseResponse.ok(null));
     }
 }

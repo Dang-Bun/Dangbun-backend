@@ -1,9 +1,6 @@
 package com.dangbun.domain.place.exception.handler;
 
-import com.dangbun.domain.place.exception.custom.AlreadyInvitedException;
-import com.dangbun.domain.place.exception.custom.InvalidInformationException;
-import com.dangbun.domain.place.exception.custom.InvalidInviteCodeException;
-import com.dangbun.domain.place.exception.custom.NoSuchPlaceException;
+import com.dangbun.domain.place.exception.custom.*;
 import com.dangbun.global.response.BaseErrorResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -34,6 +31,12 @@ public class PlaceControllerAdvice {
     @ExceptionHandler(NoSuchPlaceException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public BaseErrorResponse handleNoSuchPlaceException(NoSuchPlaceException e) {
+        return new BaseErrorResponse(e.getExceptionStatus());
+    }
+
+    @ExceptionHandler(InvalidTimeException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public BaseErrorResponse handleInvalidTimeException(InvalidTimeException e) {
         return new BaseErrorResponse(e.getExceptionStatus());
     }
 

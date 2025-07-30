@@ -15,16 +15,14 @@ import com.dangbun.domain.membercleaning.entity.MemberCleaning;
 import com.dangbun.domain.membercleaning.repository.MemberCleaningRepository;
 import com.dangbun.domain.memberduty.entity.MemberDuty;
 import com.dangbun.domain.memberduty.repository.MemberDutyRepository;
+import com.dangbun.domain.place.dto.request.PatchUpdateTimeRequest;
 import com.dangbun.domain.place.dto.request.PostCheckInviteCodeRequest;
 import com.dangbun.domain.place.dto.request.PostCreatePlaceRequest;
 import com.dangbun.domain.place.dto.request.PostRegisterPlaceRequest;
 import com.dangbun.domain.place.dto.response.*;
 import com.dangbun.domain.place.entity.Place;
 import com.dangbun.domain.place.entity.PlaceCategory;
-import com.dangbun.domain.place.exception.custom.AlreadyInvitedException;
-import com.dangbun.domain.place.exception.custom.InvalidInformationException;
-import com.dangbun.domain.place.exception.custom.InvalidInviteCodeException;
-import com.dangbun.domain.place.exception.custom.NoSuchPlaceException;
+import com.dangbun.domain.place.exception.custom.*;
 import com.dangbun.domain.place.repository.PlaceRepository;
 import com.dangbun.domain.user.entity.User;
 import com.dangbun.domain.user.exception.custom.UserNotFoundException;
@@ -100,17 +98,15 @@ public class PlaceService {
     }
 
     public PostCreateInviteCodeResponse createInviteCode(Long userId, Long placeId) {
-        Member member = memberRepository.findWithPlaceByUserIdAndPlaceId(userId, placeId)
-                .orElseThrow(() -> new MemberNotFoundException(NO_SUCH_MEMBER));
-        if (member.getRole().equals(MemberRole.MEMBER)) {
-            throw new InvalidRoleException(INVALID_ROLE);
-        }
+        Member manager = getManager(userId, placeId);
 
-        Place place = member.getPlace();
+        Place place = manager.getPlace();
         String code = place.createCode(generateCode());
 
         return new PostCreateInviteCodeResponse(code);
     }
+
+
 
 
     @Transactional(readOnly = true)
@@ -223,5 +219,25 @@ public class PlaceService {
                 .orElseThrow(() -> new MemberNotFoundException(NO_SUCH_MEMBER));
 
         memberRepository.delete(member);
+    }
+
+    public void updateTime(User user, Long placeId, PatchUpdateTimeRequest request) {
+        Member manager = getManager(user.getUserId(), placeId);
+        if(request.starTime().isAfter(request.endTime())&& request.isToday()){
+            throw new InvalidTimeException(INVALID_TIME);
+        }
+        Place place = manager.getPlace();
+        place.setTime(request.starTime(), request.endTime());
+    }
+
+
+
+    private Member getManager(Long userId, Long placeId) {
+        Member member = memberRepository.findWithPlaceByUserIdAndPlaceId(userId, placeId)
+                .orElseThrow(() -> new MemberNotFoundException(NO_SUCH_MEMBER));
+        if (member.getRole().equals(MemberRole.MEMBER)) {
+            throw new InvalidRoleException(INVALID_ROLE);
+        }
+        return member;
     }
 }
