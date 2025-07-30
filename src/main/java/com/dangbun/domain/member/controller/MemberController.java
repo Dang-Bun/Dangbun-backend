@@ -33,12 +33,13 @@ public class MemberController {
 
     @Operation(summary = "맴버 목록 조회", description = "플레이스에 참가한 맴버를 조회합니다.")
     @DocumentedApiErrors(
-            value = {},
-            includes = {""}
+            value = {MemberExceptionResponse.class},
+            includes = {"NO_SUCH_MEMBER"}
     )
     @GetMapping
-    public ResponseEntity<BaseResponse<GetMembersResponse>> getMembers(@PathVariable("placeId") Long placeId) {
-        GetMembersResponse response = memberService.getMembers(placeId);
+    public ResponseEntity<BaseResponse<GetMembersResponse>> getMembers(@AuthenticationPrincipal(expression = "user") User user,
+                                                                       @PathVariable("placeId") Long placeId) {
+        GetMembersResponse response = memberService.getMembers(user, placeId);
         return ResponseEntity.ok(BaseResponse.ok(response));
     }
 

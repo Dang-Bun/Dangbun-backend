@@ -8,12 +8,12 @@ import java.time.LocalTime;
 
 
 public record PatchUpdateTimeRequest(
-        @Schema(description = "시작 시간", example = "00:00")
+        @Schema(description = "시작 시간", example = "00:00", type = "string", pattern = "HH:mm")
         @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm")
         @NotNull
-        LocalTime starTime,
+        LocalTime startTime,
 
-        @Schema(description = "종료 시간", example = "23:59")
+        @Schema(description = "종료 시간", example = "23:59", type = "string", pattern = "HH:mm")
         @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm")
         @NotNull
         LocalTime endTime,

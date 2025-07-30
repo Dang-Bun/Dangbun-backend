@@ -223,11 +223,11 @@ public class PlaceService {
 
     public void updateTime(User user, Long placeId, PatchUpdateTimeRequest request) {
         Member manager = getManager(user.getUserId(), placeId);
-        if(request.starTime().isAfter(request.endTime())&& request.isToday()){
+        if(request.startTime().isAfter(request.endTime())&& request.isToday()){
             throw new InvalidTimeException(INVALID_TIME);
         }
         Place place = manager.getPlace();
-        place.setTime(request.starTime(), request.endTime());
+        place.setTime(request.startTime(), request.endTime());
     }
 
 

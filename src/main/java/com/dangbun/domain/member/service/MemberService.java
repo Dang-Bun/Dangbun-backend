@@ -34,12 +34,17 @@ public class MemberService {
 
 
     @Transactional(readOnly = true)
-    public GetMembersResponse getMembers(Long placeId) {
+    public GetMembersResponse getMembers(User user, Long placeId) {
+
+        Member me = memberRepository.findByUser_UserIdAndPlace_PlaceId(user.getUserId(), placeId)
+                .orElseThrow(()->new MemberNotFoundException(NO_SUCH_MEMBER));
 
         Map<Member, List<String>> memberMap = new HashMap<>();
 
         List<Member> members = memberRepository.findByPlace_PlaceId(placeId);
-        int waitingMemberNumber = 0;
+
+        Integer waitingMemberNumber = 0;
+
         for (Member member : members) {
             if(member.getStatus()) {
                 List<MemberDuty> memberDuties = memberDutyRepository.findAllByMember(member);
@@ -52,6 +57,10 @@ public class MemberService {
             if(!member.getStatus()){
                 waitingMemberNumber++;
             }
+        }
+
+        if(me.getRole().equals(MemberRole.MEMBER)){
+            waitingMemberNumber = null;
         }
 
         return GetMembersResponse.of(waitingMemberNumber, memberMap);
