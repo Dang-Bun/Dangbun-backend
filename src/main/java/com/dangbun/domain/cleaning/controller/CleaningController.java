@@ -30,9 +30,9 @@ public class CleaningController {
             includes = {""}
     )
     @GetMapping("/cleanings/duties")
-    public ResponseEntity<List<GetCleaningListResponse>> getCleaningList(
+    public ResponseEntity<BaseResponse<List<GetCleaningListResponse>>> getCleaningList(
             @RequestParam List<Long> memberIds) {
-        return ResponseEntity.ok(cleaningService.getCleaningList(memberIds));
+        return ResponseEntity.ok(BaseResponse.ok(cleaningService.getCleaningList(memberIds)));
     }
 
     @Operation(summary = "특정 당번의 선택 멤버가 참여 중인 청소 목록 조회", description = "특정 당번 옆의 버튼을 누르면 전달된 memberIds 중 한명이라도 참여한 청소 목록을 필터링하여 반환합니다.")
@@ -41,9 +41,9 @@ public class CleaningController {
             value = {CleaningExceptionResponse.class},
             includes = {"DUTY_NOT_FOUND"}
     )
-    public ResponseEntity<List<GetCleaningDetailListResponse>> getCleaningDetailList(
+    public ResponseEntity<BaseResponse<List<GetCleaningDetailListResponse>>> getCleaningDetailList(
             @PathVariable Long dutyId, @RequestParam List<Long> memberIds) {
-        return ResponseEntity.ok(cleaningService.getCleaningDetailList(dutyId, memberIds));
+        return ResponseEntity.ok(BaseResponse.ok(cleaningService.getCleaningDetailList(dutyId, memberIds)));
     }
 
     @Operation(summary = "당번별 청소 생성", description = "입력한 정보들을 바탕으로 새로운 청소를 생성합니다.")
@@ -80,6 +80,16 @@ public class CleaningController {
     public ResponseEntity<BaseResponse<Void>> deleteCleaning(@PathVariable Long cleaningId) {
         cleaningService.deleteCleaning(cleaningId);
         return ResponseEntity.ok(BaseResponse.ok(null));
+    }
+
+    @Operation(summary = "미지정 청소 목록 조회", description = " 미지정 청소 항목들의 이름 목록을 반환합니다.")
+    @GetMapping("/cleanings/unassigned")
+    @DocumentedApiErrors(
+            value = {CleaningExceptionResponse.class},
+            includes = {"PLACE_NOT_FOUND"}
+    )
+    public ResponseEntity<BaseResponse<List<GetCleaningUnassignedResponse>>> getUnassignedCleanings(@RequestParam Long placeId) {
+        return ResponseEntity.ok(BaseResponse.ok(cleaningService.getUnassignedCleanings(placeId)));
     }
 
 
