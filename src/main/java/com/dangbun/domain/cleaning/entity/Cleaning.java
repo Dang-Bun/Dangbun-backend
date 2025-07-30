@@ -1,9 +1,14 @@
 package com.dangbun.domain.cleaning.entity;
+
 import com.dangbun.domain.duty.entity.Duty;
 import com.dangbun.domain.member.entity.Member;
 import com.dangbun.domain.membercleaning.entity.MemberCleaning;
+import com.dangbun.domain.place.entity.Place;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,17 +39,22 @@ public class Cleaning {
     @Column(name = "need_photo", nullable = false)
     private Boolean needPhoto;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "place_id", nullable = false)
+    private Place place;
+
     @OneToMany(mappedBy = "cleaning", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<MemberCleaning> memberCleanings = new ArrayList<>();
 
 
     @Builder
-    public Cleaning(String name, CleaningRepeatType repeatType, String repeatDays, Duty duty, Boolean needPhoto) {
+    public Cleaning(String name, CleaningRepeatType repeatType, String repeatDays, Duty duty, Boolean needPhoto, Place place) {
         this.name = name;
         this.repeatType = repeatType;
         this.repeatDays = repeatDays;
         this.duty = duty;
         this.needPhoto = needPhoto;
+        this.place = place;
     }
 
     public void updateInfo(String name, Boolean needPhoto, CleaningRepeatType repeatType, String repeatDays, Duty duty) {
