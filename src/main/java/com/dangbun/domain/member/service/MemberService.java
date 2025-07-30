@@ -30,7 +30,6 @@ public class MemberService {
 
     private final MemberRepository memberRepository;
     private final MemberDutyRepository memberDutyRepository;
-    private final DutyRepository dutyRepository;
     private final MemberCleaningRepository memberCleaningRepository;
 
 
@@ -157,10 +156,7 @@ public class MemberService {
     }
 
 
-    private Member getMemberByMemberIdAndPlaceId(Long memberId, Long placeId) {
-        return memberRepository.findByMemberIdAndPlace_PlaceId(memberId, placeId)
-                .orElseThrow(() -> new MemberNotFoundException(NO_SUCH_MEMBER));
-    }
+
 
     public GetMemberSearchResponse searchByNameInPlace(Long placeId, String name) {
         Member me = MemberContext.get();
@@ -182,5 +178,10 @@ public class MemberService {
         memberDutyRepository.deleteAllByMember(member);
 
         memberRepository.delete(member);
+    }
+
+    private Member getMemberByMemberIdAndPlaceId(Long memberId, Long placeId) {
+        return memberRepository.findByMemberIdAndPlace_PlaceId(memberId, placeId)
+                .orElseThrow(() -> new MemberNotFoundException(NO_SUCH_MEMBER));
     }
 }
