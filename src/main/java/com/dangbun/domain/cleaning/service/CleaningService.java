@@ -2,31 +2,31 @@ package com.dangbun.domain.cleaning.service;
 
 import com.dangbun.domain.cleaning.dto.request.PostCleaningCreateRequest;
 import com.dangbun.domain.cleaning.dto.request.PutCleaningUpdateRequest;
-import com.dangbun.domain.cleaning.dto.response.*;
+import com.dangbun.domain.cleaning.dto.response.GetCleaningDetailListResponse;
+import com.dangbun.domain.cleaning.dto.response.GetCleaningListResponse;
+import com.dangbun.domain.cleaning.dto.response.PostCleaningResponse;
 import com.dangbun.domain.cleaning.entity.Cleaning;
-
 import com.dangbun.domain.cleaning.exception.custom.*;
-
 import com.dangbun.domain.cleaning.repository.CleaningRepository;
 import com.dangbun.domain.cleaningdate.entity.CleaningDate;
 import com.dangbun.domain.cleaningdate.repository.CleaningDateRepository;
-
 import com.dangbun.domain.duty.entity.Duty;
 import com.dangbun.domain.duty.repository.DutyRepository;
 import com.dangbun.domain.member.entity.Member;
 import com.dangbun.domain.member.repository.MemberRepository;
 import com.dangbun.domain.membercleaning.entity.MemberCleaning;
 import com.dangbun.domain.membercleaning.repository.MemberCleaningRepository;
-import org.springframework.transaction.annotation.Transactional;
-
+import com.dangbun.domain.place.entity.Place;
+import com.dangbun.domain.place.repository.PlaceRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.List;
 
-import static com.dangbun.domain.cleaning.entity.CleaningRepeatType.*;
+import static com.dangbun.domain.cleaning.entity.CleaningRepeatType.WEEKLY;
 import static com.dangbun.domain.cleaning.response.status.CleaningExceptionResponse.*;
 
 @RequiredArgsConstructor
@@ -38,6 +38,7 @@ public class CleaningService {
     private final CleaningRepository cleaningRepository;
     private final MemberRepository memberRepository;
     private final CleaningDateRepository cleaningDateRepository;
+    private final PlaceRepository placeRepository;
 
 
     public List<GetCleaningListResponse> getCleaningList(List<Long> memberIds) {
@@ -73,6 +74,9 @@ public class CleaningService {
 
     @Transactional()
     public PostCleaningResponse createCleaning(PostCleaningCreateRequest request) {
+        Place place = placeRepository.findById(request.placeId())
+                .orElseThrow(() -> new PlaceNotFoundException(PLACE_NOT_FOUND));
+
         Duty duty = null;
         if (request.dutyName() != null) {
             duty = dutyRepository.findByName(request.dutyName())
@@ -92,8 +96,8 @@ public class CleaningService {
                                 ? String.join(",", request.repeatDays())
                                 : null
                 )
-
                 .needPhoto(request.needPhoto())
+                .place(place)
                 .build();
 
 
