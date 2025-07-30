@@ -205,7 +205,7 @@ public class DutyService {
     }
 
     @Transactional
-    public List<GetCleanigListResponse> getCleaningList(Long dutyId) {
+    public List<GetCleaningListResponse> getCleaningList(Long dutyId) {
         Duty duty = dutyRepository.findById(dutyId)
                 .orElseThrow(() -> new DutyNotFoundException(DUTY_NOT_FOUND));
 
@@ -226,12 +226,11 @@ public class DutyService {
 
                     boolean isCommon = members.size() == dutyMemberCount;
 
-                    return GetCleanigListResponse.of(
+                    return GetCleaningListResponse.of(
                             cleaning.getCleaningId(),
                             cleaning.getName(),
                             displayednames,
-                            members.size(),
-                            isCommon
+                            members.size()
                     );
                 })
                 .toList();
