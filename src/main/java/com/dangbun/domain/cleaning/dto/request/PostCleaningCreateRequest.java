@@ -8,6 +8,10 @@ import jakarta.validation.constraints.NotNull;
 import java.util.List;
 
 public record PostCleaningCreateRequest(
+        @Schema(description = "플레이스 id", example = "1")
+        @NotNull
+        Long placeId,
+
         @Schema(description = "청소 이름", example = "바닥 쓸기")
         @NotEmpty
         String cleaningName,

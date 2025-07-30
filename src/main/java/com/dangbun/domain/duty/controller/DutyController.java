@@ -123,6 +123,18 @@ public class DutyController {
         return ResponseEntity.ok(BaseResponse.ok(dutyService.getCleaningList(dutyId)));
     }
 
+    @Operation(summary = "당번 정보 - 미지정 청소 추가", description = "당번에 미지정 청소를 추가합니다.")
+    @PostMapping("/duties/{dutyId}/cleanings")
+    @DocumentedApiErrors(
+            value = {DutyExceptionResponse.class},
+            includes = {"DUTY_NOT_FOUND"}
+    )
+    public ResponseEntity<BaseResponse<PostAddCleaningsResponse>> addCleanings(
+            @PathVariable Long dutyId,
+            @RequestBody PostAddCleaningsRequest request
+    ) {
+        return ResponseEntity.ok(BaseResponse.ok(dutyService.addCleanings(dutyId, request)));
+    }
 
 
 }
