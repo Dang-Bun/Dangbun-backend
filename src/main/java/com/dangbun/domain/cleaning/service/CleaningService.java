@@ -4,6 +4,7 @@ import com.dangbun.domain.cleaning.dto.request.PostCleaningCreateRequest;
 import com.dangbun.domain.cleaning.dto.request.PutCleaningUpdateRequest;
 import com.dangbun.domain.cleaning.dto.response.GetCleaningDetailListResponse;
 import com.dangbun.domain.cleaning.dto.response.GetCleaningListResponse;
+import com.dangbun.domain.cleaning.dto.response.GetCleaningUnassignedResponse;
 import com.dangbun.domain.cleaning.dto.response.PostCleaningResponse;
 import com.dangbun.domain.cleaning.entity.Cleaning;
 import com.dangbun.domain.cleaning.exception.custom.*;
@@ -199,4 +200,15 @@ public class CleaningService {
     }
 
 
+    public List<GetCleaningUnassignedResponse> getUnassignedCleanings(Long placeId) {
+        if (!placeRepository.existsById(placeId)) {
+            throw new PlaceNotFoundException(PLACE_NOT_FOUND);
+        }
+
+        List<Cleaning> cleanings = cleaningRepository.findUnassignedCleaningsByPlaceId(placeId);
+
+        return cleanings.stream()
+                .map(cleaning -> GetCleaningUnassignedResponse.of(cleaning.getName()))
+                .toList();
+    }
 }

@@ -35,4 +35,13 @@ public interface CleaningRepository extends JpaRepository<Cleaning, Long> {
 
     Optional<Cleaning> findByCleaningIdAndDuty_DutyId(Long cleaningId, Long dutyId);
 
+    // CleaningRepository.java
+
+    @Query("""
+    SELECT c
+    FROM Cleaning c
+    WHERE c.duty IS NULL AND c.place.placeId = :placeId
+    """)
+    List<Cleaning> findUnassignedCleaningsByPlaceId(Long placeId);
+
 }
