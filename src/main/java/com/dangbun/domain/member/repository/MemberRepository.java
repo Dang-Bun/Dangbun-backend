@@ -27,7 +27,7 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
 
     List<Member> findAllByNameIn(List<String> names);
 
-    List<Member> findByPlace_PlaceIdAndStatusIsTrue(Long placeId);
+    List<Member> findByPlace_PlaceId(Long placeId);
 
     @Query("select count(m)>0 from Member m where m.user.userId = :userId and m.place.placeId = :placeId")
     boolean existsByUserIdAndPlaceId(@Param("userId") Long userId, @Param("placeId") Long placeId);

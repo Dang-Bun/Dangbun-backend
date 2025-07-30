@@ -38,16 +38,23 @@ public class MemberService {
 
         Map<Member, List<String>> memberMap = new HashMap<>();
 
-        List<Member> members = memberRepository.findByPlace_PlaceIdAndStatusIsTrue(placeId);
+        List<Member> members = memberRepository.findByPlace_PlaceId(placeId);
+        int waitingMemberNumber = 0;
         for (Member member : members) {
-            List<MemberDuty> memberDuties = memberDutyRepository.findAllByMember(member);
-            List<String> dutyNames = new ArrayList<>();
-            for (MemberDuty memberDuty : memberDuties) {
-                dutyNames.add(memberDuty.getDuty().getName());
+            if(member.getStatus()) {
+                List<MemberDuty> memberDuties = memberDutyRepository.findAllByMember(member);
+                List<String> dutyNames = new ArrayList<>();
+                for (MemberDuty memberDuty : memberDuties) {
+                    dutyNames.add(memberDuty.getDuty().getName());
+                }
+                memberMap.put(member, dutyNames);
             }
-            memberMap.put(member, dutyNames);
+            if(!member.getStatus()){
+                waitingMemberNumber++;
+            }
         }
-        return GetMembersResponse.of(memberMap);
+
+        return GetMembersResponse.of(waitingMemberNumber, memberMap);
     }
 
 

@@ -7,10 +7,11 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
 import java.util.Map;
 
-public record GetMembersResponse (
+public record GetMembersResponse(
+        @Schema(description = "대기 맴버 숫자", example = "4") Integer waitingMemberNumber,
         @Schema(description = "맴버 리스트") List<MemberDto> members
-){
-    public static GetMembersResponse of(Map<Member,List<String>> memberMap){
+) {
+    public static GetMembersResponse of(int waitingMemberNumber, Map<Member, List<String>> memberMap) {
         List<MemberDto> memberDtos = memberMap.entrySet().stream()
                 .map(entry -> new MemberDto(
                         entry.getKey().getMemberId(),
@@ -18,7 +19,7 @@ public record GetMembersResponse (
                         entry.getKey().getName(),
                         entry.getValue()
                 )).toList();
-        return new GetMembersResponse(memberDtos);
+        return new GetMembersResponse(waitingMemberNumber, memberDtos);
     }
 
     @Schema(name = "GetMembersResponse.MemberDto", description = "맴버 DTO")
@@ -31,6 +32,7 @@ public record GetMembersResponse (
             String name,
             @Schema(description = "당번 이름", example = "[\"화장실 청소\", \"바닥 청소\"]")
             List<String> dutyName
-    ){}
+    ) {
+    }
 
 }
