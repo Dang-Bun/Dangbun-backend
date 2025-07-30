@@ -66,4 +66,9 @@ public class Cleaning {
         }
     }
 
+    public void assignToDuty(Duty duty) {
+        this.duty = duty;
+    }
+
+
 }

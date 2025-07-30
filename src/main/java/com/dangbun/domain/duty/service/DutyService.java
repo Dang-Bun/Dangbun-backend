@@ -236,4 +236,25 @@ public class DutyService {
                 })
                 .toList();
     }
+
+    @Transactional
+    public PostAddCleaningsResponse addCleanings(Long dutyId, PostAddCleaningsRequest request) {
+        Duty duty = dutyRepository.findById(dutyId)
+                .orElseThrow(() -> new DutyNotFoundException(DUTY_NOT_FOUND));
+
+        List<Cleaning> cleanings = cleaningRepository.findAllById(request.cleaningIds());
+        List<Long> assignedIds = new ArrayList<>();
+
+        for (Cleaning cleaning : cleanings) {
+            if (cleaning.getDuty() == null) {
+                cleaning.assignToDuty(duty);
+                assignedIds.add(cleaning.getCleaningId());
+            }
+        }
+        cleaningRepository.saveAll(cleanings);
+
+
+
+        return PostAddCleaningsResponse.of(assignedIds);
+    }
 }
