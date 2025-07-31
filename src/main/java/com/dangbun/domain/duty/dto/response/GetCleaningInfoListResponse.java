@@ -4,7 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.util.List;
 
-public record GetCleaningListResponse(
+public record GetCleaningInfoListResponse(
         @Schema(description = "청소 ID", example = "1")
         Long cleaningId,
         @Schema(description = "청소 이름", example = "바닥 닦기")
@@ -14,8 +14,8 @@ public record GetCleaningListResponse(
         @Schema(description = "청소 멤버 수", example = "3")
         int memberCount
 ) {
-    public static GetCleaningListResponse of(Long cleaningId, String name, List<String> displayednames, int size) {
-        return new GetCleaningListResponse(
+    public static GetCleaningInfoListResponse of(Long cleaningId, String name, List<String> displayednames, int size) {
+        return new GetCleaningInfoListResponse(
                 cleaningId, name, displayednames, size
         );
     }
