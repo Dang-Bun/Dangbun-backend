@@ -73,14 +73,24 @@ public class DutyController {
         return ResponseEntity.ok(BaseResponse.ok(null));
     }
 
-    @Operation(summary = "당번 정보 조회", description = "당번의 멤버 목록, 청소 목록을 조회합니다.")
-    @GetMapping("/duties/{dutyId}")
+    @Operation(summary = "당번 정보 - 멤버 이름 목록 조회", description = "당번의 멤버 이름 목록을 조회합니다.")
+    @GetMapping("/duties/{dutyId}/member-names")
     @DocumentedApiErrors(
             value = {DutyExceptionResponse.class},
             includes = {"DUTY_NOT_FOUND"}
     )
-    public ResponseEntity<BaseResponse<GetDutyInfoResponse>> getDutyInfo(@PathVariable Long dutyId) {
-        return ResponseEntity.ok(BaseResponse.ok(dutyService.getDutyInfo(dutyId)));
+    public ResponseEntity<BaseResponse<List<GetDutyMemberNameListResponse>>> getDutyMemberNameList(@PathVariable Long dutyId) {
+        return ResponseEntity.ok(BaseResponse.ok(dutyService.getDutyMemberNameList(dutyId)));
+    }
+
+    @Operation(summary = "당번 정보 - 청소 이름 목록 조회", description = "당번의 청소 이름 목록을 조회합니다.")
+    @GetMapping("/duties/{dutyId}/cleaning-names")
+    @DocumentedApiErrors(
+            value = {DutyExceptionResponse.class},
+            includes = {"DUTY_NOT_FOUND"}
+    )
+    public ResponseEntity<BaseResponse<List<GetDutyCleaningNameListResponse>>> getDutyCleaningNameList(@PathVariable Long dutyId) {
+        return ResponseEntity.ok(BaseResponse.ok(dutyService.getDutyCleaningNameList(dutyId)));
     }
 
     @Operation(summary = "당번 정보 - 멤버 추가", description = "당번에 멤버를 추가합니다.")
@@ -110,17 +120,17 @@ public class DutyController {
         return ResponseEntity.ok(BaseResponse.ok(null));
     }
 
-
-    @Operation(summary = "당번 역할 분담 - 청소 목록 조회", description = "해당 당번에 해당하는 청소 목록을 조회합니다.")
+    @Operation(summary = "당번 역할 분담 - 청소 목록 조회 (청소 상세 정보 포함)", description = "해당 당번에 해당하는 청소 목록(청소 상세 정보 포함)을 조회합니다.")
     @DocumentedApiErrors(
             value = {DutyExceptionResponse.class},
             includes = {"DUTY_NOT_FOUND"}
     )
-    @GetMapping("/duties/{dutyId}/cleanings")
-    public ResponseEntity<BaseResponse<List<GetCleaningListResponse>>> getCleaningList(
+    @GetMapping("/duties/{dutyId}/cleaning-info")
+    public ResponseEntity<BaseResponse<List<GetCleaningInfoListResponse>>> getCleaningInfoList(
             @PathVariable Long dutyId) {
-        return ResponseEntity.ok(BaseResponse.ok(dutyService.getCleaningList(dutyId)));
+        return ResponseEntity.ok(BaseResponse.ok(dutyService.getCleaningInfoList(dutyId)));
     }
+
 
     @Operation(summary = "당번 정보 - 미지정 청소 추가", description = "당번에 미지정 청소를 추가합니다.")
     @PostMapping("/duties/{dutyId}/cleanings")
