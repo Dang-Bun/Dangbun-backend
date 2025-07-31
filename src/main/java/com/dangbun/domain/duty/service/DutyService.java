@@ -2,6 +2,7 @@ package com.dangbun.domain.duty.service;
 
 import com.dangbun.domain.cleaning.entity.Cleaning;
 import com.dangbun.domain.cleaning.repository.CleaningRepository;
+import com.dangbun.domain.cleaning.service.CleaningService;
 import com.dangbun.domain.cleaningdate.repository.CleaningDateRepository;
 import com.dangbun.domain.duty.dto.request.*;
 import com.dangbun.domain.duty.dto.response.*;
@@ -36,6 +37,7 @@ public class DutyService {
     private final MemberRepository memberRepository;
     private final CleaningDateRepository cleaningDateRepository;
     private final MemberCleaningRepository memberCleaningRepository;
+    private final CleaningService cleaningService;
 
     @Transactional
     public PostDutyCreateResponse createDuty(Long placeId, PostDutyCreateRequest request) {
@@ -86,7 +88,11 @@ public class DutyService {
 
         List<Cleaning> cleanings = cleaningRepository.findAllByDuty(duty);
         cleaningDateRepository.deleteAllByCleaningIn(cleanings);
-        cleaningRepository.deleteAllByDuty(duty);
+//        cleaningRepository.deleteAllByDuty(duty);
+
+        for(Cleaning cleaning : cleanings) {
+            cleaningService.deleteCleaning(cleaning.getCleaningId());
+        }
         dutyRepository.delete(duty);
     }
 
