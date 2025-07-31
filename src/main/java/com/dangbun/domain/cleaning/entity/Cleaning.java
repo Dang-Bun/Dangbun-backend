@@ -80,5 +80,7 @@ public class Cleaning {
         this.duty = duty;
     }
 
-
+    public void removeDuty() {
+        this.duty = null;
+    }
 }

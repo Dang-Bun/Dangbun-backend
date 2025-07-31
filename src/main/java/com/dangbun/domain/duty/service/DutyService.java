@@ -256,4 +256,22 @@ public class DutyService {
 
         return PostAddCleaningsResponse.of(assignedIds);
     }
+
+    @Transactional
+    public void removeCleaningFromDuty(Long dutyId, Long cleaningId) {
+        Duty duty = dutyRepository.findById(dutyId)
+                .orElseThrow(() -> new DutyNotFoundException(DUTY_NOT_FOUND));
+
+        Cleaning cleaning = cleaningRepository.findById(cleaningId)
+                .orElseThrow(() -> new CleaningNotFoundException(CLEANING_NOT_FOUND));
+
+        if (cleaning.getDuty() == null || !cleaning.getDuty().getDutyId().equals(dutyId)) {
+            throw new CleaningNotAssignedException(CLEANING_NOT_ASSIGNED);
+        }
+
+        cleaning.removeDuty();
+
+
+
+    }
 }
