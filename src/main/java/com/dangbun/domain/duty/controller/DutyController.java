@@ -8,7 +8,6 @@ import com.dangbun.global.docs.DocumentedApiErrors;
 import com.dangbun.global.response.BaseResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -136,5 +135,17 @@ public class DutyController {
         return ResponseEntity.ok(BaseResponse.ok(dutyService.addCleanings(dutyId, request)));
     }
 
+    @Operation(summary = "당번에서 청소 항목 제거", description = "지정된 당번에서 특정 청소 항목을 제거하면 해당 청소는 미지정 상태로 되돌아갑니다.")
+    @DeleteMapping("/duties/{dutyId}/cleanings/{cleaningId}")
+    @DocumentedApiErrors(
+            value = DutyExceptionResponse.class,
+            includes = {"", ""}
+    )
+    public ResponseEntity<BaseResponse<Void>> removeCleaning(
+            @PathVariable Long dutyId,
+            @PathVariable Long cleaningId) {
+        dutyService.removeCleaningFromDuty(dutyId, cleaningId);
+        return ResponseEntity.ok(BaseResponse.ok(null));
+    }
 
 }
