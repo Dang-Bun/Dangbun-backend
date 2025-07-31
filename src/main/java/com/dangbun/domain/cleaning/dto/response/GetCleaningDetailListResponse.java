@@ -1,7 +1,5 @@
 package com.dangbun.domain.cleaning.dto.response;
 
-import com.dangbun.domain.cleaning.entity.Cleaning;
-import com.dangbun.domain.duty.entity.Duty;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.util.List;
