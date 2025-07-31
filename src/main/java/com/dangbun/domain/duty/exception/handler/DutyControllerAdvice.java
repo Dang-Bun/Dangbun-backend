@@ -43,8 +43,14 @@ public class DutyControllerAdvice {
     }
 
     @ExceptionHandler(MemberNotExistsException.class)
-    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
     public BaseErrorResponse handleMemberNotExistsException(MemberNotExistsException e) {
         return new BaseErrorResponse(MEMBER_NOT_EXISTS);
+    }
+
+    @ExceptionHandler(CleaningNotAssignedException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public BaseErrorResponse handleCleaningNotAssignedException(CleaningNotAssignedException e) {
+        return new BaseErrorResponse(CLEANING_NOT_ASSIGNED);
     }
 }

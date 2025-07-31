@@ -2,6 +2,7 @@ package com.dangbun.domain.duty.service;
 
 import com.dangbun.domain.cleaning.entity.Cleaning;
 import com.dangbun.domain.cleaning.repository.CleaningRepository;
+import com.dangbun.domain.cleaning.service.CleaningService;
 import com.dangbun.domain.cleaningdate.repository.CleaningDateRepository;
 import com.dangbun.domain.duty.dto.request.*;
 import com.dangbun.domain.duty.dto.response.*;
@@ -36,6 +37,7 @@ public class DutyService {
     private final MemberRepository memberRepository;
     private final CleaningDateRepository cleaningDateRepository;
     private final MemberCleaningRepository memberCleaningRepository;
+    private final CleaningService cleaningService;
 
     @Transactional
     public PostDutyCreateResponse createDuty(Long placeId, PostDutyCreateRequest request) {
@@ -86,41 +88,36 @@ public class DutyService {
 
         List<Cleaning> cleanings = cleaningRepository.findAllByDuty(duty);
         cleaningDateRepository.deleteAllByCleaningIn(cleanings);
-        cleaningRepository.deleteAllByDuty(duty);
+//        cleaningRepository.deleteAllByDuty(duty);
+
+        for(Cleaning cleaning : cleanings) {
+            cleaningService.deleteCleaning(cleaning.getCleaningId());
+        }
         dutyRepository.delete(duty);
     }
 
-
-    @Transactional()
-    public GetDutyInfoResponse getDutyInfo(Long dutyId) {
+    public List<GetDutyMemberNameListResponse> getDutyMemberNameList(Long dutyId) {
         Duty duty = dutyRepository.findById(dutyId)
                 .orElseThrow(() -> new DutyNotFoundException(DUTY_NOT_FOUND));
 
         List<MemberDuty> members = memberDutyRepository.findAllByDuty(duty);
-        List<GetDutyInfoResponse.MemberDto> memberInfos = members.stream()
-                .map(md -> new GetDutyInfoResponse.MemberDto(
-                        md.getMember().getMemberId(),
-                        md.getMember().getRole(),
-                        md.getMember().getUser().getName()
-                ))
+
+        return members.stream()
+                .map(md -> GetDutyMemberNameListResponse.of(md.getMember()))
                 .toList();
+    }
+
+    public List<GetDutyCleaningNameListResponse> getDutyCleaningNameList(Long dutyId) {
+        Duty duty = dutyRepository.findById(dutyId)
+                .orElseThrow(() -> new DutyNotFoundException(DUTY_NOT_FOUND));
 
         List<Cleaning> cleanings = cleaningRepository.findAllByDuty(duty);
-        List<GetDutyInfoResponse.CleaningDto> cleaningInfos = cleanings.stream()
-                .map(c -> new GetDutyInfoResponse.CleaningDto(
-                        c.getCleaningId(),
-                        c.getName()
-                ))
-                .toList();
 
-        return GetDutyInfoResponse.of(
-                duty.getDutyId(),
-                duty.getName(),
-                duty.getIcon(),
-                memberInfos,
-                cleaningInfos
-        );
+        return cleanings.stream()
+                .map(GetDutyCleaningNameListResponse::of)
+                .toList();
     }
+
 
     @Transactional
     public PostAddMembersResponse addMembers(Long dutyId, PostAddMembersRequest request) {
@@ -205,7 +202,7 @@ public class DutyService {
     }
 
     @Transactional
-    public List<GetCleanigListResponse> getCleaningList(Long dutyId) {
+    public List<GetCleaningInfoListResponse> getCleaningInfoList(Long dutyId) {
         Duty duty = dutyRepository.findById(dutyId)
                 .orElseThrow(() -> new DutyNotFoundException(DUTY_NOT_FOUND));
 
@@ -226,14 +223,54 @@ public class DutyService {
 
                     boolean isCommon = members.size() == dutyMemberCount;
 
-                    return GetCleanigListResponse.of(
+                    return GetCleaningInfoListResponse.of(
                             cleaning.getCleaningId(),
                             cleaning.getName(),
                             displayednames,
-                            members.size(),
-                            isCommon
+                            members.size()
                     );
                 })
                 .toList();
     }
+
+    @Transactional
+    public PostAddCleaningsResponse addCleanings(Long dutyId, PostAddCleaningsRequest request) {
+        Duty duty = dutyRepository.findById(dutyId)
+                .orElseThrow(() -> new DutyNotFoundException(DUTY_NOT_FOUND));
+
+        List<Cleaning> cleanings = cleaningRepository.findAllById(request.cleaningIds());
+        List<Long> assignedIds = new ArrayList<>();
+
+        for (Cleaning cleaning : cleanings) {
+            if (cleaning.getDuty() == null) {
+                cleaning.assignToDuty(duty);
+                assignedIds.add(cleaning.getCleaningId());
+            }
+        }
+        cleaningRepository.saveAll(cleanings);
+
+
+
+        return PostAddCleaningsResponse.of(assignedIds);
+    }
+
+    @Transactional
+    public void removeCleaningFromDuty(Long dutyId, Long cleaningId) {
+        Duty duty = dutyRepository.findById(dutyId)
+                .orElseThrow(() -> new DutyNotFoundException(DUTY_NOT_FOUND));
+
+        Cleaning cleaning = cleaningRepository.findById(cleaningId)
+                .orElseThrow(() -> new CleaningNotFoundException(CLEANING_NOT_FOUND));
+
+        if (cleaning.getDuty() == null || !cleaning.getDuty().getDutyId().equals(dutyId)) {
+            throw new CleaningNotAssignedException(CLEANING_NOT_ASSIGNED);
+        }
+
+        cleaning.removeDuty();
+
+
+
+    }
+
+
 }

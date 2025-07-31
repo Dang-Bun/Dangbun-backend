@@ -21,4 +21,9 @@ public interface MemberDutyRepository extends JpaRepository<MemberDuty, MemberDu
     @Query("SELECT md.member FROM MemberDuty md WHERE md.duty = :duty")
     List<Member> findMembersByDuty(Duty duty);
 
+
+    @Query("select md from MemberDuty md join fetch md.member m join md.duty d where m.place.placeId = :placeId")
+    List<MemberDuty> findAllWithMemberAndPlaceByPlaceId(Long placeId);
+
+    void deleteAllByMember(Member member);
 }

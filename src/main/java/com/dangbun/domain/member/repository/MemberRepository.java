@@ -16,7 +16,7 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     List<Member> findWithPlaceByUserId(Long userId);
 
     @Query("select m from Member m join fetch m.place where m.user.userId = :userId and m.place.placeId = :placeId")
-    Member findWithPlaceByUserIdAndPlaceId(Long userId, Long placeId);
+    Optional<Member> findWithPlaceByUserIdAndPlaceId(Long userId, Long placeId);
 
     Optional<Member> findByPlaceAndUser(Place place, User user);
 
@@ -27,7 +27,7 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
 
     List<Member> findAllByNameIn(List<String> names);
 
-    List<Member> findByPlace_PlaceIdAndStatusIsTrue(Long placeId);
+    List<Member> findByPlace_PlaceId(Long placeId);
 
     @Query("select count(m)>0 from Member m where m.user.userId = :userId and m.place.placeId = :placeId")
     boolean existsByUserIdAndPlaceId(@Param("userId") Long userId, @Param("placeId") Long placeId);
@@ -42,4 +42,8 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     Optional<Member> findByMemberId(Long memberId);
 
     Optional<Member> findByPlace_PlaceIdAndName(Long placeId, String name);
+
+    List<Member> findAllByPlace(Place place);
+
+    List<Member> findByUser(User user);
 }

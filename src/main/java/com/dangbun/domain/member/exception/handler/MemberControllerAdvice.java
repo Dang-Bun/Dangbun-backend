@@ -2,6 +2,7 @@ package com.dangbun.domain.member.exception.handler;
 
 import com.dangbun.domain.member.exception.custom.InvalidRoleException;
 import com.dangbun.domain.member.exception.custom.MemberNotFoundException;
+import com.dangbun.domain.member.exception.custom.NameNotMatchedException;
 import com.dangbun.domain.member.exception.custom.PlaceAccessDeniedException;
 import com.dangbun.global.response.BaseErrorResponse;
 import org.springframework.http.HttpStatus;
@@ -28,6 +29,13 @@ public class MemberControllerAdvice {
     @ExceptionHandler(PlaceAccessDeniedException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public BaseErrorResponse handlePlaceAccessDeniedException(PlaceAccessDeniedException e) {
+        return new BaseErrorResponse(e.getExceptionStatus());
+    }
+
+
+    @ExceptionHandler(NameNotMatchedException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public BaseErrorResponse handleNameNotMatched(NameNotMatchedException e) {
         return new BaseErrorResponse(e.getExceptionStatus());
     }
 }

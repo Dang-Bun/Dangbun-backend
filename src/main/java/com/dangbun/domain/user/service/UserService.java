@@ -63,7 +63,7 @@ public class UserService {
             emailService.sendEmail(toEmail, title, certCode);
             redisService.setValues(CERT_CODE_PREFIX + toEmail, certCode, Duration.ofMillis(this.authCodeExpirationMillis));
         }else{
-            throw new RuntimeException("email already exist");
+            throw new ExistEmailException(EXIST_EMAIL);
         }
     }
 
@@ -151,11 +151,10 @@ public class UserService {
             userRepository.save(user);
             return;
         }
-
         throw new InvalidEmailException(INVALID_EMAIL);
     }
 
-    public BaseResponse<?> login(@Valid PostUserLoginRequest request) {
+    public PostUserLoginResponse login(@Valid PostUserLoginRequest request) {
 
 
         User user = userRepository.findByEmail(request.email())
@@ -173,7 +172,7 @@ public class UserService {
 
         PostUserLoginResponse response = new PostUserLoginResponse(accessToken, refreshToken);
 
-        return BaseResponse.ok(response);
+        return response;
     }
 
     public void logout(String bearerToken) {

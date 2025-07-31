@@ -1,11 +1,12 @@
 package com.dangbun.domain.memberduty.entity;
+
 import com.dangbun.domain.duty.entity.Duty;
-import com.dangbun.domain.duty.entity.DutyIcon;
 import com.dangbun.domain.member.entity.Member;
-import com.dangbun.domain.membercleaning.entity.MemberCleaningId;
-import com.dangbun.domain.place.entity.Place;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 
 @Entity
