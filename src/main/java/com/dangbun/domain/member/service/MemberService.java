@@ -1,7 +1,6 @@
 package com.dangbun.domain.member.service;
 
 import com.dangbun.domain.duty.entity.Duty;
-import com.dangbun.domain.duty.repository.DutyRepository;
 import com.dangbun.domain.member.MemberContext;
 import com.dangbun.domain.member.dto.request.*;
 import com.dangbun.domain.member.dto.response.*;
@@ -13,7 +12,6 @@ import com.dangbun.domain.member.repository.MemberRepository;
 import com.dangbun.domain.membercleaning.repository.MemberCleaningRepository;
 import com.dangbun.domain.memberduty.entity.MemberDuty;
 import com.dangbun.domain.memberduty.repository.MemberDutyRepository;
-import com.dangbun.domain.user.entity.User;
 import com.dangbun.global.exception.BadRequestException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -155,8 +153,11 @@ public class MemberService {
         memberRepository.delete(member);
     }
 
-
-
+    @Transactional(readOnly = true)
+    public GetMyInformationResponse getMyInformation(Long placeId) {
+        Member me = MemberContext.get();
+        return GetMyInformationResponse.of(me);
+    }
 
     public GetMemberSearchResponse searchByNameInPlace(Long placeId, String name) {
         Member me = MemberContext.get();

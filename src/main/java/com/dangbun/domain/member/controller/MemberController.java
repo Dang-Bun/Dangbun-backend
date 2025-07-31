@@ -3,20 +3,15 @@ package com.dangbun.domain.member.controller;
 import com.dangbun.domain.member.CheckPlaceMembership;
 import com.dangbun.domain.member.dto.request.DeleteMemberRequest;
 import com.dangbun.domain.member.dto.request.DeleteSelfFromPlaceRequest;
-import com.dangbun.domain.member.dto.response.GetMemberResponse;
-import com.dangbun.domain.member.dto.response.GetMemberSearchResponse;
-import com.dangbun.domain.member.dto.response.GetMembersResponse;
-import com.dangbun.domain.member.dto.response.GetWaitingMembersResponse;
+import com.dangbun.domain.member.dto.response.*;
 import com.dangbun.domain.member.response.status.MemberExceptionResponse;
 import com.dangbun.domain.member.service.MemberService;
-import com.dangbun.domain.user.entity.User;
 import com.dangbun.global.docs.DocumentedApiErrors;
 import com.dangbun.global.response.BaseResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -97,7 +92,8 @@ public class MemberController {
             includes = {"PLACE_ACCESS_DENIED","PLACE_NAME_NOT_MATCHED", "INVALID_ROLE"}
     )
     @DeleteMapping("/me")
-    public ResponseEntity<?> removeSelfFromPlace(@RequestBody DeleteSelfFromPlaceRequest request) {
+    public ResponseEntity<?> removeSelfFromPlace(@PathVariable("placeId") Long placeId,
+                                                 @RequestBody DeleteSelfFromPlaceRequest request) {
         memberService.exitPlace(request);
         return ResponseEntity.ok(BaseResponse.ok(null));
     }
@@ -108,7 +104,8 @@ public class MemberController {
             includes = {"PLACE_ACCESS_DENIED","INVALID_ROLE", "NO_SUCH_USER", "NAME_NOT_MATCHED"}
     )
     @DeleteMapping("/{memberId}")
-    public ResponseEntity<?> removeMember(@PathVariable("memberId") Long memberId,
+    public ResponseEntity<?> removeMember(@PathVariable("placeId") Long placeId,
+                                          @PathVariable("memberId") Long memberId,
                                           @RequestBody DeleteMemberRequest request) {
         memberService.removeMember(memberId, request);
         return ResponseEntity.ok(BaseResponse.ok(null));
@@ -120,10 +117,20 @@ public class MemberController {
             includes = {"PLACE_ACCESS_DENIED","INVALID_ROLE"}
     )
     @GetMapping("/search")
-    public ResponseEntity<BaseResponse<GetMemberSearchResponse>> searchMemberInPlace(
-            @PathVariable("placeId") Long placeId,
-            @RequestParam String name) {
+    public ResponseEntity<BaseResponse<GetMemberSearchResponse>> searchMemberInPlace(@PathVariable("placeId") Long placeId,
+                                                                                     @RequestParam String name) {
         return ResponseEntity.ok(BaseResponse.ok(memberService.searchByNameInPlace(placeId, name)));
+    }
+
+
+    @Operation(summary = "내 정보 조회(맴버)")
+    @DocumentedApiErrors(
+            value = MemberExceptionResponse.class,
+            includes = {"PLACE_ACCESS_DENIED"}
+    )
+    @GetMapping("/me")
+    public ResponseEntity<BaseResponse<GetMyInformationResponse>> getMyInformation(@PathVariable("placeId") Long placeId){
+        return ResponseEntity.ok(BaseResponse.ok(memberService.getMyInformation(placeId)));
     }
 
 }
