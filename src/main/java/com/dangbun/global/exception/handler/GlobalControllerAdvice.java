@@ -2,7 +2,6 @@ package com.dangbun.global.exception.handler;
 
 
 import com.dangbun.global.exception.BadRequestException;
-import com.dangbun.global.exception.InvalidRefreshJWTException;
 import com.dangbun.global.response.BaseErrorResponse;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;

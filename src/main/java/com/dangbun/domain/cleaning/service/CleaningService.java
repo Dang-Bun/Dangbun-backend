@@ -1,5 +1,8 @@
 package com.dangbun.domain.cleaning.service;
 
+import com.dangbun.domain.checkList.entity.CheckList;
+import com.dangbun.domain.checkList.repository.CheckListRepository;
+import com.dangbun.domain.checkList.service.CheckListService;
 import com.dangbun.domain.cleaning.dto.request.PostCleaningCreateRequest;
 import com.dangbun.domain.cleaning.dto.request.PutCleaningUpdateRequest;
 import com.dangbun.domain.cleaning.dto.response.GetCleaningDetailListResponse;
@@ -40,6 +43,8 @@ public class CleaningService {
     private final MemberRepository memberRepository;
     private final CleaningDateRepository cleaningDateRepository;
     private final PlaceRepository placeRepository;
+    private final CheckListService checkListService;
+    private final CheckListRepository checkListRepository;
 
 
     public List<GetCleaningListResponse> getCleaningList(List<Long> memberIds) {
@@ -195,6 +200,11 @@ public class CleaningService {
                 .orElseThrow(() -> new DutyNotFoundException(DUTY_NOT_FOUND));
 
         cleaningDateRepository.deleteAllByCleaning_CleaningId(cleaningId);
+
+        List<CheckList> checkLists = checkListRepository.findByCleaning_CleaningId(cleaningId);
+        for(CheckList checkList : checkLists) {
+            checkListService.deleteCheckList(checkList.getCheckListId());
+        }
 
         cleaningRepository.delete(cleaning);
     }
