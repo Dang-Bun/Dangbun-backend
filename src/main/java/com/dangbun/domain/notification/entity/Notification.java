@@ -1,6 +1,7 @@
 package com.dangbun.domain.notification.entity;
 
 import com.dangbun.domain.member.entity.Member;
+import com.dangbun.global.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -12,9 +13,10 @@ import java.time.LocalDateTime;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Notification {
+public class Notification extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "notification_id")
     private Long notificationId;
 
     @Column(nullable = false)
@@ -22,9 +24,6 @@ public class Notification {
 
     @Column(nullable = false, columnDefinition = "TEXT")
     private String content;
-
-    @Column(nullable = false)
-    private LocalDateTime createdAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "sender_id", nullable = false)
@@ -35,7 +34,6 @@ public class Notification {
         this.notificationId = notificationId;
         this.title = title;
         this.content = content;
-        this.createdAt = createAt;
         this.sender = sender;
     }
 }
