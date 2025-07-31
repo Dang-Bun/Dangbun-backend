@@ -73,14 +73,24 @@ public class DutyController {
         return ResponseEntity.ok(BaseResponse.ok(null));
     }
 
-    @Operation(summary = "당번 정보 조회", description = "당번의 멤버 목록, 청소 목록을 조회합니다.")
-    @GetMapping("/duties/{dutyId}")
+    @Operation(summary = "당번 정보 - 멤버 이름 목록 조회", description = "당번의 멤버 이름 목록을 조회합니다.")
+    @GetMapping("/duties/{dutyId}/member-names")
     @DocumentedApiErrors(
             value = {DutyExceptionResponse.class},
             includes = {"DUTY_NOT_FOUND"}
     )
-    public ResponseEntity<BaseResponse<GetDutyInfoResponse>> getDutyInfo(@PathVariable Long dutyId) {
-        return ResponseEntity.ok(BaseResponse.ok(dutyService.getDutyInfo(dutyId)));
+    public ResponseEntity<BaseResponse<List<GetDutyMemberNameListResponse>>> getDutyMemberNameList(@PathVariable Long dutyId) {
+        return ResponseEntity.ok(BaseResponse.ok(dutyService.getDutyMemberNameList(dutyId)));
+    }
+
+    @Operation(summary = "당번 정보 - 청소 이름 목록 조회", description = "당번의 청소 이름 목록을 조회합니다.")
+    @GetMapping("/duties/{dutyId}/cleaning-names")
+    @DocumentedApiErrors(
+            value = {DutyExceptionResponse.class},
+            includes = {"DUTY_NOT_FOUND"}
+    )
+    public ResponseEntity<BaseResponse<List<GetDutyCleaningNameListResponse>>> getDutyCleaningNameList(@PathVariable Long dutyId) {
+        return ResponseEntity.ok(BaseResponse.ok(dutyService.getDutyCleaningNameList(dutyId)));
     }
 
     @Operation(summary = "당번 정보 - 멤버 추가", description = "당번에 멤버를 추가합니다.")
@@ -115,7 +125,7 @@ public class DutyController {
             value = {DutyExceptionResponse.class},
             includes = {"DUTY_NOT_FOUND"}
     )
-    @GetMapping("/duties/{dutyId}/cleaningInfo")
+    @GetMapping("/duties/{dutyId}/cleaning-info")
     public ResponseEntity<BaseResponse<List<GetCleaningInfoListResponse>>> getCleaningInfoList(
             @PathVariable Long dutyId) {
         return ResponseEntity.ok(BaseResponse.ok(dutyService.getCleaningInfoList(dutyId)));

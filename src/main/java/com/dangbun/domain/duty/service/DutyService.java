@@ -90,37 +90,28 @@ public class DutyService {
         dutyRepository.delete(duty);
     }
 
-
-    @Transactional()
-    public GetDutyInfoResponse getDutyInfo(Long dutyId) {
+    public List<GetDutyMemberNameListResponse> getDutyMemberNameList(Long dutyId) {
         Duty duty = dutyRepository.findById(dutyId)
                 .orElseThrow(() -> new DutyNotFoundException(DUTY_NOT_FOUND));
 
         List<MemberDuty> members = memberDutyRepository.findAllByDuty(duty);
-        List<GetDutyInfoResponse.MemberDto> memberInfos = members.stream()
-                .map(md -> new GetDutyInfoResponse.MemberDto(
-                        md.getMember().getMemberId(),
-                        md.getMember().getRole(),
-                        md.getMember().getUser().getName()
-                ))
+
+        return members.stream()
+                .map(md -> GetDutyMemberNameListResponse.of(md.getMember()))
                 .toList();
+    }
+
+    public List<GetDutyCleaningNameListResponse> getDutyCleaningNameList(Long dutyId) {
+        Duty duty = dutyRepository.findById(dutyId)
+                .orElseThrow(() -> new DutyNotFoundException(DUTY_NOT_FOUND));
 
         List<Cleaning> cleanings = cleaningRepository.findAllByDuty(duty);
-        List<GetDutyInfoResponse.CleaningDto> cleaningInfos = cleanings.stream()
-                .map(c -> new GetDutyInfoResponse.CleaningDto(
-                        c.getCleaningId(),
-                        c.getName()
-                ))
-                .toList();
 
-        return GetDutyInfoResponse.of(
-                duty.getDutyId(),
-                duty.getName(),
-                duty.getIcon(),
-                memberInfos,
-                cleaningInfos
-        );
+        return cleanings.stream()
+                .map(GetDutyCleaningNameListResponse::of)
+                .toList();
     }
+
 
     @Transactional
     public PostAddMembersResponse addMembers(Long dutyId, PostAddMembersRequest request) {
@@ -274,4 +265,6 @@ public class DutyService {
 
 
     }
+
+
 }
