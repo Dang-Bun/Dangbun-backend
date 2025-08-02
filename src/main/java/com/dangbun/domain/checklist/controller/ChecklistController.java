@@ -26,10 +26,9 @@ public class ChecklistController {
     @PostMapping("/complete")
     public ResponseEntity<?> completeChecklist(@PathVariable("placeId") Long placeId,
                                            @PathVariable("checklistId") Long checklistId){
-        checklistService.completeChecklist(placeId, checklistId);
+        checklistService.completeChecklist();
         return ResponseEntity.ok(BaseResponse.ok(null));
     }
 
-//    @PostMapping("/checkList/{checkListId}")
 
 }

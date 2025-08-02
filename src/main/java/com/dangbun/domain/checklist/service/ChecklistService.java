@@ -1,9 +1,13 @@
 package com.dangbun.domain.checklist.service;
 
+import com.dangbun.domain.checklist.ChecklistContext;
+import com.dangbun.domain.checklist.entity.Checklist;
 import com.dangbun.domain.checklist.repository.ChecklistRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+@Transactional
 @RequiredArgsConstructor
 @Service
 public class ChecklistService {
@@ -12,11 +16,12 @@ public class ChecklistService {
     private final ChecklistRepository checklistRepository;
 
 
-    public void deleteChecklist(Long checkListId){
-        checklistRepository.deleteById(checkListId);
+    public void deleteChecklist(Long checklistId){
+        checklistRepository.deleteById(checklistId);
     }
 
-    public void completeChecklist(Long placeId, Long checklistId) {
-        checklistRepository.findById(checklistId);
+    public void completeChecklist() {
+        Checklist checklist = ChecklistContext.get();
+        checklist.completeChecklist();
     }
 }

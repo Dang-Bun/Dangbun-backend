@@ -1,4 +1,4 @@
-package com.dangbun.domain.checklist.exception;
+package com.dangbun.domain.checklist.exception.custom;
 
 import com.dangbun.global.response.status.ResponseStatus;
 import lombok.Getter;

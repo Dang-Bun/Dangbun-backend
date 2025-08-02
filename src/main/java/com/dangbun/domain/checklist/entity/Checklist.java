@@ -33,4 +33,11 @@ public class Checklist extends BaseEntity {
     @Column(name = "complete_time")
     private LocalDateTime completeTime;
 
+    public void completeChecklist(){
+        this.isComplete =true;
+    }
+
+    public void unCompleteChecklist(){
+        this.isComplete = false;
+    }
 }

@@ -1,7 +1,7 @@
 package com.dangbun.domain.checklist;
 
 import com.dangbun.domain.checklist.entity.Checklist;
-import com.dangbun.domain.checklist.exception.ChecklistAccessDeniedException;
+import com.dangbun.domain.checklist.exception.custom.ChecklistAccessDeniedException;
 import com.dangbun.domain.checklist.repository.ChecklistRepository;
 import com.dangbun.domain.checklist.response.status.ChecklistExceptionResponse;
 import com.dangbun.domain.cleaning.entity.Cleaning;
