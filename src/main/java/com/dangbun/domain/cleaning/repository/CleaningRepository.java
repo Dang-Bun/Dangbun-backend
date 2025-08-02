@@ -44,4 +44,5 @@ public interface CleaningRepository extends JpaRepository<Cleaning, Long> {
     """)
     List<Cleaning> findUnassignedCleaningsByPlaceId(Long placeId);
 
+    List<Cleaning> findByDuty_DutyId(Long dutyId);
 }

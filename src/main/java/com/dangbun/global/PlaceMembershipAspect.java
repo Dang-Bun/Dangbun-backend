@@ -1,10 +1,13 @@
 package com.dangbun.global;
 
+import com.dangbun.domain.member.MemberContext;
+import com.dangbun.domain.member.entity.Member;
 import com.dangbun.domain.member.exception.custom.PlaceAccessDeniedException;
 import com.dangbun.domain.member.repository.MemberRepository;
 import com.dangbun.domain.user.entity.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
 import org.aspectj.lang.JoinPoint;
+import org.aspectj.lang.annotation.After;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
 import org.aspectj.lang.reflect.MethodSignature;
@@ -59,10 +62,14 @@ public class PlaceMembershipAspect {
             throw new IllegalArgumentException("placeId 파라미터가 존재하지 않거나 Long 타입이 아닙니다.");
         }
 
-        boolean exists = memberRepository.existsByUserIdAndPlaceId(userDetails.getUser().getUserId(), placeId);
+        Member member = memberRepository.findByUser_UserIdAndPlace_PlaceId(userDetails.getUser().getUserId(), placeId)
+                .orElseThrow(()->new PlaceAccessDeniedException(PLACE_ACCESS_DENIED));
 
-        if (!exists) {
-            throw new PlaceAccessDeniedException(PLACE_ACCESS_DENIED);
-        }
+        MemberContext.set(member);
+    }
+
+    @After("@within(com.dangbun.global.CheckPlaceMembership) || @annotation(com.dangbun.global.CheckPlaceMembership)")
+    public void clearMemberContext() {
+        MemberContext.clear();
     }
 }
