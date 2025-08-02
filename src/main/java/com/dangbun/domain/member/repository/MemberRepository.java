@@ -47,7 +47,7 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
 
     Page<Member> findByPlace_PlaceId(Long placeId, Pageable pageable);
 
-    Page<Member> findByPlace_PlaceIdAndUser_NameContaining(Long placeId, String name, Pageable pageable);
+    Page<Member> findByPlace_PlaceIdAndNameContaining(Long placeId, String name, Pageable pageable);
 
     List<Member> findAllByPlace(Place place);
 

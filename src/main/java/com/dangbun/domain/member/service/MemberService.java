@@ -157,6 +157,12 @@ public class MemberService {
     public GetMyInformationResponse getMyInformation(Long placeId) {
         Member me = MemberContext.get();
         return GetMyInformationResponse.of(me);
+
+    }
+
+    public Member getMemberByUserAndPlace(Long userId, Long placeId) {
+        return memberRepository.findByUser_UserIdAndPlace_PlaceId(userId, placeId)
+                .orElseThrow(() -> new MemberNotFoundException(NO_SUCH_MEMBER));
     }
 
     public GetMemberSearchResponse searchByNameInPlace(Long placeId, String name) {

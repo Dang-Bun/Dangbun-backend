@@ -1,9 +1,9 @@
-package com.dangbun.domain.member;
+package com.dangbun.global;
 
+import com.dangbun.domain.member.MemberContext;
 import com.dangbun.domain.member.entity.Member;
 import com.dangbun.domain.member.exception.custom.PlaceAccessDeniedException;
 import com.dangbun.domain.member.repository.MemberRepository;
-import com.dangbun.domain.member.response.status.MemberExceptionResponse;
 import com.dangbun.domain.user.entity.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
 import org.aspectj.lang.JoinPoint;
@@ -11,13 +11,13 @@ import org.aspectj.lang.annotation.After;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
 import org.aspectj.lang.reflect.MethodSignature;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Method;
-import java.nio.file.AccessDeniedException;
 
-import static com.dangbun.domain.member.response.status.MemberExceptionResponse.*;
+import static com.dangbun.domain.member.response.status.MemberExceptionResponse.PLACE_ACCESS_DENIED;
 
 @Aspect
 @Component
@@ -26,7 +26,7 @@ public class PlaceMembershipAspect {
     private final MemberRepository memberRepository;
 
 
-    @Before("@within(com.dangbun.domain.member.CheckPlaceMembership) || @annotation(com.dangbun.domain.member.CheckPlaceMembership)")
+    @Before("@within(com.dangbun.global.CheckPlaceMembership) || @annotation(com.dangbun.global.CheckPlaceMembership)")
     public void validate(JoinPoint joinPoint) throws  AccessDeniedException {
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         if (!(principal instanceof CustomUserDetails userDetails)) {
@@ -68,7 +68,7 @@ public class PlaceMembershipAspect {
         MemberContext.set(member);
     }
 
-    @After("@within(com.dangbun.domain.member.CheckPlaceMembership) || @annotation(com.dangbun.domain.member.CheckPlaceMembership)")
+    @After("@within(com.dangbun.global.CheckPlaceMembership) || @annotation(com.dangbun.global.CheckPlaceMembership)")
     public void clearMemberContext() {
         MemberContext.clear();
     }

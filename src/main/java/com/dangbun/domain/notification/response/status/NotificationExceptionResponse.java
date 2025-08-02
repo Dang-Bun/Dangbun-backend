@@ -5,7 +5,6 @@ import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 public enum NotificationExceptionResponse implements ResponseStatus {
-    PLACE_NOT_FOUND(120000, "해당 플레이스가 존재하지 않습니다."),
 
     ;
 
