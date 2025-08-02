@@ -1,6 +1,6 @@
 package com.dangbun.domain.member.controller;
 
-import com.dangbun.domain.member.CheckPlaceMembership;
+import com.dangbun.global.CheckPlaceMembership;
 import com.dangbun.domain.member.dto.request.DeleteMemberRequest;
 import com.dangbun.domain.member.dto.request.DeleteSelfFromPlaceRequest;
 import com.dangbun.domain.member.dto.response.GetMemberSearchResponse;
