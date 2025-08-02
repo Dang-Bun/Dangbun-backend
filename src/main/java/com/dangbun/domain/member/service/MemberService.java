@@ -126,7 +126,7 @@ public class MemberService {
         memberRepository.delete(member);
     }
 
-    private Member getMemberByUserAndPlace(Long userId, Long placeId) {
+    public Member getMemberByUserAndPlace(Long userId, Long placeId) {
         return memberRepository.findByUser_UserIdAndPlace_PlaceId(userId, placeId)
                 .orElseThrow(() -> new MemberNotFoundException(NO_SUCH_MEMBER));
     }
@@ -145,5 +145,4 @@ public class MemberService {
             .map(member -> GetMemberSearchResponse.of(member.getMemberId(), member.getName()))
                     .orElse(GetMemberSearchResponse.of(null, null));
     }
-
 }
