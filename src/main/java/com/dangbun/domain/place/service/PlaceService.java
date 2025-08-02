@@ -1,7 +1,7 @@
 package com.dangbun.domain.place.service;
 
-import com.dangbun.domain.checkList.entity.CheckList;
-import com.dangbun.domain.checkList.repository.CheckListRepository;
+import com.dangbun.domain.checklist.entity.Checklist;
+import com.dangbun.domain.checklist.repository.ChecklistRepository;
 import com.dangbun.domain.duty.entity.Duty;
 import com.dangbun.domain.duty.repository.DutyRepository;
 import com.dangbun.domain.duty.service.DutyService;
@@ -56,7 +56,7 @@ public class PlaceService {
     private static final SecureRandom RANDOM = new SecureRandom();
     private final MemberDutyRepository memberDutyRepository;
     private final MemberCleaningRepository memberCleaningRepository;
-    private final CheckListRepository checkListRepository;
+    private final ChecklistRepository checkListRepository;
     private final DutyRepository dutyRepository;
     private final DutyService dutyService;
     private final MemberService memberService;
@@ -180,7 +180,7 @@ public class PlaceService {
             memberCleanings.addAll(memberCleaningRepository.findAllByMember(memberDuty.getMember()));
         }
 
-        Map<MemberDuty, List<CheckList>> cleaningMap = memberDuties.stream()
+        Map<MemberDuty, List<Checklist>> cleaningMap = memberDuties.stream()
                 .collect(Collectors.toMap(
                         md -> md,
                         md -> checkListRepository.findWithCleaningByDutyId(md.getDuty().getDutyId())

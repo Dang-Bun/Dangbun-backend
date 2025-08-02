@@ -5,8 +5,6 @@ import com.dangbun.domain.duty.entity.Duty;
 import com.dangbun.domain.member.entity.Member;
 import com.dangbun.domain.membercleaning.entity.MemberCleaning;
 import com.dangbun.domain.membercleaning.entity.MemberCleaningId;
-import com.dangbun.domain.memberduty.entity.MemberDuty;
-import io.lettuce.core.dynamic.annotation.Param;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -25,4 +23,7 @@ public interface MemberCleaningRepository extends JpaRepository<MemberCleaning, 
     List<MemberCleaning> findAllByMember(Member member);
 
     void deleteAllByMember(Member member);
+
+    @Query("select mc.cleaning from MemberCleaning mc where mc.id.memberId = :memberId")
+    Cleaning findCleaningByMemberId(Long memberId);
 }

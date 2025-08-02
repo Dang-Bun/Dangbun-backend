@@ -3,7 +3,6 @@ package com.dangbun.domain.member;
 import com.dangbun.domain.member.entity.Member;
 import com.dangbun.domain.member.exception.custom.PlaceAccessDeniedException;
 import com.dangbun.domain.member.repository.MemberRepository;
-import com.dangbun.domain.member.response.status.MemberExceptionResponse;
 import com.dangbun.domain.user.entity.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
 import org.aspectj.lang.JoinPoint;
