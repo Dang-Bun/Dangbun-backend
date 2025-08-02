@@ -1,5 +1,7 @@
 package com.dangbun.domain.checklist.entity;
 
+import com.dangbun.domain.checklist.exception.custom.ChecklistStatusConflictException;
+import com.dangbun.domain.checklist.response.status.ChecklistExceptionResponse;
 import com.dangbun.domain.cleaning.entity.Cleaning;
 import com.dangbun.global.BaseEntity;
 import jakarta.persistence.*;
@@ -9,6 +11,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+
+import static com.dangbun.domain.checklist.response.status.ChecklistExceptionResponse.*;
 
 @Getter
 @Entity
@@ -34,10 +38,16 @@ public class Checklist extends BaseEntity {
     private LocalDateTime completeTime;
 
     public void completeChecklist(){
+        if(this.isComplete == true){
+            throw new ChecklistStatusConflictException(ALREADY_CHECKED);
+        }
         this.isComplete =true;
     }
 
-    public void unCompleteChecklist(){
+    public void incompleteChecklist(){
+        if(this.isComplete == false){
+            throw new ChecklistStatusConflictException(ALREADY_UNCHECKED);
+        }
         this.isComplete = false;
     }
 }

@@ -1,9 +1,13 @@
 package com.dangbun.domain.checklist.controller;
 
 import com.dangbun.domain.checklist.CheckChecklistMembership;
+import com.dangbun.domain.checklist.response.status.ChecklistExceptionResponse;
 import com.dangbun.domain.checklist.service.ChecklistService;
 import com.dangbun.domain.member.CheckPlaceMembership;
+import com.dangbun.domain.member.response.status.MemberExceptionResponse;
+import com.dangbun.global.docs.DocumentedApiErrors;
 import com.dangbun.global.response.BaseResponse;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -23,10 +27,27 @@ public class ChecklistController {
     private final ChecklistService checklistService;
 
 
-    @PostMapping("/complete")
+    @Operation(summary = "체크리스트 완료")
+    @DocumentedApiErrors(
+            value = {ChecklistExceptionResponse.class},
+            includes = {"ALREADY_CHECKED"}
+    )
+    @PostMapping("/actions/complete")
     public ResponseEntity<?> completeChecklist(@PathVariable("placeId") Long placeId,
                                            @PathVariable("checklistId") Long checklistId){
         checklistService.completeChecklist();
+        return ResponseEntity.ok(BaseResponse.ok(null));
+    }
+
+    @Operation(summary = "체크리스트 해제")
+    @DocumentedApiErrors(
+            value = {ChecklistExceptionResponse.class},
+            includes = {"ALREADY_UNCHECKED"}
+    )
+    @PostMapping("/actions/incomplete")
+    public ResponseEntity<?> incompleteChecklist(@PathVariable("placeId") Long placeId,
+                                                 @PathVariable("checklistId") Long checklistId){
+        checklistService.incompleteChecklist();
         return ResponseEntity.ok(BaseResponse.ok(null));
     }
 

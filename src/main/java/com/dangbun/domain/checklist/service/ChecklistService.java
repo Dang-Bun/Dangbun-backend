@@ -24,4 +24,9 @@ public class ChecklistService {
         Checklist checklist = ChecklistContext.get();
         checklist.completeChecklist();
     }
+
+    public void incompleteChecklist() {
+        Checklist checklist = ChecklistContext.get();
+        checklist.incompleteChecklist();
+    }
 }

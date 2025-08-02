@@ -1,0 +1,13 @@
+package com.dangbun.domain.checklist.exception.custom;
+
+import com.dangbun.global.response.status.ResponseStatus;
+
+public class ChecklistStatusConflictException extends RuntimeException {
+
+  private final ResponseStatus exceptionStatus;
+
+  public ChecklistStatusConflictException(ResponseStatus status) {
+    super(status.getMessage());
+    this.exceptionStatus = status;
+  }
+}
