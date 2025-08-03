@@ -19,10 +19,14 @@ public class Notification extends BaseEntity {
     @Column(name = "notification_id")
     private Long notificationId;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 30)
+    private NotificationTemplate template;
+
     @Column(nullable = false)
     private String title;
 
-    @Column(nullable = false, columnDefinition = "TEXT")
+    @Column(nullable = false, length = 1000)
     private String content;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -30,8 +34,9 @@ public class Notification extends BaseEntity {
     private Member sender;
 
     @Builder
-    public Notification(Long notificationId, String title, String content, LocalDateTime createAt, Member sender) {
+    public Notification(Long notificationId, NotificationTemplate template, String title, String content, Member sender) {
         this.notificationId = notificationId;
+        this.template = template;
         this.title = title;
         this.content = content;
         this.sender = sender;
