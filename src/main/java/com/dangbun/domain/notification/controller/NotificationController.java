@@ -32,7 +32,7 @@ public class NotificationController {
 
     private final NotificationService notificationService;
 
-    @Operation(summary = "알림함 - 수신인 멤버 검색 결과 조회", description = "수신인 선택 화면에서 멤버 검색어 입력 시 이름이 포함된 멤버 결과를 조회합니다.")
+    @Operation(summary = "알림함 - 수신인 멤버 검색 결과 조회 (무한 스크롤)", description = "수신인 선택 화면에서 멤버 검색어 입력 시 이름이 포함된 멤버 결과를 조회합니다.")
     @GetMapping("/recipients/search")
     @DocumentedApiErrors(
             value = {NotificationExceptionResponse.class},
@@ -59,6 +59,10 @@ public class NotificationController {
 
     @Operation(summary = "알림함 - 알림 작성", description = "작성한 내용의 알림을 전송합니다.")
     @PostMapping
+    @DocumentedApiErrors(
+            value = {NotificationExceptionResponse.class},
+            includes = {"MEMBER_NOT_FOUND"}
+    )
     public ResponseEntity<BaseResponse<PostNotificationCreateResponse>> createNotification(
             @RequestParam Long placeId,
             @Valid @RequestBody PostNotificationCreateRequest request
@@ -66,6 +70,5 @@ public class NotificationController {
 
         return ResponseEntity.ok(BaseResponse.ok(notificationService.createNotification(request)));
     }
-
 
 }
