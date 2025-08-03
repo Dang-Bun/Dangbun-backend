@@ -2,6 +2,7 @@ package com.dangbun.domain.notificationreceiver.entity;
 
 import com.dangbun.domain.member.entity.Member;
 import com.dangbun.domain.notification.entity.Notification;
+import com.dangbun.global.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -12,7 +13,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name="notification_receiver")
-public class NotificationReceiver {
+public class NotificationReceiver extends BaseEntity {
 
     @EmbeddedId
     private NotificationReceiverId id;
