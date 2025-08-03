@@ -36,5 +36,6 @@ public class NotificationReceiver {
         this.receiver = receiver;
         this.notification = notification;
         this.isRead = isRead;
+        this.id = new NotificationReceiverId(receiver.getMemberId(), notification.getNotificationId());
     }
 }
