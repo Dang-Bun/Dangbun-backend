@@ -47,10 +47,14 @@ public record GetNotificationReceivedListResponse(
                     receiver.getId(),
                     notification.getSender().getName(),
                     notification.getTitle(),
-                    notification.getContent(),
+                    shortenContent(notification.getContent()),
                     formatCreatedAt(notification.getCreatedAt()),
                     receiver.isRead()
             );
+        }
+
+        private static String shortenContent(String content) {
+            return content.length() > 30 ? content.substring(0, 30) + "..." : content;
         }
 
         private static String formatCreatedAt(LocalDateTime createdAt) {
