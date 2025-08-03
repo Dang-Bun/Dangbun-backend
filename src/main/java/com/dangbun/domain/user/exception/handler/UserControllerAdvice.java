@@ -1,12 +1,12 @@
 package com.dangbun.domain.user.exception.handler;
 
-import com.dangbun.domain.user.exception.custom.ExistEmailException;
-import com.dangbun.domain.user.exception.custom.InvalidCertCodeException;
-import com.dangbun.domain.user.exception.custom.InvalidPasswordException;
+import com.dangbun.domain.user.exception.custom.*;
 import com.dangbun.global.response.BaseErrorResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -34,5 +34,18 @@ public class UserControllerAdvice {
         log.error("[InvalidCertCodeException]",e);
         return new BaseErrorResponse(INVALID_CERT_CODE);
     }
+
+    @ExceptionHandler(InvalidEmailException.class)
+    public BaseErrorResponse handleInvalidEmail(InvalidEmailException e){
+        log.error("[InvalidEmailException]",e);
+        return new BaseErrorResponse(INVALID_EMAIL);
+    }
+
+    @ExceptionHandler(UserNotFoundException.class)
+    public BaseErrorResponse handleUserNotFound(UserNotFoundException e){
+        return new BaseErrorResponse(USER_NOT_FOUND);
+    }
+
+
 
 }
