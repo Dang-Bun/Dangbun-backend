@@ -12,8 +12,6 @@ import static com.dangbun.domain.notification.response.status.NotificationExcept
 @RestControllerAdvice(basePackages = "com.dangbun.domain.notification")
 public class NotificationControllerAdvice {
     @ExceptionHandler(MemberNotFoundException.class)
-
-    @ResponseStatus(HttpStatus.NOT_FOUND)
     public BaseErrorResponse handleMemberNotFoundException(MemberNotFoundException e) {
         return new BaseErrorResponse(MEMBER_NOT_FOUND);
     }
