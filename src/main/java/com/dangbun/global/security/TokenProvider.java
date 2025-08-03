@@ -10,6 +10,7 @@ import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.security.Key;
@@ -20,7 +21,7 @@ import java.util.Date;
 @Service
 public class TokenProvider {
 
-    private final RedisTemplate redisTemplate;
+    private final StringRedisTemplate redisTemplate;
     @Value("${jwt.secret}")
     private String SECRET;
     private Key key;
