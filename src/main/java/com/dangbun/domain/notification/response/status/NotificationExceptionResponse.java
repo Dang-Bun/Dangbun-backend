@@ -5,7 +5,7 @@ import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 public enum NotificationExceptionResponse implements ResponseStatus {
-
+    MEMBER_NOT_FOUND(12000, "해당 멤버가 존재하지 않습니다."),
     ;
 
     private final int code;
