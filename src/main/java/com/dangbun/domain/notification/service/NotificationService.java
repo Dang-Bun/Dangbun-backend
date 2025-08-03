@@ -4,15 +4,16 @@ import com.dangbun.domain.member.MemberContext;
 import com.dangbun.domain.member.entity.Member;
 import com.dangbun.domain.member.repository.MemberRepository;
 import com.dangbun.domain.member.service.MemberService;
-import com.dangbun.domain.notification.dto.request.PostNotificationCreateRequest;
-import com.dangbun.domain.notification.dto.response.GetMemberSearchListResponse;
+import com.dangbun.domain.notification.dto.request.*;
+import com.dangbun.domain.notification.dto.response.*;
+import com.dangbun.domain.notification.dto.response.GetNotificationListResponse.NotificationDto;
 import com.dangbun.domain.notification.dto.response.GetMemberSearchListResponse.MemberDto;
-import com.dangbun.domain.notification.dto.response.GetRecentSearchResponse;
-import com.dangbun.domain.notification.dto.response.PostNotificationCreateResponse;
 import com.dangbun.domain.notification.entity.Notification;
 import com.dangbun.domain.notification.entity.NotificationTemplate;
 import com.dangbun.domain.notification.exception.custom.MemberNotFoundException;
 import com.dangbun.domain.notification.repository.NotificationRepository;
+import com.dangbun.domain.notificationreceiver.dto.response.GetNotificationReceivedListResponse;
+
 import com.dangbun.domain.notificationreceiver.entity.NotificationReceiver;
 import com.dangbun.domain.notificationreceiver.repository.NotificationReceiverRepository;
 import com.dangbun.domain.place.repository.PlaceRepository;
@@ -27,6 +28,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import static com.dangbun.domain.notification.response.status.NotificationExceptionResponse.MEMBER_NOT_FOUND;
+import static java.util.stream.Collectors.toList;
 
 @Service
 @RequiredArgsConstructor
@@ -42,8 +44,10 @@ public class NotificationService {
 
 
 
-    public GetMemberSearchListResponse searchMembers( Long placeId, String searchName, Pageable pageable) {
-        Long memberId = MemberContext.get().getMemberId();
+    public GetMemberSearchListResponse searchMembers( String searchName, Pageable pageable) {
+        Member me = MemberContext.get();
+        Long memberId = me.getMemberId();
+        Long placeId = me.getPlace().getPlaceId();
 
         Page<Member> memberPage;
         if (searchName == null || searchName.isBlank()) {
@@ -61,8 +65,11 @@ public class NotificationService {
         return GetMemberSearchListResponse.of(memberDtos, memberPage.hasNext());
     }
 
-    public GetRecentSearchResponse getRecentSearches(Long placeId) {
-        Long memberId = MemberContext.get().getMemberId();
+    public GetRecentSearchResponse getRecentSearches() {
+        Member me = MemberContext.get();
+        Long memberId = me.getMemberId();
+        Long placeId = me.getPlace().getPlaceId();
+
         String redisKey = redisService.getRedisKey(placeId, memberId);
         List<String> recentSearches = redisService.getRecentSearches(redisKey, MAX_RECENT_COUNT);
         return GetRecentSearchResponse.of(recentSearches);
@@ -125,6 +132,19 @@ public class NotificationService {
         }
 
         return content.length() > 25 ? content.substring(0, 25) + "..." : content;
+    }
+
+    public GetNotificationListResponse getNotificationList(Pageable pageable) {
+        Long senderId = MemberContext.get().getMemberId();
+
+        Page<Notification> resultPage = notificationRepository.findBySender_MemberId(senderId, pageable);
+
+        List<NotificationDto> notifications = resultPage.getContent().stream()
+                .map(NotificationDto::of)
+                .toList();
+
+        return new GetNotificationListResponse(notifications, resultPage.hasNext());
+
     }
 }
 
