@@ -10,9 +10,8 @@ import com.dangbun.domain.notification.dto.response.GetNotificationListResponse.
 import com.dangbun.domain.notification.dto.response.GetMemberSearchListResponse.MemberDto;
 import com.dangbun.domain.notification.entity.Notification;
 import com.dangbun.domain.notification.entity.NotificationTemplate;
-import com.dangbun.domain.notification.exception.custom.MemberNotFoundException;
+import com.dangbun.domain.notification.exception.custom.*;
 import com.dangbun.domain.notification.repository.NotificationRepository;
-import com.dangbun.domain.notificationreceiver.dto.response.GetNotificationReceivedListResponse;
 
 import com.dangbun.domain.notificationreceiver.entity.NotificationReceiver;
 import com.dangbun.domain.notificationreceiver.repository.NotificationReceiverRepository;
@@ -24,11 +23,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
-import static com.dangbun.domain.notification.response.status.NotificationExceptionResponse.MEMBER_NOT_FOUND;
-import static java.util.stream.Collectors.toList;
+import static com.dangbun.domain.notification.response.status.NotificationExceptionResponse.*;
 
 @Service
 @RequiredArgsConstructor
@@ -145,6 +142,28 @@ public class NotificationService {
 
         return new GetNotificationListResponse(notifications, resultPage.hasNext());
 
+    }
+
+    public GetNotificationInfoResponse getNotificationInfo(Long notificationId) {
+        Member member = MemberContext.get();
+
+        Notification notification = notificationRepository.findById(notificationId)
+                .orElseThrow(() -> new NotificationNotFoundException(NOTIFICATION_NOT_FOUND));
+
+        boolean isSender = notification.getSender().getMemberId().equals(member.getMemberId());
+
+        boolean isReceiver = notificationReceiverRepository.existsByNotificationAndReceiver(notification, member);
+
+        if (!isSender && !isReceiver) {
+            throw new NotificationAccessForbiddenException(NOTIFICATION_ACCESS_FORBIDDEN);
+        }
+
+        List<String> receiverNames = notificationReceiverRepository.findAllByNotification(notification)
+                .stream()
+                .map(nr -> nr.getReceiver().getName())
+                .toList();
+
+        return GetNotificationInfoResponse.of(notification, receiverNames);
     }
 }
 
