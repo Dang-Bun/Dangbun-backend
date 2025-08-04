@@ -6,6 +6,9 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public enum NotificationExceptionResponse implements ResponseStatus {
     MEMBER_NOT_FOUND(12000, "해당 멤버가 존재하지 않습니다."),
+    NOTIFICATION_NOT_FOUND(12001, "해당 알림이 존재하지 않습니다."),
+    NOTIFICATION_ACCESS_FORBIDDEN(12002, "해당 알림에 접근할 수 없습니다.");
+
     ;
 
     private final int code;
