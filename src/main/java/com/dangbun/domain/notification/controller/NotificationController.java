@@ -1,10 +1,7 @@
 package com.dangbun.domain.notification.controller;
 
 import com.dangbun.domain.notification.dto.request.PostNotificationCreateRequest;
-import com.dangbun.domain.notification.dto.response.GetMemberSearchListResponse;
-import com.dangbun.domain.notification.dto.response.GetNotificationListResponse;
-import com.dangbun.domain.notification.dto.response.GetRecentSearchResponse;
-import com.dangbun.domain.notification.dto.response.PostNotificationCreateResponse;
+import com.dangbun.domain.notification.dto.response.*;
 import com.dangbun.domain.notification.response.status.NotificationExceptionResponse;
 import com.dangbun.domain.notification.service.NotificationService;
 import com.dangbun.domain.notificationreceiver.dto.response.GetNotificationReceivedListResponse;
@@ -88,6 +85,19 @@ public class NotificationController {
             Pageable pageable
     ) {
         return ResponseEntity.ok(BaseResponse.ok(notificationService.getNotificationList(pageable)));
+    }
+
+    @GetMapping("/{notificationId}")
+    @Operation(summary = "알림 상세 조회", description = "알림함에서 특정 알림을 클릭했을 때 상세 내용을 조회합니다.")
+    @DocumentedApiErrors(
+            value = NotificationExceptionResponse.class,
+            includes = {"NOTIFICATION_NOT_FOUND", "NOTIFICATION_ACCESS_FORBIDDEN"}
+    )
+    public ResponseEntity<GetNotificationInfoResponse> getNotificationInfo(
+            @RequestParam Long placeId,
+            @PathVariable Long notificationId
+    ) {
+        return ResponseEntity.ok(notificationService.getNotificationInfo(notificationId));
     }
 
 }
