@@ -15,6 +15,17 @@ public class NotificationControllerAdvice {
     public BaseErrorResponse handleMemberNotFoundException(MemberNotFoundException e) {
         return new BaseErrorResponse(MEMBER_NOT_FOUND);
     }
+
+    @ExceptionHandler(NotificationNotFoundException.class)
+    public BaseErrorResponse handleNotificationNotFoundException(NotificationNotFoundException e) {
+        return new BaseErrorResponse(NOTIFICATION_NOT_FOUND);
+    }
+
+    @ExceptionHandler(NotificationAccessForbiddenException.class)
+    public BaseErrorResponse handleNotificationAccessForbiddenException(NotificationAccessForbiddenException e) {
+        return new BaseErrorResponse(NOTIFICATION_ACCESS_FORBIDDEN);
+    }
+
 }
 
 
