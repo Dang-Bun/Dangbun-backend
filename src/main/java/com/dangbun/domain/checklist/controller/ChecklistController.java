@@ -10,7 +10,7 @@ import com.dangbun.domain.checklist.dto.response.PostIncompleteChecklistResponse
 import com.dangbun.domain.checklist.response.status.ChecklistExceptionResponse;
 import com.dangbun.domain.checklist.service.ChecklistService;
 import com.dangbun.domain.cleaningImage.response.status.CleaningImageExceptionResponse;
-import com.dangbun.domain.member.CheckPlaceMembership;
+import com.dangbun.global.CheckPlaceMembership;
 import com.dangbun.global.docs.DocumentedApiErrors;
 import com.dangbun.global.response.BaseResponse;
 import io.swagger.v3.oas.annotations.Operation;
