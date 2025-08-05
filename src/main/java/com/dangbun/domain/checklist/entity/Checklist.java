@@ -1,5 +1,6 @@
-package com.dangbun.domain.checkList.entity;
+package com.dangbun.domain.checklist.entity;
 
+import com.dangbun.domain.checklist.exception.custom.ChecklistStatusConflictException;
 import com.dangbun.domain.cleaning.entity.Cleaning;
 import com.dangbun.global.BaseEntity;
 import jakarta.persistence.*;
@@ -10,14 +11,16 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
+import static com.dangbun.domain.checklist.response.status.ChecklistExceptionResponse.*;
+
 @Getter
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class CheckList extends BaseEntity {
+public class Checklist extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "checklist_id")
-    private Long checkListId;
+    private Long checklistId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "cleaning_id")
@@ -33,4 +36,18 @@ public class CheckList extends BaseEntity {
     @Column(name = "complete_time")
     private LocalDateTime completeTime;
 
+
+    public void completeChecklist(){
+        if(this.isComplete == true){
+            throw new ChecklistStatusConflictException(ALREADY_CHECKED);
+        }
+        this.isComplete =true;
+    }
+
+    public void incompleteChecklist(){
+        if(this.isComplete == false){
+            throw new ChecklistStatusConflictException(ALREADY_UNCHECKED);
+        }
+        this.isComplete = false;
+    }
 }
