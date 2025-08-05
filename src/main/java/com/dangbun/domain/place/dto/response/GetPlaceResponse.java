@@ -1,6 +1,6 @@
 package com.dangbun.domain.place.dto.response;
 
-import com.dangbun.domain.checkList.entity.CheckList;
+import com.dangbun.domain.checklist.entity.Checklist;
 import com.dangbun.domain.cleaning.entity.Cleaning;
 import com.dangbun.domain.member.entity.Member;
 import com.dangbun.domain.membercleaning.entity.MemberCleaning;
@@ -33,7 +33,7 @@ public record GetPlaceResponse(
         List<DutyDto> duties
 ) {
 
-    public static GetPlaceResponse of(User user, Place place, Map<MemberDuty, List<CheckList>> cleaningMap, List<MemberCleaning> memberCleanings) {
+    public static GetPlaceResponse of(User user, Place place, Map<MemberDuty, List<Checklist>> cleaningMap, List<MemberCleaning> memberCleanings) {
 
         MemberDuty memberDuty = cleaningMap.keySet().stream().filter(md -> md.getMember().getUser().getUserId().equals(user.getUserId()))
                 .findAny().orElseThrow(() -> new RuntimeException("GetPlaceResponse 에러"));
@@ -44,10 +44,10 @@ public record GetPlaceResponse(
         LocalTime endTime = place.getEndTime();
 
         List<DutyDto> duties = new ArrayList<>();
-        for (Map.Entry<MemberDuty, List<CheckList>> mdc : cleaningMap.entrySet()) {
+        for (Map.Entry<MemberDuty, List<Checklist>> mdc : cleaningMap.entrySet()) {
             MemberDuty md = mdc.getKey();
             List<CheckListDto> checkListDtos = new ArrayList<>();
-            for (CheckList checkList : mdc.getValue()) {
+            for (Checklist checkList : mdc.getValue()) {
 
                 Cleaning cleaning = checkList.getCleaning();
 
@@ -103,11 +103,11 @@ public record GetPlaceResponse(
             Boolean needPhoto
 
     ) {
-        public static CheckListDto of(CheckList checkList, List<Member> members) {
+        public static CheckListDto of(Checklist checkList, List<Member> members) {
 
             List<MemberDto> memberDtos = members.stream()
                     .map(MemberDto::of).toList();
-            return new CheckListDto(checkList.getCheckListId(), memberDtos, checkList.getCleaning().getName(), null, checkList.getCleaning().getNeedPhoto());
+            return new CheckListDto(checkList.getChecklistId(), memberDtos, checkList.getCleaning().getName(), null, checkList.getCleaning().getNeedPhoto());
         }
     }
 
