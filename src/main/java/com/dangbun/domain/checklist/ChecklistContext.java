@@ -6,7 +6,7 @@ public class ChecklistContext {
     private static final ThreadLocal<Checklist> currentChecklist = new ThreadLocal<>();
 
     public static void set(Checklist ch){
-        currentChecklist = ch;
+        currentChecklist.set(ch);
     }
 
     public static Checklist get(){

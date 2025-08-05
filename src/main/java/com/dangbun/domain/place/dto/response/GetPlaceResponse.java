@@ -107,7 +107,7 @@ public record GetPlaceResponse(
 
             List<MemberDto> memberDtos = members.stream()
                     .map(MemberDto::of).toList();
-            return new CheckListDto(checkList.getCheckListId(), memberDtos, checkList.getCleaning().getName(), null, checkList.getCleaning().getNeedPhoto());
+            return new CheckListDto(checkList.getChecklistId(), memberDtos, checkList.getCleaning().getName(), null, checkList.getCleaning().getNeedPhoto());
         }
     }
 

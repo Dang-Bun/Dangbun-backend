@@ -20,6 +20,8 @@ import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Method;
 import java.nio.file.AccessDeniedException;
+import java.util.List;
+import java.util.Optional;
 
 @Aspect
 @Component
@@ -68,12 +70,18 @@ public class ChecklistMembershipAspect {
 
         Member me = MemberContext.get();
 
-        Cleaning cleaning = memberCleaningRepository.findCleaningByMemberId(me.getMemberId());
-        Checklist checklist = checklistRepository
-                .findByChecklistIdAndCleaning_CleaningId(checklistId, cleaning.getCleaningId())
-                .orElseThrow(()->new ChecklistAccessDeniedException(ChecklistExceptionResponse.CHECKLIST_ACCESS_DENIED));
+        List<Cleaning> cleanings = memberCleaningRepository.findCleaningsByMemberId(me.getMemberId());
 
-        ChecklistContext.set(checklist);
+        for(Cleaning cleaning : cleanings) {
+            Optional<Checklist> checklist = checklistRepository
+                    .findByChecklistIdAndCleaning_CleaningId(checklistId, cleaning.getCleaningId());
+            if(checklist.isPresent()){
+                ChecklistContext.set(checklist.get());
+                return;
+            }
+        }
+
+        throw new ChecklistAccessDeniedException(ChecklistExceptionResponse.CHECKLIST_ACCESS_DENIED);
 
     }
 

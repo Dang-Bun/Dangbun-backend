@@ -1,7 +1,6 @@
 package com.dangbun.domain.checklist.entity;
 
 import com.dangbun.domain.checklist.exception.custom.ChecklistStatusConflictException;
-import com.dangbun.domain.checklist.response.status.ChecklistExceptionResponse;
 import com.dangbun.domain.cleaning.entity.Cleaning;
 import com.dangbun.global.BaseEntity;
 import jakarta.persistence.*;
@@ -36,6 +35,7 @@ public class Checklist extends BaseEntity {
 
     @Column(name = "complete_time")
     private LocalDateTime completeTime;
+
 
     public void completeChecklist(){
         if(this.isComplete == true){
