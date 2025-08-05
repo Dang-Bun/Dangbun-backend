@@ -1,4 +1,4 @@
-package com.dangbun.domain.member;
+package com.dangbun.global;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

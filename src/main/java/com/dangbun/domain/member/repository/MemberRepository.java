@@ -4,6 +4,8 @@ import com.dangbun.domain.member.entity.Member;
 import com.dangbun.domain.place.entity.Place;
 import com.dangbun.domain.user.entity.User;
 import io.lettuce.core.dynamic.annotation.Param;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -43,7 +45,12 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
 
     Optional<Member> findByPlace_PlaceIdAndName(Long placeId, String name);
 
+    Page<Member> findByPlace_PlaceId(Long placeId, Pageable pageable);
+
+    Page<Member> findByPlace_PlaceIdAndNameContaining(Long placeId, String name, Pageable pageable);
+
     List<Member> findAllByPlace(Place place);
 
     List<Member> findByUser(User user);
+
 }

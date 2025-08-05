@@ -149,7 +149,7 @@ public class DutyController {
     @DeleteMapping("/duties/{dutyId}/cleanings/{cleaningId}")
     @DocumentedApiErrors(
             value = DutyExceptionResponse.class,
-            includes = {"", ""}
+            includes = {"DUTY_NOT_FOUND", "CLEANING_NOT_FOUND", "CLEANING_NOT_ASSIGNED"}
     )
     public ResponseEntity<BaseResponse<Void>> removeCleaning(
             @PathVariable Long dutyId,
