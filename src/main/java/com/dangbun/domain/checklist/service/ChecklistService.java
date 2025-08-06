@@ -10,14 +10,17 @@ import com.dangbun.domain.checklist.dto.response.PostIncompleteChecklistResponse
 import com.dangbun.domain.checklist.entity.Checklist;
 import com.dangbun.domain.checklist.repository.ChecklistRepository;
 import com.dangbun.domain.cleaning.entity.Cleaning;
+import com.dangbun.domain.cleaningImage.repository.CleaningImageRepository;
 import com.dangbun.domain.cleaningImage.service.CleaningImageService;
 import com.dangbun.domain.member.MemberContext;
 import com.dangbun.domain.member.entity.Member;
 import com.dangbun.domain.membercleaning.repository.MemberCleaningRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
@@ -32,8 +35,13 @@ public class ChecklistService {
     private final ChecklistRepository checklistRepository;
     private final CleaningImageService cleaningImageService;
     private final MemberCleaningRepository memberCleaningRepository;
+    private final ChecklistGenerateService checklistGenerateService;
+    private final CleaningImageRepository cleaningImageRepository;
 
     public void deleteChecklist(Long checklistId) {
+
+        cleaningImageRepository.deleteByChecklist_ChecklistId(checklistId);
+
         checklistRepository.deleteById(checklistId);
     }
 
@@ -76,5 +84,10 @@ public class ChecklistService {
     public GetImageUrlResponse getImageUrl(Long checklistId) {
         String accessUrl = cleaningImageService.getImageUrl(checklistId);
         return new GetImageUrlResponse(accessUrl);
+    }
+
+    @Scheduled(cron = "0 0 0 * * *") // 매일 자정
+    public void scheduledChecklistGeneration() {
+        checklistGenerateService.generateDailyChecklists(LocalDateTime.now());
     }
 }

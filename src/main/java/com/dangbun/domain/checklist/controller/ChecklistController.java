@@ -53,7 +53,7 @@ public class ChecklistController {
         return ResponseEntity.ok(BaseResponse.ok(checklistService.incompleteChecklist()));
     }
 
-    @Operation(summary = "사진 등록 url 생성", description = "s3 이미지 업로드 url을 획득합니다.")
+    @Operation(summary = "이미지 등록 url 생성", description = "s3 이미지 업로드 url을 획득합니다.")
     @PostMapping("/photos/upload-url")
     public ResponseEntity<BaseResponse<PostGetPresignedUrlResponse>> getPresignedUrl(@PathVariable("placeId") Long placeId,
                                                                                      @PathVariable("checklistId") Long checklistId,
@@ -62,7 +62,7 @@ public class ChecklistController {
         return ResponseEntity.ok(BaseResponse.ok(checklistService.generateImageUrl(request)));
     }
 
-    @Operation(summary = "사진 등록 성공", description = "FE에서 이미지 업로드를 완료 후 BE에 알리는 용도")
+    @Operation(summary = "이미지 등록 성공", description = "FE에서 이미지 업로드를 완료 후 BE에 알리는 용도")
     @DocumentedApiErrors(
             value = {ChecklistExceptionResponse.class},
             includes = {"INVALID_S3_KEY"}
@@ -75,7 +75,7 @@ public class ChecklistController {
         return ResponseEntity.ok(BaseResponse.ok(null));
     }
 
-    @Operation(summary = "이미지 저장 url 요청", description = "이미지 확인을 위한 url을 요청합니다.")
+    @Operation(summary = "이미지 확인 url 요청", description = "이미지 확인을 위한 url을 요청합니다.")
     @DocumentedApiErrors(
             value = {CleaningImageExceptionResponse.class},
             includes = {"NO_SUCH_IMAGE"}

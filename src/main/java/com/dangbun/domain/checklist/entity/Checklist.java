@@ -6,6 +6,7 @@ import com.dangbun.global.BaseEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -35,6 +36,15 @@ public class Checklist extends BaseEntity {
 
     @Column(name = "complete_time")
     private LocalDateTime completeTime;
+
+    @Builder
+    public Checklist(Long checklistId, Cleaning cleaning, Boolean isComplete, String completeMemberId, LocalDateTime completeTime) {
+        this.checklistId = checklistId;
+        this.cleaning = cleaning;
+        this.isComplete = isComplete;
+        this.completeMemberId = completeMemberId;
+        this.completeTime = completeTime;
+    }
 
 
     public void completeChecklist(){
