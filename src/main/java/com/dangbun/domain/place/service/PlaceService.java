@@ -70,7 +70,7 @@ public class PlaceService {
         return GetPlaceListResponse.of(members);
     }
 
-    public void createPlaceWithManager(Long userId, PostCreatePlaceRequest request) {
+    public PostCreatePlaceResponse createPlaceWithManager(Long userId, PostCreatePlaceRequest request) {
 
 
         String placeName = request.placeName();
@@ -95,6 +95,8 @@ public class PlaceService {
                 .build();
 
         memberRepository.save(member);
+
+        return PostCreatePlaceResponse.of(savedPlace.getPlaceId());
     }
 
     public PostCreateInviteCodeResponse createInviteCode(Long userId, Long placeId) {
