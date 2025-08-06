@@ -88,7 +88,6 @@ public class DutyService {
 
         List<Cleaning> cleanings = cleaningRepository.findAllByDuty(duty);
         cleaningDateRepository.deleteAllByCleaningIn(cleanings);
-//        cleaningRepository.deleteAllByDuty(duty);
 
         for(Cleaning cleaning : cleanings) {
             cleaningService.deleteCleaning(cleaning.getCleaningId());

@@ -11,4 +11,6 @@ public interface CleaningImageRepository extends JpaRepository<CleaningImage, Lo
     CleaningImage getByChecklist(Checklist checklist);
 
     Optional<CleaningImage> getByChecklist_ChecklistId(Long checklistChecklistId);
+
+    void deleteByChecklist_ChecklistId(Long checklistChecklistId);
 }
