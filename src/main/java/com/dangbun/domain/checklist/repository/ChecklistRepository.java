@@ -33,4 +33,13 @@ public interface ChecklistRepository extends JpaRepository<Checklist, Long> {
             and c.place.placeId = :placeId
             """)
     List<Checklist> findAllByCreatedDateAndPlaceId(@Param("start") LocalDateTime start, @Param("end") LocalDateTime end, @Param("placeId") Long placeId);
+
+    @Query("""
+            select case when count(ch)>0 then true else false end
+            from Checklist ch
+            where ch.createdAt >= :start and ch.createdAt< :end
+            and ch.cleaning = :cleaning
+            and ch.isComplete = true
+            """)
+    boolean existsCompletedChecklistByDateAndCleaning(@Param("start") LocalDateTime start, @Param("end") LocalDateTime end, @Param("cleaning") Cleaning cleaning);
 }

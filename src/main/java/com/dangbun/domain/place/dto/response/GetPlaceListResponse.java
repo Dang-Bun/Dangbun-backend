@@ -11,17 +11,9 @@ public record GetPlaceListResponse(
         @Schema(description = "플레이스 리스트") List<PlaceDto> places
 ) {
 
-    public static GetPlaceListResponse of(List<Member> memberList){
-        List<PlaceDto> placeDtos = new ArrayList<>();
-        for(Member member : memberList){
-            if(!member.getStatus()){
-                Place place = member.getPlace();
-                placeDtos.add(PlaceDto.of(place.getPlaceId(), place.getName(), null, null, null, null));
-            }else {
-                Place place = member.getPlace();
-                placeDtos.add(PlaceDto.of(place.getPlaceId(), place.getName(), 0,0,member.getRole().getDisplayName(), 0));
-            }
-        }
+
+
+    public static GetPlaceListResponse of(List<PlaceDto> placeDtos) {
         return new GetPlaceListResponse(placeDtos);
     }
 
