@@ -2,6 +2,7 @@ package com.dangbun.domain.checklist.repository;
 
 import com.dangbun.domain.checklist.entity.Checklist;
 import com.dangbun.domain.cleaning.entity.Cleaning;
+import io.lettuce.core.dynamic.annotation.Param;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -23,4 +24,13 @@ public interface ChecklistRepository extends JpaRepository<Checklist, Long> {
     Optional<Checklist> findByChecklistIdAndCleaning_CleaningId(Long checklistId, Long cleaningId);
 
     Boolean existsByCleaningAndCreatedAt(@NotNull Cleaning cleaning, LocalDateTime createdAt);
+
+    @Query("""
+            select ch from Checklist ch
+            join fetch ch.cleaning c
+            join fetch c.duty d
+            where ch.createdAt >= :start and ch.createdAt < :end
+            and c.place.placeId = :placeId
+            """)
+    List<Checklist> findAllByCreatedDateAndPlaceId(@Param("start") LocalDateTime start, @Param("end") LocalDateTime end, @Param("placeId") Long placeId);
 }
