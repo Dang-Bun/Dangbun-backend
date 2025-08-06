@@ -38,7 +38,7 @@ public class Checklist extends BaseEntity {
     private LocalDateTime completeTime;
 
     @Builder
-    public Checklist(Long checklistId, Cleaning cleaning, Boolean isComplete, String completeMemberId, LocalDateTime completeTime) {
+    public Checklist(Long checklistId, Cleaning cleaning, Boolean isComplete, Long completeMemberId, LocalDateTime completeTime) {
         this.checklistId = checklistId;
         this.cleaning = cleaning;
         this.isComplete = isComplete;
