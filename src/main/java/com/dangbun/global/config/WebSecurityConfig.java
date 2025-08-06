@@ -35,16 +35,18 @@ public class WebSecurityConfig {
                     ).authenticated()
                     .requestMatchers(
                             "/users/**",
-                            "/actuator/health",
                             "/duties/**",
                             "/cleanigs/**",
                             "/places/**",
+                            "/notifications/**",
 
                             // Swagger 관련 경로 허용
                             "/swagger-ui/**",
+                            "/docs/**",
                             "/v3/api-docs/**",
                             "/swagger-resources/**",
-                            "/webjars/**"
+                            "/webjars/**",
+                            "/actuator/health"
                     ).permitAll();
             authorizeRequest.anyRequest().authenticated();
         });
