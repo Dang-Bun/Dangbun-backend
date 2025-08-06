@@ -31,7 +31,7 @@ public class Checklist extends BaseEntity {
     private Boolean isComplete;
 
     @Column(name = "complete_member_id")
-    private String completeMemberId;
+    private Long completeMemberId;
 
     @Column(name = "complete_time")
     private LocalDateTime completeTime;
