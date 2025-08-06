@@ -47,11 +47,11 @@ public class PlaceController {
             includes = {"NO_SUCH_USER"}
     )
     @PostMapping
-    public ResponseEntity<BaseResponse<?>> createPlace(@AuthenticationPrincipal(expression = "user") User user,
+    public ResponseEntity<BaseResponse<PostCreatePlaceResponse>> createPlace(@AuthenticationPrincipal(expression = "user") User user,
                                                        @RequestBody PostCreatePlaceRequest request) {
 
-        placeService.createPlaceWithManager(user.getUserId(), request);
-        return ResponseEntity.ok(BaseResponse.ok(null));
+
+        return ResponseEntity.ok(BaseResponse.ok(placeService.createPlaceWithManager(user.getUserId(), request)));
     }
 
     @Operation(summary = "참여코드 생성", description = "플레이스의 참여코드를 생성합니다.")
