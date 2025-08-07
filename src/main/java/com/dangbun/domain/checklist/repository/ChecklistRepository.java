@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.lang.ScopedValue;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -24,6 +25,10 @@ public interface ChecklistRepository extends JpaRepository<Checklist, Long> {
 
     @Query("select ch from Checklist ch join fetch Cleaning c where ch.checklistId = :checklistId")
     Optional<Checklist> findWithCleaningById(Long checklistId);
+
+    @Query("select ch from Checklist ch join fetch Cleaning c join fetch Duty d where ch.checklistId = :checklistId")
+    Optional<Checklist> findWithCleaningAndDutyById(Long checklistId);
+
 
     Optional<Checklist> findByChecklistIdAndCleaning_CleaningId(Long checklistId, Long cleaningId);
 
@@ -60,4 +65,5 @@ public interface ChecklistRepository extends JpaRepository<Checklist, Long> {
     List<Checklist> findByPlaceAndMonth(@Param("placeId") Long placeId,
                              @Param("startDateTime") LocalDateTime startDateTime,
                              @Param("endDateTime") LocalDateTime endDateTime);
+
 }

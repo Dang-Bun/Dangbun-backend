@@ -1,15 +1,17 @@
 package com.dangbun.domain.calender.service;
 
-import com.dangbun.domain.calender.dto.GetChecklistsResponse;
-import com.dangbun.domain.calender.dto.GetImageUrlResponse;
-import com.dangbun.domain.calender.dto.GetProgressBarsResponse;
-import com.dangbun.domain.calender.dto.PatchUpdateChecklistToCompleteResponse;
+import com.dangbun.domain.calender.dto.*;
 import com.dangbun.domain.calender.exception.custom.InvalidDateException;
 import com.dangbun.domain.calender.exception.custom.InvalidRoleException;
 import com.dangbun.domain.calender.exception.custom.NoPhotoException;
 import com.dangbun.domain.checklist.entity.Checklist;
 import com.dangbun.domain.checklist.repository.ChecklistRepository;
+import com.dangbun.domain.cleaning.entity.Cleaning;
+import com.dangbun.domain.cleaning.entity.CleaningRepeatType;
 import com.dangbun.domain.cleaningImage.service.CleaningImageService;
+import com.dangbun.domain.cleaningdate.entity.CleaningDate;
+import com.dangbun.domain.cleaningdate.repository.CleaningDateRepository;
+import com.dangbun.domain.duty.entity.Duty;
 import com.dangbun.domain.member.MemberContext;
 import com.dangbun.domain.member.entity.Member;
 import com.dangbun.domain.member.entity.MemberRole;
@@ -20,10 +22,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.time.YearMonth;
+import java.time.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -40,13 +39,14 @@ public class CalenderService {
     private final MemberCleaningRepository memberCleaningRepository;
     private final MemberRepository memberRepository;
     private final CleaningImageService cleaningImageService;
+    private final CleaningDateRepository cleaningDateRepository;
 
     @Transactional(readOnly = true)
     public GetChecklistsResponse getChecklists(Long placeId, LocalDate date) {
 
         Member me = MemberContext.get();
 
-        if(date.isAfter(LocalDate.now())){
+        if (date.isAfter(LocalDate.now())) {
             throw new InvalidDateException(FUTURE_DATE_NOT_ALLOWED);
         }
         LocalDateTime start = date.atStartOfDay();
@@ -58,7 +58,7 @@ public class CalenderService {
 
         List<ChecklistDto> checklistDtos = new ArrayList<>();
 
-        for(Checklist checklist : checklists){
+        for (Checklist checklist : checklists) {
             Long checklistId = checklist.getChecklistId();
             String dutyName = checklist.getCleaning().getDuty().getName();
             Boolean isComplete = checklist.getIsComplete();
@@ -73,7 +73,6 @@ public class CalenderService {
     }
 
 
-
     @Transactional(readOnly = true)
     public GetProgressBarsResponse getProgressBars(Long placeId, int year, int month) {
         Member me = MemberContext.get();
@@ -83,7 +82,7 @@ public class CalenderService {
 
         List<Checklist> checklists = checklistRepository.findByPlaceAndMonth(placeId, start, end);
 
-        if(me.getRole().equals(MemberRole.MEMBER)){
+        if (me.getRole().equals(MemberRole.MEMBER)) {
             filterMyChecklists(me, checklists);
         }
 
@@ -107,10 +106,10 @@ public class CalenderService {
     }
 
     private void filterMyChecklists(Member me, List<Checklist> checklists) {
-        if(me.getRole().equals(MemberRole.MEMBER)){
+        if (me.getRole().equals(MemberRole.MEMBER)) {
             List<MemberCleaning> memberCleanings = memberCleaningRepository.findAllByMember(me);
 
-            for(MemberCleaning memberCleaning : memberCleanings){
+            for (MemberCleaning memberCleaning : memberCleanings) {
                 checklists.removeIf(checklist -> !memberCleaning.getCleaning().equals(checklist.getCleaning()));
             }
         }
@@ -118,7 +117,7 @@ public class CalenderService {
 
     public PatchUpdateChecklistToCompleteResponse finishChecklist(Long placeId, Long checklistId) {
         Member me = MemberContext.get();
-        if(me.getRole().equals(MemberRole.MEMBER)){
+        if (me.getRole().equals(MemberRole.MEMBER)) {
             throw new InvalidRoleException(INVALID_ROLE);
         }
 
@@ -133,11 +132,47 @@ public class CalenderService {
     public GetImageUrlResponse getPhotoUrl(Long placeId, Long checklistId) {
         Checklist checklist = checklistRepository.findWithCleaningById(checklistId).orElseThrow();
 
-        if(!checklist.getCleaning().getNeedPhoto()){
+        if (!checklist.getCleaning().getNeedPhoto()) {
             throw new NoPhotoException(NO_PHOTO);
         }
 
         String imageUrl = cleaningImageService.getImageUrl(checklistId);
         return GetImageUrlResponse.of(imageUrl);
+    }
+
+    public GetCleaningInfoResponse getCleaningInfo(Long placeId, Long checklistId) {
+        Checklist checklist = checklistRepository.findWithCleaningAndDutyById(checklistId).orElseThrow();
+
+        Cleaning cleaning = checklist.getCleaning();
+        Duty duty = cleaning.getDuty();
+        List<MemberCleaning> memberCleanings = memberCleaningRepository.findAllByCleaning(cleaning);
+        List<Member> members = memberCleanings.stream().map(MemberCleaning::getMember).toList();
+
+        Long cleaningId = cleaning.getCleaningId();
+        String dutyName = duty.getName();
+        List<String> membersName = members.stream().map(Member::getName).toList();
+        Boolean needPhoto = cleaning.getNeedPhoto();
+        CleaningRepeatType repeatType = cleaning.getRepeatType();
+        List<DayOfWeek> repeatDays = parseRepeatDaysToDayOfWeek(cleaning.getRepeatDays());
+
+        List<CleaningDate> cleaningDates = cleaningDateRepository.findByCleaning(cleaning);
+
+        List<LocalDate> dates = cleaningDates.stream().map(CleaningDate::getDate).toList();
+
+        return GetCleaningInfoResponse.of(cleaningId, dutyName, membersName, needPhoto, repeatType, repeatDays, dates);
+
+    }
+
+
+    public static List<DayOfWeek> parseRepeatDaysToDayOfWeek(String repeatDays) {
+        if (repeatDays == null || repeatDays.isBlank()) {
+            return List.of(); // 빈 리스트
+        }
+        return Arrays.stream(repeatDays.split(","))
+                .map(String::trim)
+                .filter(s -> !s.isEmpty())
+                .map(String::toUpperCase)
+                .map(DayOfWeek::valueOf)
+                .collect(Collectors.toList());
     }
 }
