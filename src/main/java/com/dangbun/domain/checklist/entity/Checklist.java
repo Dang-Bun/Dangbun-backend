@@ -2,6 +2,7 @@ package com.dangbun.domain.checklist.entity;
 
 import com.dangbun.domain.checklist.exception.custom.ChecklistStatusConflictException;
 import com.dangbun.domain.cleaning.entity.Cleaning;
+import com.dangbun.domain.member.entity.Member;
 import com.dangbun.global.entity.BaseEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -47,11 +48,13 @@ public class Checklist extends BaseEntity {
     }
 
 
-    public void completeChecklist(){
+    public void completeChecklist(Member member){
         if(this.isComplete == true){
             throw new ChecklistStatusConflictException(ALREADY_CHECKED);
         }
         this.isComplete =true;
+        this.completeMemberId = member.getMemberId();
+        this.completeTime = LocalDateTime.now();
     }
 
     public void incompleteChecklist(){
@@ -59,5 +62,7 @@ public class Checklist extends BaseEntity {
             throw new ChecklistStatusConflictException(ALREADY_UNCHECKED);
         }
         this.isComplete = false;
+        this.completeMemberId = null;
+        this.completeTime = null;
     }
 }
