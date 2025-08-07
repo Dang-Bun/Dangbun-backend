@@ -142,8 +142,8 @@ public class PlaceController {
             value = {},
             includes = {}
     )
-    @GetMapping("/{placeId}/duties")
-    public ResponseEntity<BaseResponse<?>> getDutiesProgress(@AuthenticationPrincipal(expression = "user") User user,
+    @GetMapping("/{placeId}/duties/progress")
+    public ResponseEntity<BaseResponse<GetDutiesProgressResponse>> getDutiesProgress(@AuthenticationPrincipal(expression = "user") User user,
                                                             @PathVariable Long placeId){
         return ResponseEntity.ok(BaseResponse.ok(placeService.getDutiesProgress(user, placeId)));
     }

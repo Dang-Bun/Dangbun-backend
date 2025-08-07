@@ -1,9 +1,8 @@
 package com.dangbun.domain.duty.repository;
 
 import com.dangbun.domain.duty.entity.Duty;
-import com.dangbun.domain.place.dto.response.GetDutiesProgressResponse;
+import com.dangbun.domain.place.dto.response.DutyProgressDto;
 import io.lettuce.core.dynamic.annotation.Param;
-import org.hibernate.annotations.Parameter;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -21,7 +20,7 @@ public interface DutyRepository extends JpaRepository<Duty, Long> {
     List<Duty> findWithPlaceByPlaceId(@Param("placeId") Long placeId);
 
     @Query("""
-    SELECT new com.dangbun.domain.place.dto.response.GetDutiesProgressResponse.DutyDto(
+    SELECT new com.dangbun.domain.place.dto.response.DutyProgressDto(
         d.dutyId,
         d.name,
         COUNT(cl),
@@ -34,5 +33,5 @@ public interface DutyRepository extends JpaRepository<Duty, Long> {
       AND cl.createdAt = CURRENT_DATE
     GROUP BY d.dutyId, d.name
 """)
-    List<GetDutiesProgressResponse.DutyDto> findDutyProgressByPlaceToday(@Param("placeId") Long placeId);
+    List<DutyProgressDto> findDutyProgressByPlaceToday(@Param("placeId") Long placeId);
 }

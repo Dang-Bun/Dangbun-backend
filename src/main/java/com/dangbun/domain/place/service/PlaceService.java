@@ -266,7 +266,7 @@ public class PlaceService {
     public GetDutiesProgressResponse getDutiesProgress(User user, Long placeId) {
         Member manager = getManager(user.getUserId(), placeId);
 
-        List<GetDutiesProgressResponse.DutyDto> dutyDtos = dutyRepository.findDutyProgressByPlaceToday(placeId);
+        List<DutyProgressDto> dutyDtos = dutyRepository.findDutyProgressByPlaceToday(placeId);
         return GetDutiesProgressResponse.of(dutyDtos);
 
     }

@@ -3,7 +3,8 @@ package com.dangbun.domain.calender.controller;
 import com.dangbun.domain.calender.dto.*;
 import com.dangbun.domain.calender.response.status.CalenderExceptionResponse;
 import com.dangbun.domain.calender.service.CalenderService;
-import com.dangbun.global.CheckPlaceMembership;
+
+import com.dangbun.global.aop.CheckPlaceMembership;
 import com.dangbun.global.docs.DocumentedApiErrors;
 import com.dangbun.global.response.BaseResponse;
 import io.swagger.v3.oas.annotations.Operation;
