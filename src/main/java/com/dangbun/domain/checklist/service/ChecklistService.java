@@ -48,7 +48,7 @@ public class ChecklistService {
     public PostCompleteChecklistResponse completeChecklist() {
         Member member = MemberContext.get();
         Checklist checklist = ChecklistContext.get();
-        checklist.completeChecklist();
+        checklist.completeChecklist(member);
         LocalDateTime endTime = checklist.getUpdatedAt();
         return PostCompleteChecklistResponse.of(member.getName(), LocalTime.from(endTime));
     }

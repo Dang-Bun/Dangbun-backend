@@ -124,7 +124,6 @@ public class PlaceController {
     }
 
 
-    //Todo "INVALID_ROLE"도 추가해야함
     @Operation(summary = "체크리스트 시간 설정", description = "플레이스의 체크리스트 시작시간/종료시간을 설정합니다.")
     @DocumentedApiErrors(
             value = {PlaceExceptionResponse.class},
@@ -136,5 +135,16 @@ public class PlaceController {
                                                       @RequestBody PatchUpdateTimeRequest request){
         placeService.updateTime(user, placeId, request);
         return ResponseEntity.ok(BaseResponse.ok(null));
+    }
+
+    @Operation(summary = "매니저-전체 진행률", description = "플레이스 내의 모든 당번에 대한 진행률을 보여줍니다.")
+    @DocumentedApiErrors(
+            value = {},
+            includes = {}
+    )
+    @GetMapping("/{placeId}/duties/progress")
+    public ResponseEntity<BaseResponse<GetDutiesProgressResponse>> getDutiesProgress(@AuthenticationPrincipal(expression = "user") User user,
+                                                            @PathVariable Long placeId){
+        return ResponseEntity.ok(BaseResponse.ok(placeService.getDutiesProgress(user, placeId)));
     }
 }
