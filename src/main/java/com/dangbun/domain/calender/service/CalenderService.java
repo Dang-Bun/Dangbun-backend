@@ -2,7 +2,9 @@ package com.dangbun.domain.calender.service;
 
 import com.dangbun.domain.calender.dto.GetChecklistsResponse;
 import com.dangbun.domain.calender.dto.GetProgressBarsResponse;
+import com.dangbun.domain.calender.dto.PatchUpdateChecklistToCompleteResponse;
 import com.dangbun.domain.calender.exception.custom.InvalidDateException;
+import com.dangbun.domain.calender.exception.custom.InvalidRoleException;
 import com.dangbun.domain.checklist.entity.Checklist;
 import com.dangbun.domain.checklist.repository.ChecklistRepository;
 import com.dangbun.domain.member.MemberContext;
@@ -13,15 +15,13 @@ import com.dangbun.domain.membercleaning.entity.MemberCleaning;
 import com.dangbun.domain.membercleaning.repository.MemberCleaningRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.YearMonth;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.dangbun.domain.calender.dto.GetChecklistsResponse.*;
@@ -29,6 +29,7 @@ import static com.dangbun.domain.calender.response.status.CalenderExceptionRespo
 
 @RequiredArgsConstructor
 @Service
+@Transactional
 public class CalenderService {
 
 
@@ -36,6 +37,7 @@ public class CalenderService {
     private final MemberCleaningRepository memberCleaningRepository;
     private final MemberRepository memberRepository;
 
+    @Transactional(readOnly = true)
     public GetChecklistsResponse getChecklists(Long placeId, LocalDate date) {
 
         Member me = MemberContext.get();
@@ -68,6 +70,7 @@ public class CalenderService {
 
 
 
+    @Transactional(readOnly = true)
     public GetProgressBarsResponse getProgressBars(Long placeId, int year, int month) {
         Member me = MemberContext.get();
         YearMonth current = YearMonth.of(year, month);
@@ -107,5 +110,19 @@ public class CalenderService {
                 checklists.removeIf(checklist -> !memberCleaning.getCleaning().equals(checklist.getCleaning()));
             }
         }
+    }
+
+    public PatchUpdateChecklistToCompleteResponse finishChecklist(Long placeId, Long checklistId) {
+        Member me = MemberContext.get();
+        if(me.getRole().equals(MemberRole.MEMBER)){
+            throw new InvalidRoleException(INVALID_ROLE);
+        }
+
+        Checklist checklist = checklistRepository.findById(checklistId)
+                .orElseThrow();
+
+        checklist.completeChecklist(me);
+
+        return PatchUpdateChecklistToCompleteResponse.of(me.getName(), LocalTime.now());
     }
 }

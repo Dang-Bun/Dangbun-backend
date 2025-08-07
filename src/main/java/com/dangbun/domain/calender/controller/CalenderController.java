@@ -2,6 +2,7 @@ package com.dangbun.domain.calender.controller;
 
 import com.dangbun.domain.calender.dto.GetChecklistsResponse;
 import com.dangbun.domain.calender.dto.GetProgressBarsResponse;
+import com.dangbun.domain.calender.dto.PatchUpdateChecklistToCompleteResponse;
 import com.dangbun.domain.calender.response.status.CalenderExceptionResponse;
 import com.dangbun.domain.calender.service.CalenderService;
 import com.dangbun.global.CheckPlaceMembership;
@@ -38,6 +39,10 @@ public class CalenderController {
     }
 
     @Operation(summary = "프로그래스바 조회(이전 달, 다음 달 포함)")
+    @DocumentedApiErrors(
+            value = {},
+            includes = {""}
+    )
     @GetMapping()
     public ResponseEntity<BaseResponse<GetProgressBarsResponse>> getProgressBars(@PathVariable Long placeId,
                                                                                  @RequestParam int year,
@@ -45,7 +50,18 @@ public class CalenderController {
         return ResponseEntity.ok(BaseResponse.ok(calenderService.getProgressBars(placeId, year, month)));
     }
 
-    // 체크리스트 매니저가 수정하기
+    @Operation(summary = "체크리스트 완료(매니저)")
+    @DocumentedApiErrors(
+            value = {CalenderExceptionResponse.class},
+            includes = {"INVALID_ROLE"}
+    )
+    @PatchMapping("/{checklistId}/complete")
+    public ResponseEntity<BaseResponse<PatchUpdateChecklistToCompleteResponse>> updateChecklistToComplete(@PathVariable Long placeId,
+                                                                                                          @PathVariable Long checklistId){
+        calenderService.finishChecklist(placeId, checklistId);
+        return ResponseEntity.ok(null);
+    }
+
 
     //사진 확인
 
