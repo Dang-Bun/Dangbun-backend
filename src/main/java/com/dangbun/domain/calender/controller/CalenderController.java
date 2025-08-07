@@ -1,6 +1,7 @@
 package com.dangbun.domain.calender.controller;
 
 import com.dangbun.domain.calender.dto.GetChecklistsResponse;
+import com.dangbun.domain.calender.dto.GetImageUrlResponse;
 import com.dangbun.domain.calender.dto.GetProgressBarsResponse;
 import com.dangbun.domain.calender.dto.PatchUpdateChecklistToCompleteResponse;
 import com.dangbun.domain.calender.response.status.CalenderExceptionResponse;
@@ -63,7 +64,16 @@ public class CalenderController {
     }
 
 
-    //사진 확인
+    @Operation(summary = "사진 확인")
+    @DocumentedApiErrors(
+            value = {CalenderExceptionResponse.class},
+            includes = {"INVALID_ROLE","NO_PHOTO"}
+    )
+    @GetMapping("/{checklistId}/photos")
+    public ResponseEntity<BaseResponse<GetImageUrlResponse>> getImageUrl(@PathVariable Long placeId,
+                                                                         @PathVariable Long checklistId){
+        return ResponseEntity.ok(BaseResponse.ok(calenderService.getPhotoUrl(placeId, checklistId)));
+    }
 
     // 청소 정보
 

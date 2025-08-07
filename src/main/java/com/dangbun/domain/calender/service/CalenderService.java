@@ -1,12 +1,15 @@
 package com.dangbun.domain.calender.service;
 
 import com.dangbun.domain.calender.dto.GetChecklistsResponse;
+import com.dangbun.domain.calender.dto.GetImageUrlResponse;
 import com.dangbun.domain.calender.dto.GetProgressBarsResponse;
 import com.dangbun.domain.calender.dto.PatchUpdateChecklistToCompleteResponse;
 import com.dangbun.domain.calender.exception.custom.InvalidDateException;
 import com.dangbun.domain.calender.exception.custom.InvalidRoleException;
+import com.dangbun.domain.calender.exception.custom.NoPhotoException;
 import com.dangbun.domain.checklist.entity.Checklist;
 import com.dangbun.domain.checklist.repository.ChecklistRepository;
+import com.dangbun.domain.cleaningImage.service.CleaningImageService;
 import com.dangbun.domain.member.MemberContext;
 import com.dangbun.domain.member.entity.Member;
 import com.dangbun.domain.member.entity.MemberRole;
@@ -36,6 +39,7 @@ public class CalenderService {
     private final ChecklistRepository checklistRepository;
     private final MemberCleaningRepository memberCleaningRepository;
     private final MemberRepository memberRepository;
+    private final CleaningImageService cleaningImageService;
 
     @Transactional(readOnly = true)
     public GetChecklistsResponse getChecklists(Long placeId, LocalDate date) {
@@ -124,5 +128,16 @@ public class CalenderService {
         checklist.completeChecklist(me);
 
         return PatchUpdateChecklistToCompleteResponse.of(me.getName(), LocalTime.now());
+    }
+
+    public GetImageUrlResponse getPhotoUrl(Long placeId, Long checklistId) {
+        Checklist checklist = checklistRepository.findWithCleaningById(checklistId).orElseThrow();
+
+        if(!checklist.getCleaning().getNeedPhoto()){
+            throw new NoPhotoException(NO_PHOTO);
+        }
+
+        String imageUrl = cleaningImageService.getImageUrl(checklistId);
+        return GetImageUrlResponse.of(imageUrl);
     }
 }
