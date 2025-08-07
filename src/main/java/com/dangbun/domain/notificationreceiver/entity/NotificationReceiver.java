@@ -2,7 +2,7 @@ package com.dangbun.domain.notificationreceiver.entity;
 
 import com.dangbun.domain.member.entity.Member;
 import com.dangbun.domain.notification.entity.Notification;
-import com.dangbun.global.BaseEntity;
+import com.dangbun.global.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;

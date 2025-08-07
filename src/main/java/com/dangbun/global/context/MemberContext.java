@@ -1,4 +1,4 @@
-package com.dangbun.domain.member;
+package com.dangbun.global.context;
 
 import com.dangbun.domain.member.entity.Member;
 

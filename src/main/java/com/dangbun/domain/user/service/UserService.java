@@ -4,14 +4,13 @@ import com.dangbun.domain.user.dto.request.DeleteUserAccountRequest;
 import com.dangbun.domain.user.dto.request.PostUserLoginRequest;
 import com.dangbun.domain.user.dto.request.PostUserPasswordUpdateRequest;
 import com.dangbun.domain.user.dto.request.PostUserSignUpRequest;
+import com.dangbun.domain.user.dto.response.GetUserMyInfoResponse;
 import com.dangbun.domain.user.dto.response.PostUserLoginResponse;
-import com.dangbun.domain.user.entity.CustomUserDetails;
 import com.dangbun.domain.user.entity.User;
 import com.dangbun.domain.user.exception.custom.*;
 import com.dangbun.domain.user.repository.UserRepository;
 import com.dangbun.global.email.EmailService;
 import com.dangbun.global.redis.RedisService;
-import com.dangbun.global.response.BaseResponse;
 import com.dangbun.global.security.JwtUtil;
 import com.dangbun.global.security.TokenProvider;
 import jakarta.validation.Valid;
@@ -144,9 +143,8 @@ public class UserService {
 
     }
 
-    public void deleteCurrentUser(CustomUserDetails customUser, DeleteUserAccountRequest request) {
-        if(request.email() != null && customUser.getEmail().equals(request.email())){
-            User user = customUser.getUser();
+    public void deleteCurrentUser(User user, DeleteUserAccountRequest request) {
+        if(request.email() != null && user.getEmail().equals(request.email())){
             user.deactivate();
             userRepository.save(user);
             return;
@@ -190,4 +188,7 @@ public class UserService {
 
     }
 
+    public GetUserMyInfoResponse getMyInfo(User user) {
+        return GetUserMyInfoResponse.from(user);
+    }
 }

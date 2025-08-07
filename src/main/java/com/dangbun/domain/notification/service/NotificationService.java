@@ -1,6 +1,6 @@
 package com.dangbun.domain.notification.service;
 
-import com.dangbun.domain.member.MemberContext;
+import com.dangbun.global.context.MemberContext;
 import com.dangbun.domain.member.entity.Member;
 import com.dangbun.domain.member.repository.MemberRepository;
 import com.dangbun.domain.member.service.MemberService;
@@ -32,13 +32,10 @@ import static com.dangbun.domain.notification.response.status.NotificationExcept
 public class NotificationService {
 
     private final MemberRepository memberRepository;
-    private final PlaceRepository placeRepository;
     private final RedisService redisService;
-    private static final int MAX_RECENT_COUNT = 5;
-    private final MemberService memberService;
     private final NotificationReceiverRepository notificationReceiverRepository;
     private final NotificationRepository notificationRepository;
-
+    private static final int MAX_RECENT_COUNT = 5;
 
 
     public GetMemberSearchListResponse searchMembers( String searchName, Pageable pageable) {
@@ -90,7 +87,7 @@ public class NotificationService {
                 : request.template().getMessage();
 
         String title = extractTitle(content);
-        System.out.println(title);
+
         Notification notification = Notification.builder()
                 .template(request.template())
                 .title(title)
@@ -124,7 +121,6 @@ public class NotificationService {
 
         if (minIdx != 1000) {
             String sentence = content.substring(0, minIdx + 1);
-            System.out.println(sentence);
             return sentence.length() <= 25 ? sentence : sentence.substring(0, 25) + "...";
         }
 

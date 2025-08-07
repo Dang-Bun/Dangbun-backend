@@ -2,13 +2,12 @@ package com.dangbun.domain.place.entity;
 
 
 import com.dangbun.domain.duty.entity.Duty;
-import com.dangbun.global.BaseEntity;
+import com.dangbun.global.entity.BaseEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
-import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 

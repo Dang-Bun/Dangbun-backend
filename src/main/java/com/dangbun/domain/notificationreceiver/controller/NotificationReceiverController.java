@@ -1,24 +1,20 @@
 package com.dangbun.domain.notificationreceiver.controller;
 
 import com.dangbun.domain.notification.response.status.NotificationExceptionResponse;
-import com.dangbun.domain.notification.service.NotificationService;
 import com.dangbun.domain.notificationreceiver.dto.response.GetNotificationReceivedListResponse;
 import com.dangbun.domain.notificationreceiver.service.NotificationReceiverService;
-import com.dangbun.global.CheckPlaceMembership;
+import com.dangbun.global.aop.CheckPlaceMembership;
 import com.dangbun.global.docs.DocumentedApiErrors;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.validation.constraints.Size;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 

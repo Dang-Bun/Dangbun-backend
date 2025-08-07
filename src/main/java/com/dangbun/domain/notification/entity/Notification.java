@@ -1,14 +1,12 @@
 package com.dangbun.domain.notification.entity;
 
 import com.dangbun.domain.member.entity.Member;
-import com.dangbun.global.BaseEntity;
+import com.dangbun.global.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import java.time.LocalDateTime;
 
 @Entity
 @Getter
