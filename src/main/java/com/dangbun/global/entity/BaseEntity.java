@@ -1,4 +1,4 @@
-package com.dangbun.global;
+package com.dangbun.global.entity;
 
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.MappedSuperclass;

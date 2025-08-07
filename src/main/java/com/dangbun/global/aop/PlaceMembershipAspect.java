@@ -1,6 +1,6 @@
-package com.dangbun.global;
+package com.dangbun.global.aop;
 
-import com.dangbun.domain.member.MemberContext;
+import com.dangbun.global.context.MemberContext;
 import com.dangbun.domain.member.entity.Member;
 import com.dangbun.domain.member.exception.custom.PlaceAccessDeniedException;
 import com.dangbun.domain.member.repository.MemberRepository;
@@ -26,7 +26,7 @@ public class PlaceMembershipAspect {
     private final MemberRepository memberRepository;
 
 
-    @Before("@within(com.dangbun.global.CheckPlaceMembership) || @annotation(com.dangbun.global.CheckPlaceMembership)")
+    @Before("@within(com.dangbun.global.aop.CheckPlaceMembership) || @annotation(com.dangbun.global.aop.CheckPlaceMembership)")
     public void validate(JoinPoint joinPoint) throws  AccessDeniedException {
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         if (!(principal instanceof CustomUserDetails userDetails)) {
@@ -68,7 +68,7 @@ public class PlaceMembershipAspect {
         MemberContext.set(member);
     }
 
-    @After("@within(com.dangbun.global.CheckPlaceMembership) || @annotation(com.dangbun.global.CheckPlaceMembership)")
+    @After("@within(com.dangbun.global.aop.CheckPlaceMembership) || @annotation(com.dangbun.global.aop.CheckPlaceMembership)")
     public void clearMemberContext() {
         MemberContext.clear();
     }

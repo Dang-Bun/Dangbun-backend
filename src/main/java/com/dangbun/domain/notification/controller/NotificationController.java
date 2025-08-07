@@ -4,8 +4,7 @@ import com.dangbun.domain.notification.dto.request.PostNotificationCreateRequest
 import com.dangbun.domain.notification.dto.response.*;
 import com.dangbun.domain.notification.response.status.NotificationExceptionResponse;
 import com.dangbun.domain.notification.service.NotificationService;
-import com.dangbun.domain.notificationreceiver.dto.response.GetNotificationReceivedListResponse;
-import com.dangbun.global.CheckPlaceMembership;
+import com.dangbun.global.aop.CheckPlaceMembership;
 import com.dangbun.global.docs.DocumentedApiErrors;
 import com.dangbun.global.response.BaseResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -18,7 +17,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 

@@ -1,7 +1,7 @@
 package com.dangbun.domain.member.service;
 
 import com.dangbun.domain.duty.entity.Duty;
-import com.dangbun.domain.member.MemberContext;
+import com.dangbun.global.context.MemberContext;
 import com.dangbun.domain.member.dto.request.*;
 import com.dangbun.domain.member.dto.response.*;
 

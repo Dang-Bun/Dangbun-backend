@@ -1,6 +1,6 @@
 package com.dangbun.domain.notification.service;
 
-import com.dangbun.domain.member.MemberContext;
+import com.dangbun.global.context.MemberContext;
 import com.dangbun.domain.member.entity.Member;
 import com.dangbun.domain.member.repository.MemberRepository;
 import com.dangbun.domain.member.service.MemberService;

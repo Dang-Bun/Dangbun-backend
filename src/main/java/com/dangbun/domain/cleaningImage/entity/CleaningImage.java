@@ -1,7 +1,7 @@
 package com.dangbun.domain.cleaningImage.entity;
 
 import com.dangbun.domain.checklist.entity.Checklist;
-import com.dangbun.global.BaseEntity;
+import com.dangbun.global.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
