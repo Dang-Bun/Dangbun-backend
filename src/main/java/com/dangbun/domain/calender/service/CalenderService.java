@@ -6,6 +6,7 @@ import com.dangbun.domain.calender.exception.custom.InvalidRoleException;
 import com.dangbun.domain.calender.exception.custom.NoPhotoException;
 import com.dangbun.domain.checklist.entity.Checklist;
 import com.dangbun.domain.checklist.repository.ChecklistRepository;
+import com.dangbun.domain.checklist.service.ChecklistService;
 import com.dangbun.domain.cleaning.entity.Cleaning;
 import com.dangbun.domain.cleaning.entity.CleaningRepeatType;
 import com.dangbun.domain.cleaningImage.service.CleaningImageService;
@@ -40,6 +41,7 @@ public class CalenderService {
     private final MemberRepository memberRepository;
     private final CleaningImageService cleaningImageService;
     private final CleaningDateRepository cleaningDateRepository;
+    private final ChecklistService checklistService;
 
     @Transactional(readOnly = true)
     public GetChecklistsResponse getChecklists(Long placeId, LocalDate date) {
@@ -174,5 +176,15 @@ public class CalenderService {
                 .map(String::toUpperCase)
                 .map(DayOfWeek::valueOf)
                 .collect(Collectors.toList());
+    }
+
+    public void deleteChecklist(Long checklistId) {
+        Member me = MemberContext.get();
+
+        if(me.getRole().equals(MemberRole.MEMBER)){
+            throw new InvalidRoleException(INVALID_ROLE);
+        }
+
+        checklistService.deleteChecklist(checklistId);
     }
 }

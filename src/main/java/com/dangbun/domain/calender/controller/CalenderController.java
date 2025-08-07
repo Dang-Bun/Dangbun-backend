@@ -84,4 +84,16 @@ public class CalenderController {
     }
 
     // 청소 삭제
+
+    @Operation(summary = "청소 삭제")
+    @DocumentedApiErrors(
+            value = {CalenderExceptionResponse.class},
+            includes = {"INVALID_ROLE"}
+    )
+    @DeleteMapping("/{checklistId}")
+    public ResponseEntity<BaseResponse<?>> deleteChecklist(@PathVariable Long placeId,
+                                                          @PathVariable Long checklistId){
+        calenderService.deleteChecklist(checklistId);
+        return ResponseEntity.ok(BaseResponse.ok(null));
+    }
 }

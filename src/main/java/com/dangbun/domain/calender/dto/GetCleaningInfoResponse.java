@@ -26,7 +26,7 @@ public record GetCleaningInfoResponse(
         @Schema(description = "청소 반복 정보: WEEKLY 일 경우", example = "[TUESDAY, FRIDAY]")
         List<String> repeatDays,
 
-        @Schema(description = "세부 날짜", example = "[2025-08-07, 2025-08-12]")
+        @Schema(description = "세부 날짜(루틴 제외)", example = "[2025-08-07, 2025-08-12]")
         List<LocalDate> dates
 
 ) {
