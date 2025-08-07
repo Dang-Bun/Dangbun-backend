@@ -33,7 +33,7 @@ public class MemberController {
     )
     @GetMapping
     public ResponseEntity<BaseResponse<GetMembersResponse>> getMembers(@PathVariable("placeId") Long placeId) {
-        GetMembersResponse response = memberService.getMembers(placeId);
+        GetMembersResponse response = memberService.getMembers();
         return ResponseEntity.ok(BaseResponse.ok(response));
     }
 
@@ -45,7 +45,7 @@ public class MemberController {
     )
     @GetMapping("/waiting")
     public ResponseEntity<BaseResponse<GetWaitingMembersResponse>> getWaitingMembers(@PathVariable("placeId") Long placeId) {
-        return ResponseEntity.ok(BaseResponse.ok(memberService.getWaitingMembers(placeId)));
+        return ResponseEntity.ok(BaseResponse.ok(memberService.getWaitingMembers()));
     }
 
     @Operation(summary = "맴버 수락", description = "대기중인 맴버의 참가를 수락합니다.(매니저용)")
@@ -56,7 +56,7 @@ public class MemberController {
     @PostMapping("/{memberId}/accept")
     public ResponseEntity<?> registerMember(@PathVariable("placeId") Long placeId,
                                             @PathVariable("memberId") Long memberId) {
-        memberService.registerMember(placeId, memberId);
+        memberService.registerMember(memberId);
 
         return ResponseEntity.ok(BaseResponse.ok(null));
     }
@@ -70,7 +70,7 @@ public class MemberController {
     public ResponseEntity<?> removeWaitingMember(@PathVariable("placeId") Long placeId,
                                                  @PathVariable("memberId") Long memberId) {
 
-        memberService.removeWaitingMember(placeId, memberId);
+        memberService.removeWaitingMember(memberId);
         return ResponseEntity.ok(BaseResponse.ok(null));
     }
 
@@ -83,7 +83,7 @@ public class MemberController {
     public ResponseEntity<BaseResponse<GetMemberResponse>> getMember(@PathVariable("placeId") Long placeId,
                                                                      @PathVariable("memberId") Long memberId) {
 
-        return ResponseEntity.ok(BaseResponse.ok(memberService.getMember(placeId, memberId)));
+        return ResponseEntity.ok(BaseResponse.ok(memberService.getMember(memberId)));
     }
 
     @Operation(summary = "플레이스 나가기", description = "플레이스에서 나갑니다")
@@ -130,7 +130,7 @@ public class MemberController {
     )
     @GetMapping("/me")
     public ResponseEntity<BaseResponse<GetMyInformationResponse>> getMyInformation(@PathVariable("placeId") Long placeId){
-        return ResponseEntity.ok(BaseResponse.ok(memberService.getMyInformation(placeId)));
+        return ResponseEntity.ok(BaseResponse.ok(memberService.getMyInformation()));
     }
 
 }

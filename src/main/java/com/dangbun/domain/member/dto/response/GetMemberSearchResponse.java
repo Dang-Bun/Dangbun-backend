@@ -9,7 +9,7 @@ public record GetMemberSearchResponse(
         @Schema(description = "검색 결과 멤버 이름", example = "박완")
         String name
 ) {
-    public static GetMemberSearchResponse of(Long memberId, String name) {
-        return new GetMemberSearchResponse(memberId, name);
+    public static GetMemberSearchResponse of(Member member) {
+        return new GetMemberSearchResponse(member.getMemberId(), member.getName());
     }
 }
