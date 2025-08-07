@@ -2,15 +2,12 @@ package com.dangbun.domain.checklist.repository;
 
 import com.dangbun.domain.checklist.entity.Checklist;
 import com.dangbun.domain.cleaning.entity.Cleaning;
-import com.dangbun.domain.member.entity.Member;
 import io.lettuce.core.dynamic.annotation.Param;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
-import java.lang.ScopedValue;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -52,9 +49,6 @@ public interface ChecklistRepository extends JpaRepository<Checklist, Long> {
             """)
     boolean existsCompletedChecklistByDateAndCleaning(@Param("start") LocalDateTime start, @Param("end") LocalDateTime end, @Param("cleaning") Cleaning cleaning);
 
-    @Query("""
-            """)
-    void findByMemberAndMonth(Member me, int year, int month);
 
     @Query("""
             select ch from Checklist ch

@@ -263,6 +263,13 @@ public class PlaceService {
         place.setTime(request.startTime(), request.endTime());
     }
 
+    public GetDutiesProgressResponse getDutiesProgress(User user, Long placeId) {
+        Member manager = getManager(user.getUserId(), placeId);
+
+        List<GetDutiesProgressResponse.DutyDto> dutyDtos = dutyRepository.findDutyProgressByPlaceToday(placeId);
+        return GetDutiesProgressResponse.of(dutyDtos);
+
+    }
 
     private Member getManager(Long userId, Long placeId) {
         Member member = memberRepository.findWithPlaceByUserIdAndPlaceId(userId, placeId)
@@ -272,4 +279,6 @@ public class PlaceService {
         }
         return member;
     }
+
+
 }
