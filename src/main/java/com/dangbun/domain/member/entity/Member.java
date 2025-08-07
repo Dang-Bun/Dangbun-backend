@@ -4,7 +4,7 @@ import com.dangbun.domain.membercleaning.entity.MemberCleaning;
 import com.dangbun.domain.memberduty.entity.MemberDuty;
 import com.dangbun.domain.place.entity.Place;
 import com.dangbun.domain.user.entity.User;
-import com.dangbun.global.BaseEntity;
+import com.dangbun.global.entity.BaseEntity;
 import com.dangbun.global.converter.MapToJsonConverter;
 import jakarta.persistence.*;
 import lombok.AccessLevel;

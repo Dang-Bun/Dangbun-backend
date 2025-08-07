@@ -5,7 +5,7 @@ import com.dangbun.domain.checklist.exception.custom.ChecklistAccessDeniedExcept
 import com.dangbun.domain.checklist.repository.ChecklistRepository;
 import com.dangbun.domain.checklist.response.status.ChecklistExceptionResponse;
 import com.dangbun.domain.cleaning.entity.Cleaning;
-import com.dangbun.domain.member.MemberContext;
+import com.dangbun.global.context.MemberContext;
 import com.dangbun.domain.member.entity.Member;
 import com.dangbun.domain.membercleaning.repository.MemberCleaningRepository;
 import com.dangbun.domain.user.entity.CustomUserDetails;

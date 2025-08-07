@@ -3,6 +3,7 @@ package com.dangbun.domain.user.controller;
 import com.dangbun.domain.user.dto.request.*;
 import com.dangbun.domain.user.dto.response.PostUserLoginResponse;
 import com.dangbun.domain.user.entity.CustomUserDetails;
+import com.dangbun.domain.user.entity.User;
 import com.dangbun.domain.user.response.status.UserExceptionResponse;
 import com.dangbun.domain.user.service.UserService;
 import com.dangbun.global.docs.DocumentedApiErrors;
@@ -95,10 +96,23 @@ public class UserController {
             includes = {"INVALID_PASSWORD"}
     )
     @DeleteMapping("/me")
-    public ResponseEntity<BaseResponse<?>> deleteCurrentUser(@AuthenticationPrincipal CustomUserDetails customUser,
+    public ResponseEntity<BaseResponse<?>> deleteCurrentUser(@AuthenticationPrincipal(expression = "user") User user,
                                                              @RequestBody DeleteUserAccountRequest request) {
-        userService.deleteCurrentUser(customUser, request);
+        userService.deleteCurrentUser(user, request);
         return ResponseEntity.ok(BaseResponse.ok(null));
+    }
+
+    @Operation(summary = "내 회원 정보 조회",description = "회원가입 시 입력한 이름, 이메일 정보를 조회합니다.")
+    @DocumentedApiErrors(
+            value = {UserExceptionResponse.class},
+            includes = {"INVALID_PASSWORD"}
+    )
+    @GetMapping("/me")
+    public ResponseEntity<BaseResponse<?>> getMyInfo(
+            @AuthenticationPrincipal(expression = "user") User user
+    ) {
+
+        return ResponseEntity.ok(BaseResponse.ok(userService.getMyInfo(user)));
     }
 
 }
