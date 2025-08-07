@@ -1,9 +1,9 @@
 package com.dangbun.domain.calender.controller;
 
 import com.dangbun.domain.calender.dto.GetChecklistsResponse;
+import com.dangbun.domain.calender.dto.GetProgressBarsResponse;
 import com.dangbun.domain.calender.response.status.CalenderExceptionResponse;
 import com.dangbun.domain.calender.service.CalenderService;
-import com.dangbun.domain.checklist.response.status.ChecklistExceptionResponse;
 import com.dangbun.global.CheckPlaceMembership;
 import com.dangbun.global.docs.DocumentedApiErrors;
 import com.dangbun.global.response.BaseResponse;
@@ -33,7 +33,23 @@ public class CalenderController {
     )
     @GetMapping("/checklists")
     public ResponseEntity<BaseResponse<GetChecklistsResponse>> getChecklistsByDate(@PathVariable Long placeId,
-                                                                                   @RequestParam LocalDate date){
-        return ResponseEntity.ok(BaseResponse.ok(calenderService.getChecklists(placeId,date)));
+                                                                                   @RequestParam LocalDate date) {
+        return ResponseEntity.ok(BaseResponse.ok(calenderService.getChecklists(placeId, date)));
     }
+
+    @Operation(summary = "프로그래스바 조회(이전 달, 다음 달 포함)")
+    @GetMapping()
+    public ResponseEntity<BaseResponse<GetProgressBarsResponse>> getProgressBars(@PathVariable Long placeId,
+                                                                                 @RequestParam int year,
+                                                                                 @RequestParam int month) {
+        return ResponseEntity.ok(BaseResponse.ok(calenderService.getProgressBars(placeId, year, month)));
+    }
+
+    // 체크리스트 매니저가 수정하기
+
+    //사진 확인
+
+    // 청소 정보
+
+    // 청소 삭제
 }

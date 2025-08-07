@@ -1,6 +1,7 @@
 package com.dangbun.domain.calender.service;
 
 import com.dangbun.domain.calender.dto.GetChecklistsResponse;
+import com.dangbun.domain.calender.dto.GetProgressBarsResponse;
 import com.dangbun.domain.calender.exception.custom.InvalidDateException;
 import com.dangbun.domain.checklist.entity.Checklist;
 import com.dangbun.domain.checklist.repository.ChecklistRepository;
@@ -16,8 +17,12 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
+import java.util.stream.Collectors;
 
 import static com.dangbun.domain.calender.dto.GetChecklistsResponse.*;
 import static com.dangbun.domain.calender.response.status.CalenderExceptionResponse.*;
@@ -43,13 +48,7 @@ public class CalenderService {
 
         List<Checklist> checklists = checklistRepository.findAllByCreatedDateAndPlaceId(start, end, placeId);
 
-        if(me.getRole().equals(MemberRole.MEMBER)){
-            List<MemberCleaning> memberCleanings = memberCleaningRepository.findAllByMember(me);
-
-            for(MemberCleaning memberCleaning : memberCleanings){
-                checklists.removeIf(checklist -> !memberCleaning.getCleaning().equals(checklist.getCleaning()));
-            }
-        }
+        filterMyChecklists(me, checklists);
 
         List<ChecklistDto> checklistDtos = new ArrayList<>();
 
@@ -65,5 +64,48 @@ public class CalenderService {
         }
 
         return GetChecklistsResponse.of(checklistDtos);
+    }
+
+
+
+    public GetProgressBarsResponse getProgressBars(Long placeId, int year, int month) {
+        Member me = MemberContext.get();
+        YearMonth current = YearMonth.of(year, month);
+        LocalDateTime start = current.minusMonths(1).atDay(1).atStartOfDay();
+        LocalDateTime end = current.plusMonths(1).atDay(1).atStartOfDay();
+
+        List<Checklist> checklists = checklistRepository.findByPlaceAndMonth(placeId, start, end);
+
+        if(me.getRole().equals(MemberRole.MEMBER)){
+            filterMyChecklists(me, checklists);
+        }
+
+        Map<LocalDate, List<Checklist>> dailyGrouped = checklists.stream().collect(Collectors.groupingBy(ch -> ch.getCreatedAt().toLocalDate(),
+                TreeMap::new, Collectors.toList()));
+
+        List<GetProgressBarsResponse.DailyProgressDto> result = new ArrayList<>();
+
+        for (Map.Entry<LocalDate, List<Checklist>> entry : dailyGrouped.entrySet()) {
+            LocalDate date = entry.getKey();
+            List<Checklist> list = entry.getValue();
+
+            int total = list.size();
+            int completed = (int) list.stream().filter(Checklist::getIsComplete).count();
+
+            result.add(GetProgressBarsResponse.DailyProgressDto.of(date, total, completed));
+        }
+
+        return GetProgressBarsResponse.of(result);
+
+    }
+
+    private void filterMyChecklists(Member me, List<Checklist> checklists) {
+        if(me.getRole().equals(MemberRole.MEMBER)){
+            List<MemberCleaning> memberCleanings = memberCleaningRepository.findAllByMember(me);
+
+            for(MemberCleaning memberCleaning : memberCleanings){
+                checklists.removeIf(checklist -> !memberCleaning.getCleaning().equals(checklist.getCleaning()));
+            }
+        }
     }
 }
