@@ -23,7 +23,7 @@ public record GetProgressBarsResponse (
             @Schema(description = "해당 날의 완료된 청소 수", example = "7")
             int endCleaning,
 
-            @Schema(description = "완료 퍼센트", example = "70.123")
+            @Schema(description = "완료 퍼센트", example = "70")
             double endPercent
     ){
         public static DailyProgressDto of(LocalDate date, int totalCleaning, int endCleaning){

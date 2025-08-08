@@ -25,7 +25,6 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.time.Duration;
 import java.util.Date;
-import java.util.Optional;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
@@ -51,35 +50,44 @@ public class UserService {
     private Long authCodeExpirationMillis;
 
 
-    public User findByEmail(String email){
+    public User findByEmail(String email) {
         return userRepository.findByEmail(email).get();
     }
 
-    public void sendAuthCode(String toEmail) {
-        if(!isDuplicateEmail(toEmail)) {
-            String title = "당번 이메일 인증 번호";
-            String certCode = createAuthCode();
-            emailService.sendEmail(toEmail, title, certCode);
-            redisService.setValues(CERT_CODE_PREFIX + toEmail, certCode, Duration.ofMillis(this.authCodeExpirationMillis));
-        }else{
+    public void sendFindPasswordAuthCode(String toEmail) {
+        if (isDuplicateEmail(toEmail)) {
+            sendAuthCode(toEmail);
+        } else{
+            throw new InvalidEmailException(INVALID_EMAIL);
+        }
+    }
+
+
+    public void sendSignupAuthCode(String toEmail) {
+        if (!isDuplicateEmail(toEmail)) {
+            User user = userRepository.findByEmail(toEmail).get();
+            userRepository.delete(user);
+            sendAuthCode(toEmail);
+        } else {
             throw new ExistEmailException(EXIST_EMAIL);
         }
     }
 
-    private boolean isDuplicateEmail(String email){
+
+    private boolean isDuplicateEmail(String email) {
         return userRepository.findByEmail(email).isPresent();
     }
 
-    private String createAuthCode(){
-        int length= 6;
+    private String createAuthCode() {
+        int length = 6;
         try {
             Random random = SecureRandom.getInstanceStrong();
             StringBuilder builder = new StringBuilder();
-            for(int i=0; i<length; i++){
+            for (int i = 0; i < length; i++) {
                 builder.append(random.nextInt(10));
             }
             return builder.toString();
-        }catch (NoSuchAlgorithmException e){
+        } catch (NoSuchAlgorithmException e) {
             throw new RuntimeException();
         }
     }
@@ -106,6 +114,7 @@ public class UserService {
 
         User user = User.builder().
                 name(name)
+                .enabled(true)
                 .password(encodePassword)
                 .email(email)
                 .build();
@@ -114,7 +123,7 @@ public class UserService {
     }
 
     private void checkCertCode(String email, String certCode) {
-        if (!redisService.getValues(CERT_CODE_PREFIX+ email).equals(certCode)){
+        if (!redisService.getValues(CERT_CODE_PREFIX + email).equals(certCode)) {
             throw new InvalidCertCodeException(INVALID_CERT_CODE);
         }
     }
@@ -124,17 +133,15 @@ public class UserService {
     }
 
     public void updatePassword(@Valid PostUserPasswordUpdateRequest request) {
-        Optional<User> optional = userRepository.findByEmail(request.email());
-        if(optional.isEmpty()){
-            throw new UserNotFoundException(NO_SUCH_USER);
-        }
 
-        User user = optional.get();
-        sendAuthCode(request.email());
+        User user = userRepository.findByEmail(request.email())
+                .orElseThrow(() -> new UserNotFoundException(NO_SUCH_USER));
+
+        sendFindPasswordAuthCode(request.email());
 
         checkCertCode(request.email(), request.certCode());
 
-        if(isValidPassword(request.password())){
+        if (isValidPassword(request.password())) {
             String encodedPassword = passwordEncoder.encode(request.password());
             user.updatePassword(encodedPassword);
         }
@@ -144,7 +151,7 @@ public class UserService {
     }
 
     public void deleteCurrentUser(User user, DeleteUserAccountRequest request) {
-        if(request.email() != null && user.getEmail().equals(request.email())){
+        if (request.email() != null && user.getEmail().equals(request.email())) {
             user.deactivate();
             userRepository.save(user);
             return;
@@ -156,39 +163,48 @@ public class UserService {
 
 
         User user = userRepository.findByEmail(request.email())
-                .orElseThrow(()->new UserNotFoundException(NO_SUCH_USER));
+                .orElseThrow(() -> new UserNotFoundException(NO_SUCH_USER));
 
+        if (!user.getEnabled()) {
+            throw new DeleteMemberException(DELETE_MEMBER);
+        }
 
-        if(!passwordEncoder.matches(request.password(), user.getPassword())){
+        if (!passwordEncoder.matches(request.password(), user.getPassword())) {
             throw new InvalidPasswordException(INVALID_PASSWORD);
         }
 
         final String accessToken = tokenProvider.createAccessToken(user);
         final String refreshToken = tokenProvider.createRefreshToken(user);
 
-        tokenProvider.saveRefreshToken(user.getUserId(),refreshToken);
+        tokenProvider.saveRefreshToken(user.getUserId(), refreshToken);
 
-        PostUserLoginResponse response = new PostUserLoginResponse(accessToken, refreshToken);
-
-        return response;
+        return new PostUserLoginResponse(accessToken, refreshToken);
     }
 
     public void logout(String bearerToken) {
         String accessToken = jwtUtil.parseAccessToken(bearerToken);
         String userId = tokenProvider.validateAndGetUserId(accessToken);
 
-        redisTemplate.delete("refreshToken:"+userId);
+        redisTemplate.delete("refreshToken:" + userId);
 
         Date expiration = jwtUtil.getExpiration(accessToken);
         Long now = System.currentTimeMillis();
         Long expirationMs = expiration.getTime() - now;
 
         redisTemplate.opsForValue()
-                .set("blacklist:"+accessToken,"logout",expirationMs, TimeUnit.MILLISECONDS);
+                .set("blacklist:" + accessToken, "logout", expirationMs, TimeUnit.MILLISECONDS);
 
     }
 
     public GetUserMyInfoResponse getMyInfo(User user) {
         return GetUserMyInfoResponse.from(user);
+    }
+
+
+    private void sendAuthCode(String toEmail) {
+        String title = "당번 이메일 인증 번호";
+        String certCode = createAuthCode();
+        emailService.sendEmail(toEmail, title, certCode);
+        redisService.setValues(CERT_CODE_PREFIX + toEmail, certCode, Duration.ofMillis(this.authCodeExpirationMillis));
     }
 }
