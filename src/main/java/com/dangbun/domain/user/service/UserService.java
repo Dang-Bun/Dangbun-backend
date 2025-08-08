@@ -54,7 +54,7 @@ public class UserService {
         return userRepository.findByEmail(email).get();
     }
 
-    public void sendSignupAuthCode(String toEmail) {
+    public void sendFindPasswordAuthCode(String toEmail) {
         if (isDuplicateEmail(toEmail)) {
             sendAuthCode(toEmail);
         } else{
@@ -62,8 +62,11 @@ public class UserService {
         }
     }
 
-    public void sendFindPasswordAuthCode(String toEmail) {
+
+    public void sendSignupAuthCode(String toEmail) {
         if (!isDuplicateEmail(toEmail)) {
+            User user = userRepository.findByEmail(toEmail).get();
+            userRepository.delete(user);
             sendAuthCode(toEmail);
         } else {
             throw new ExistEmailException(EXIST_EMAIL);
