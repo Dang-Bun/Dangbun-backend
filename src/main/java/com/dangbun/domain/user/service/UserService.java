@@ -56,10 +56,7 @@ public class UserService {
 
     public void sendSignupAuthCode(String toEmail) {
         if (isDuplicateEmail(toEmail)) {
-            String title = "당번 이메일 인증 번호";
-            String certCode = createAuthCode();
-            emailService.sendEmail(toEmail, title, certCode);
-            redisService.setValues(CERT_CODE_PREFIX + toEmail, certCode, Duration.ofMillis(this.authCodeExpirationMillis));
+            sendAuthCode(toEmail);
         } else{
             throw new InvalidEmailException(INVALID_EMAIL);
         }
@@ -67,14 +64,12 @@ public class UserService {
 
     public void sendFindPasswordAuthCode(String toEmail) {
         if (!isDuplicateEmail(toEmail)) {
-            String title = "당번 이메일 인증 번호";
-            String certCode = createAuthCode();
-            emailService.sendEmail(toEmail, title, certCode);
-            redisService.setValues(CERT_CODE_PREFIX + toEmail, certCode, Duration.ofMillis(this.authCodeExpirationMillis));
+            sendAuthCode(toEmail);
         } else {
             throw new ExistEmailException(EXIST_EMAIL);
         }
     }
+
 
     private boolean isDuplicateEmail(String email) {
         return userRepository.findByEmail(email).isPresent();
@@ -200,5 +195,13 @@ public class UserService {
 
     public GetUserMyInfoResponse getMyInfo(User user) {
         return GetUserMyInfoResponse.from(user);
+    }
+
+
+    private void sendAuthCode(String toEmail) {
+        String title = "당번 이메일 인증 번호";
+        String certCode = createAuthCode();
+        emailService.sendEmail(toEmail, title, certCode);
+        redisService.setValues(CERT_CODE_PREFIX + toEmail, certCode, Duration.ofMillis(this.authCodeExpirationMillis));
     }
 }
