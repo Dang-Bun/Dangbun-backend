@@ -35,7 +35,7 @@ public class UserController {
             includes = {"INVALID_EMAIL"}
     )
     @PostMapping("/email-code")
-    public ResponseEntity<BaseResponse<?>> generateAuthCode(@RequestBody PostUserAuthCodeRequest request) {
+    public ResponseEntity<BaseResponse<?>> generatePasswordAuthCode(@RequestBody PostUserAuthCodeRequest request) {
         String email = request.email();
         userService.sendFindPasswordAuthCode(email);
         return ResponseEntity.ok(BaseResponse.ok(null));
