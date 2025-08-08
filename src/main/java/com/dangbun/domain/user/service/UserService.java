@@ -51,10 +51,6 @@ public class UserService {
     private Long authCodeExpirationMillis;
 
 
-    public User findByEmail(String email) {
-        return userRepository.findByEmail(email).get();
-    }
-
     public void sendFindPasswordAuthCode(String toEmail) {
         if (getUserByEmail(toEmail).isPresent()) {
             sendAuthCode(toEmail);
@@ -142,8 +138,6 @@ public class UserService {
 
         User user = userRepository.findByEmail(request.email())
                 .orElseThrow(() -> new UserNotFoundException(NO_SUCH_USER));
-
-        sendFindPasswordAuthCode(request.email());
 
         checkCertCode(request.email(), request.certCode());
 
