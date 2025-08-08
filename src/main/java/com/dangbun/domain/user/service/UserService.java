@@ -25,6 +25,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.time.Duration;
 import java.util.Date;
+import java.util.Optional;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
@@ -55,7 +56,7 @@ public class UserService {
     }
 
     public void sendFindPasswordAuthCode(String toEmail) {
-        if (isDuplicateEmail(toEmail)) {
+        if (getUserByEmail(toEmail).isPresent()) {
             sendAuthCode(toEmail);
         } else{
             throw new InvalidEmailException(INVALID_EMAIL);
@@ -64,18 +65,23 @@ public class UserService {
 
 
     public void sendSignupAuthCode(String toEmail) {
-        if (!isDuplicateEmail(toEmail)) {
-            User user = userRepository.findByEmail(toEmail).get();
+        if (getUserByEmail(toEmail).isEmpty()) {
+            sendAuthCode(toEmail);
+            return;
+        }
+
+        User user = getUserByEmail(toEmail).get();
+        if(!user.getEnabled()){
             userRepository.delete(user);
             sendAuthCode(toEmail);
-        } else {
-            throw new ExistEmailException(EXIST_EMAIL);
+            return;
         }
+        throw new ExistEmailException(EXIST_EMAIL);
     }
 
 
-    private boolean isDuplicateEmail(String email) {
-        return userRepository.findByEmail(email).isPresent();
+    private Optional<User> getUserByEmail(String email) {
+        return userRepository.findByEmail(email);
     }
 
     private String createAuthCode() {
