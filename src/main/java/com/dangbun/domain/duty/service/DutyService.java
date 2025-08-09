@@ -17,6 +17,7 @@ import com.dangbun.domain.memberduty.entity.MemberDuty;
 import com.dangbun.domain.memberduty.repository.MemberDutyRepository;
 import com.dangbun.domain.place.entity.Place;
 import com.dangbun.domain.place.repository.PlaceRepository;
+import com.dangbun.global.context.MemberContext;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -28,10 +29,10 @@ import static com.dangbun.domain.duty.response.status.DutyExceptionResponse.*;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class DutyService {
 
     private final DutyRepository dutyRepository;
-    private final PlaceRepository placeRepository;
     private final MemberDutyRepository memberDutyRepository;
     private final CleaningRepository cleaningRepository;
     private final MemberRepository memberRepository;
@@ -39,12 +40,12 @@ public class DutyService {
     private final MemberCleaningRepository memberCleaningRepository;
     private final CleaningService cleaningService;
 
-    @Transactional
-    public PostDutyCreateResponse createDuty(Long placeId, PostDutyCreateRequest request) {
-        Place place = placeRepository.findById(placeId)
-                .orElseThrow(() -> new PlaceNotFoundException(PLACE_NOT_FOUND));
 
-        if (dutyRepository.existsByNameAndPlace_PlaceId(request.name(), placeId)) {
+    public PostDutyCreateResponse createDuty(PostDutyCreateRequest request) {
+
+        Place place = MemberContext.get().getPlace();
+
+        if (dutyRepository.existsByNameAndPlace_PlaceId(request.name(), place.getPlaceId())) {
             throw new DutyAlreadyExistsException(DUTY_ALREADY_EXISTS);
         }
 
@@ -59,10 +60,8 @@ public class DutyService {
     }
 
     @Transactional
-    public List<GetDutyListResponse> getDutyList(Long placeId) {
-        if (!placeRepository.existsById(placeId)) {
-            throw new PlaceNotFoundException(PLACE_NOT_FOUND);
-        }
+    public List<GetDutyListResponse> getDutyList() {
+        Long placeId = MemberContext.get().getPlace().getPlaceId();
 
         List<Duty> duties = dutyRepository.findByPlace_PlaceId(placeId);
 
