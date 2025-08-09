@@ -155,7 +155,7 @@ public class PlaceService {
         Set<String> information = member.getInformation().keySet();
         List<String> iList = information.stream().toList();
 
-        return PostCheckInviteCodeResponse.of(request.inviteCode(), iList);
+        return PostCheckInviteCodeResponse.of(place.getPlaceId(), iList);
     }
 
     public static String generateCode() {
