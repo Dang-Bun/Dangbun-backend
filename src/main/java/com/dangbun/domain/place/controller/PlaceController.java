@@ -10,6 +10,8 @@ import com.dangbun.domain.place.response.status.PlaceExceptionResponse;
 import com.dangbun.domain.place.service.PlaceService;
 import com.dangbun.domain.user.entity.User;
 import com.dangbun.domain.user.response.status.UserExceptionResponse;
+import com.dangbun.global.aop.CheckManagerAuthority;
+import com.dangbun.global.aop.CheckPlaceMembership;
 import com.dangbun.global.docs.DocumentedApiErrors;
 import com.dangbun.global.response.BaseResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -54,15 +56,16 @@ public class PlaceController {
         return ResponseEntity.ok(BaseResponse.ok(placeService.createPlaceWithManager(user.getUserId(), request)));
     }
 
-    @Operation(summary = "참여코드 생성", description = "플레이스의 참여코드를 생성합니다.")
+    @Operation(summary = "참여코드 생성", description = "플레이스의 참여코드를 생성합니다.(매니저)")
     @DocumentedApiErrors(
             value = {MemberExceptionResponse.class},
             includes = {"INVALID_ROLE", "NO_SUCH_MEMBER"}
     )
     @PostMapping("/{placeId}/invite-code")
-    public ResponseEntity<BaseResponse<PostCreateInviteCodeResponse>> createInviteCode(@AuthenticationPrincipal(expression = "user") User user,
-                                                                                       @PathVariable Long placeId) {
-        PostCreateInviteCodeResponse data = placeService.createInviteCode(user.getUserId(), placeId);
+    @CheckPlaceMembership(placeIdParam = "placeId")
+    @CheckManagerAuthority
+    public ResponseEntity<BaseResponse<PostCreateInviteCodeResponse>> createInviteCode(@PathVariable Long placeId) {
+        PostCreateInviteCodeResponse data = placeService.createInviteCode();
         return ResponseEntity.ok(BaseResponse.ok(data));
     }
 
@@ -94,9 +97,9 @@ public class PlaceController {
 
     @Operation(summary = "참여 취소",description = "대기중인 플레이스의 참여 신청을 철회합니다")
     @DeleteMapping("/{placeId}/join-requests")
-    public ResponseEntity<BaseResponse<?>> deleteRegisterPlace(@AuthenticationPrincipal(expression = "user") User user,
-                                                               @PathVariable Long placeId){
-        placeService.cancelRegister(user,placeId);
+    @CheckPlaceMembership(placeIdParam = "placeId")
+    public ResponseEntity<BaseResponse<?>> deleteRegisterPlace(@PathVariable Long placeId){
+        placeService.cancelRegister();
         return ResponseEntity.ok(BaseResponse.ok(null));
     }
 
@@ -105,10 +108,10 @@ public class PlaceController {
             value = {MemberExceptionResponse.class},
             includes = {"NO_SUCH_MEMBER"}
     )
+    @CheckPlaceMembership(placeIdParam = "placeId")
     @GetMapping("/{placeId}")
-    public ResponseEntity<BaseResponse<GetPlaceResponse>> getPlace(@AuthenticationPrincipal(expression = "user") User user,
-                                                                   @PathVariable Long placeId) {
-        return ResponseEntity.ok(BaseResponse.ok(placeService.getPlace(user, placeId)));
+    public ResponseEntity<BaseResponse<GetPlaceResponse>> getPlace(@PathVariable Long placeId) {
+        return ResponseEntity.ok(BaseResponse.ok(placeService.getPlace()));
     }
 
     @Operation(summary = "플레이스 삭제", description = "플레이스를 삭제합니다(매니저)")
@@ -117,24 +120,27 @@ public class PlaceController {
             includes = {"NO_SUCH_MEMBER", "INVALID_ROLE"}
     )
     @DeleteMapping("/{placeId}")
-    public ResponseEntity<BaseResponse<?>> deletePlace(@AuthenticationPrincipal(expression = "user") User user,
-                                                       @PathVariable Long placeId) {
-        placeService.deletePlace(user, placeId);
+    @CheckPlaceMembership(placeIdParam = "placeId")
+    @CheckManagerAuthority
+    public ResponseEntity<BaseResponse<?>> deletePlace(@PathVariable Long placeId) {
+        placeService.deletePlace();
         return ResponseEntity.ok(BaseResponse.ok(null));
     }
 
 
-    //Todo "INVALID_ROLE"도 추가해야함
-    @Operation(summary = "체크리스트 시간 설정", description = "플레이스의 체크리스트 시작시간/종료시간을 설정합니다.")
+
+    @Operation(summary = "체크리스트 시간 설정", description = "플레이스의 체크리스트 시작시간/종료시간을 설정합니다.(매니저)")
     @DocumentedApiErrors(
             value = {PlaceExceptionResponse.class},
             includes = {"INVALID_TIME"}
     )
     @PatchMapping("/{placeId}/settings/time")
-    public ResponseEntity<BaseResponse<?>> updateTime(@AuthenticationPrincipal(expression = "user") User user,
+    @CheckPlaceMembership(placeIdParam = "placeId")
+    @CheckManagerAuthority
+    public ResponseEntity<BaseResponse<?>> updateTime(
                                                       @PathVariable Long placeId,
                                                       @RequestBody PatchUpdateTimeRequest request){
-        placeService.updateTime(user, placeId, request);
+        placeService.updateTime(request);
         return ResponseEntity.ok(BaseResponse.ok(null));
     }
 }

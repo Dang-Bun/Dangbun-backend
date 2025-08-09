@@ -33,12 +33,8 @@ public record GetPlaceResponse(
         List<DutyDto> duties
 ) {
 
-    public static GetPlaceResponse of(User user, Place place, Map<MemberDuty, List<Checklist>> cleaningMap, List<MemberCleaning> memberCleanings) {
+    public static GetPlaceResponse of(Member member, Place place, Map<MemberDuty, List<Checklist>> cleaningMap, List<MemberCleaning> memberCleanings) {
 
-        MemberDuty memberDuty = cleaningMap.keySet().stream().filter(md -> md.getMember().getUser().getUserId().equals(user.getUserId()))
-                .findAny().orElseThrow(() -> new RuntimeException("GetPlaceResponse 에러"));
-
-        Member member = memberDuty.getMember();
         Long placeId = place.getPlaceId();
         String placeName = place.getName();
         LocalTime endTime = place.getEndTime();

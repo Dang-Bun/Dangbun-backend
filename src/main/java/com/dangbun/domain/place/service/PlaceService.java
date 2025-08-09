@@ -27,6 +27,7 @@ import com.dangbun.domain.place.repository.PlaceRepository;
 import com.dangbun.domain.user.entity.User;
 import com.dangbun.domain.user.exception.custom.UserNotFoundException;
 import com.dangbun.domain.user.repository.UserRepository;
+import com.dangbun.global.context.MemberContext;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -99,10 +100,8 @@ public class PlaceService {
         return PostCreatePlaceResponse.of(savedPlace.getPlaceId());
     }
 
-    public PostCreateInviteCodeResponse createInviteCode(Long userId, Long placeId) {
-        Member manager = getManager(userId, placeId);
-
-        Place place = manager.getPlace();
+    public PostCreateInviteCodeResponse createInviteCode() {
+        Place place = MemberContext.get().getPlace();
         String code = place.createCode(generateCode());
 
         return new PostCreateInviteCodeResponse(code);
@@ -163,16 +162,13 @@ public class PlaceService {
     }
 
     @Transactional(readOnly = true)
-    public GetPlaceResponse getPlace(User user, Long placeId) {
-
-        Place place = placeRepository.findById(placeId)
-                .orElseThrow(() -> new NoSuchPlaceException(NO_SUCH_PLACE));
-
-        Member member = memberRepository.findByUser_UserIdAndPlace_PlaceId(user.getUserId(), placeId)
-                .orElseThrow(() -> new MemberNotFoundException(NO_SUCH_MEMBER));
+    public GetPlaceResponse getPlace() {
+        Member member = MemberContext.get();
+        Place place = member.getPlace();
+        Long placeId = place.getPlaceId();
 
         if(!member.getStatus()){
-            return new GetPlaceResponse(member.getMemberId(),placeId, place.getName(), null, null);
+            return new GetPlaceResponse(member.getMemberId(), placeId, place.getName(), null, null);
         }
 
         List<MemberDuty> memberDuties = memberDutyRepository.findAllWithMemberAndPlaceByPlaceId(placeId);
@@ -189,19 +185,15 @@ public class PlaceService {
                 ));
 
 
-        return GetPlaceResponse.of(user, place, cleaningMap, memberCleanings);
+        return GetPlaceResponse.of(member, place, cleaningMap, memberCleanings);
     }
 
-    public void deletePlace(User user, Long placeId) {
-        Member runner = memberRepository.findWithPlaceByUserIdAndPlaceId(user.getUserId(), placeId)
-                .orElseThrow(() -> new MemberNotFoundException(NO_SUCH_MEMBER));
-
-        if (!runner.getRole().equals(MemberRole.MANAGER)) {
-            throw new InvalidRoleException(INVALID_ROLE);
-        }
+    public void deletePlace() {
+        Member runner = MemberContext.get();
 
         Place place = runner.getPlace();
-        List<Duty> duties = dutyRepository.findByPlace_PlaceId(placeId);
+        List<Duty> duties = dutyRepository.findByPlace_PlaceId(place.getPlaceId());
+
         for (Duty duty : duties) {
             dutyService.deleteDuty(duty.getDutyId());
         }
@@ -211,35 +203,22 @@ public class PlaceService {
             memberService.deleteMember(member);
         }
 
-
         placeRepository.delete(place);
 
     }
 
-    public void cancelRegister(User user, Long placeId) {
-        Member member = memberRepository.findByUser_UserIdAndPlace_PlaceId(user.getUserId(), placeId)
-                .orElseThrow(() -> new MemberNotFoundException(NO_SUCH_MEMBER));
+    public void cancelRegister() {
+        Member member = MemberContext.get();
 
         memberRepository.delete(member);
     }
 
-    public void updateTime(User user, Long placeId, PatchUpdateTimeRequest request) {
-        Member manager = getManager(user.getUserId(), placeId);
+    public void updateTime(PatchUpdateTimeRequest request) {
         if(request.startTime().isAfter(request.endTime())&& request.isToday()){
             throw new InvalidTimeException(INVALID_TIME);
         }
-        Place place = manager.getPlace();
+        Place place = MemberContext.get().getPlace();
         place.setTime(request.startTime(), request.endTime());
     }
 
-
-
-    private Member getManager(Long userId, Long placeId) {
-        Member member = memberRepository.findWithPlaceByUserIdAndPlaceId(userId, placeId)
-                .orElseThrow(() -> new MemberNotFoundException(NO_SUCH_MEMBER));
-        if (member.getRole().equals(MemberRole.MEMBER)) {
-            throw new InvalidRoleException(INVALID_ROLE);
-        }
-        return member;
-    }
 }
