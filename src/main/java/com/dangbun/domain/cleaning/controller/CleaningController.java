@@ -4,6 +4,7 @@ import com.dangbun.domain.cleaning.dto.request.*;
 import com.dangbun.domain.cleaning.dto.response.*;
 import com.dangbun.domain.cleaning.response.status.CleaningExceptionResponse;
 import com.dangbun.domain.cleaning.service.CleaningService;
+import com.dangbun.global.aop.CheckManagerAuthority;
 import com.dangbun.global.aop.CheckPlaceMembership;
 import com.dangbun.global.docs.DocumentedApiErrors;
 import com.dangbun.global.response.BaseResponse;
@@ -52,12 +53,13 @@ public class CleaningController {
         return ResponseEntity.ok(BaseResponse.ok(cleaningService.getCleaningDetailList(dutyId, memberIds)));
     }
 
-    @Operation(summary = "당번별 청소 생성", description = "입력한 정보들을 바탕으로 새로운 청소를 생성합니다.")
+    @Operation(summary = "당번별 청소 생성", description = "입력한 정보들을 바탕으로 새로운 청소를 생성합니다. (매니저용)")
     @PostMapping("/cleanings")
     @DocumentedApiErrors(
             value = {CleaningExceptionResponse.class},
             includes = {"DUTY_NOT_FOUND", "INVALID_DATE_FORMAT", "CLEANING_ALREADY_EXISTS"}
     )
+    @CheckManagerAuthority
     public ResponseEntity<BaseResponse<PostCleaningResponse>> createCleaning(
             @PathVariable Long placeId,
             @RequestBody @Valid PostCleaningCreateRequest request) {
@@ -65,12 +67,13 @@ public class CleaningController {
         return ResponseEntity.ok(BaseResponse.ok(cleaningService.createCleaning(request)));
     }
 
-    @Operation(summary = "당번별 청소 수정", description = "입력한 정보들을 바탕으로 청소를 수정합니다.")
+    @Operation(summary = "당번별 청소 수정", description = "입력한 정보들을 바탕으로 청소를 수정합니다. (매니저용)")
     @DocumentedApiErrors(
             value = {CleaningExceptionResponse.class},
             includes = {"CLEANING_NOT_FOUND", "DUTY_NOT_FOUND", "INVALID_DATE_FORMAT", "CLEANING_ALREADY_EXISTS"}
     )
     @PutMapping("/cleanings/{cleaningId}")
+    @CheckManagerAuthority
     public ResponseEntity<BaseResponse<Void>> updateCleaning(
             @PathVariable Long placeId,
             @PathVariable Long cleaningId,
@@ -80,12 +83,13 @@ public class CleaningController {
         return ResponseEntity.ok(BaseResponse.ok(null));
     }
 
-    @Operation(summary = "청소 삭제", description = "청소 항목을 삭제합니다.")
+    @Operation(summary = "청소 삭제", description = "청소 항목을 삭제합니다. (매니저용)")
     @DocumentedApiErrors(
             value = {CleaningExceptionResponse.class},
             includes = {"CLEANING_NOT_FOUND"}
     )
     @DeleteMapping("/cleanings/{cleaningId}")
+    @CheckManagerAuthority
     public ResponseEntity<BaseResponse<Void>> deleteCleaning(
             @PathVariable Long placeId,
             @PathVariable Long cleaningId) {
