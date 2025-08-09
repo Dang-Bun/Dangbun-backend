@@ -8,5 +8,5 @@ import java.lang.annotation.Target;
 @Target({ElementType.TYPE, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface CheckPlaceMembership {
-    String placeIdParam();
+    String placeIdParam() default "placeId";
 }

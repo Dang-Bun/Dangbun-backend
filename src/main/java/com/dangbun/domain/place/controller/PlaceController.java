@@ -62,7 +62,7 @@ public class PlaceController {
             includes = {"INVALID_ROLE", "NO_SUCH_MEMBER"}
     )
     @PostMapping("/{placeId}/invite-code")
-    @CheckPlaceMembership(placeIdParam = "placeId")
+    @CheckPlaceMembership()
     @CheckManagerAuthority
     public ResponseEntity<BaseResponse<PostCreateInviteCodeResponse>> createInviteCode(@PathVariable Long placeId) {
         PostCreateInviteCodeResponse data = placeService.createInviteCode();
@@ -97,7 +97,7 @@ public class PlaceController {
 
     @Operation(summary = "참여 취소",description = "대기중인 플레이스의 참여 신청을 철회합니다")
     @DeleteMapping("/{placeId}/join-requests")
-    @CheckPlaceMembership(placeIdParam = "placeId")
+    @CheckPlaceMembership()
     public ResponseEntity<BaseResponse<?>> deleteRegisterPlace(@PathVariable Long placeId){
         placeService.cancelRegister();
         return ResponseEntity.ok(BaseResponse.ok(null));
@@ -108,7 +108,7 @@ public class PlaceController {
             value = {MemberExceptionResponse.class},
             includes = {"NO_SUCH_MEMBER"}
     )
-    @CheckPlaceMembership(placeIdParam = "placeId")
+    @CheckPlaceMembership()
     @GetMapping("/{placeId}")
     public ResponseEntity<BaseResponse<GetPlaceResponse>> getPlace(@PathVariable Long placeId) {
         return ResponseEntity.ok(BaseResponse.ok(placeService.getPlace()));
@@ -120,7 +120,7 @@ public class PlaceController {
             includes = {"NO_SUCH_MEMBER", "INVALID_ROLE"}
     )
     @DeleteMapping("/{placeId}")
-    @CheckPlaceMembership(placeIdParam = "placeId")
+    @CheckPlaceMembership()
     @CheckManagerAuthority
     public ResponseEntity<BaseResponse<?>> deletePlace(@PathVariable Long placeId) {
         placeService.deletePlace();
@@ -135,7 +135,7 @@ public class PlaceController {
             includes = {"INVALID_TIME"}
     )
     @PatchMapping("/{placeId}/settings/time")
-    @CheckPlaceMembership(placeIdParam = "placeId")
+    @CheckPlaceMembership()
     @CheckManagerAuthority
     public ResponseEntity<BaseResponse<?>> updateTime(
                                                       @PathVariable Long placeId,
@@ -149,7 +149,7 @@ public class PlaceController {
             value = {},
             includes = {}
     )
-    @CheckPlaceMembership(placeIdParam = "placeId")
+    @CheckPlaceMembership()
     @CheckManagerAuthority
     @GetMapping("/{placeId}/duties/progress")
     public ResponseEntity<BaseResponse<GetDutiesProgressResponse>> getDutiesProgress(@PathVariable Long placeId){

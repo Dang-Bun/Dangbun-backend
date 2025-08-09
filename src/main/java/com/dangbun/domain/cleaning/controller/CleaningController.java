@@ -21,7 +21,7 @@ import java.util.List;
 @Validated
 @Tag(name = "Cleaning", description = "CleaningController - 청소 관련 API")
 @RestController
-@CheckPlaceMembership(placeIdParam = "placeId")
+@CheckPlaceMembership()
 @RequestMapping("/places/{placeId}")
 @RequiredArgsConstructor
 public class CleaningController {

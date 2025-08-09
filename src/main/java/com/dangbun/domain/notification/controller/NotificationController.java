@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.*;
 
 @Validated
 @Tag(name = "Notification", description = "NotificationController - 알림함 관련 API")
-@CheckPlaceMembership(placeIdParam = "placeId")
+@CheckPlaceMembership()
 @RestController
 @RequestMapping("/notifications")
 @RequiredArgsConstructor

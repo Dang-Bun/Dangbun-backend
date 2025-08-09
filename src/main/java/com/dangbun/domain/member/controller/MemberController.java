@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RequiredArgsConstructor
 @Validated
-@CheckPlaceMembership(placeIdParam = "placeId")
+@CheckPlaceMembership()
 @Tag(name = "Member", description = "MemberController - 맴버 관련 API")
 @RequestMapping("/places/{placeId}/members")
 @RestController

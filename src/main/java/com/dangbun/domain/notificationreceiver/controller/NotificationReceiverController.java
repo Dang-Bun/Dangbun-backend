@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Validated
 @Tag(name = "Notification_Receiver", description = "NotificationReceiverController - 알림함(수신) 관련 API")
 @RestController
-@CheckPlaceMembership(placeIdParam = "placeId")
+@CheckPlaceMembership()
 @RequiredArgsConstructor
 public class NotificationReceiverController {
 

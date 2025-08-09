@@ -23,7 +23,7 @@ import java.util.List;
 @Validated
 @Tag(name = "Duty", description = "DutyController - 당번 관련 API")
 @RestController
-@CheckPlaceMembership(placeIdParam = "placeId")
+@CheckPlaceMembership()
 @RequestMapping("/places/{placeId}/duties")
 @RequiredArgsConstructor
 public class DutyController {

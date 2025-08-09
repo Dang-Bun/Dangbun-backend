@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
 
 @Validated
-@CheckPlaceMembership(placeIdParam = "placeId")
+@CheckPlaceMembership()
 @RequestMapping("/place/{placeId}/calender")
 @RequiredArgsConstructor
 @Tag(name = "Calender", description = "CalenderController - 캘린더 관련 API")
@@ -87,7 +87,7 @@ public class CalenderController {
     }
 
 
-    @Operation(summary = "청소 삭제")
+    @Operation(summary = "청소 삭제 (매니저용)")
     @DocumentedApiErrors(
             value = {CalenderExceptionResponse.class},
             includes = {"INVALID_ROLE"}
