@@ -35,8 +35,6 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     boolean existsByUserIdAndPlaceId(@Param("userId") Long userId, @Param("placeId") Long placeId);
 
 
-    Optional<Member> findByUser_UserIdAndPlace_PlaceId(Long userId, Long placePlaceId);
-
     List<Member> findByPlace_PlaceIdAndStatusIsFalse(Long placeId);
 
     Optional<Member> findByMemberIdAndPlace_PlaceId(Long memberId, Long placeId);
