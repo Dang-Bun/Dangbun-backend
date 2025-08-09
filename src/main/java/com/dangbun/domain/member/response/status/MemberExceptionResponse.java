@@ -9,7 +9,8 @@ public enum MemberExceptionResponse implements ResponseStatus {
     NO_SUCH_MEMBER(70001, "해당하는 맴버가 없습니다."),
     PLACE_ACCESS_DENIED(70002,"해당 플레이스에 소속된 맴버가 아닙니다."),
     NAME_NOT_MATCHED(70003, "요청한 맴버와 이름이 일치하지 않습니다."),
-    PLACE_NAME_NOT_MATCHED(70004, "나가기 위한 플레이스 이름과 일치하지 않습니다.")
+    PLACE_NAME_NOT_MATCHED(70004, "나가기 위한 플레이스 이름과 일치하지 않습니다."),
+    PLACE_MEMBERSHIP_UNAUTHORIZED(70005, "로그인되어 있지 않거나 플레이스 멤버십 인증을 거치지 않았습니다."),
     ;
 
     private final int code;
