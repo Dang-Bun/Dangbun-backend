@@ -27,7 +27,7 @@ public record GetPlaceResponse(
         @Schema(description = "플레이스 이름", example = "메가박스")
         String placeName,
 
-        @Schema(description = "플레이스 카테고리(CAFE, RESTAURANT, THEATER, DOMITORY, BUILDING, OFFICE, SCHOOL, GYM, ETC)", example = "CAFE")
+        @Schema(description = "플레이스 카테고리(CAFE, RESTAURANT, THEATER, DORMITORY, BUILDING, OFFICE, SCHOOL, GYM, ETC)", example = "CAFE")
         PlaceCategory category,
 
         @Schema(description = "청소 마감 시간", example = "23:59")
