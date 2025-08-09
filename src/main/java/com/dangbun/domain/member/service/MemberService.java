@@ -82,13 +82,8 @@ public class MemberService {
 
     @Transactional(readOnly = true)
     public GetWaitingMembersResponse getWaitingMembers() {
-
         Member me = MemberContext.get();
         Long placeId = me.getPlace().getPlaceId();
-
-        if (me.getRole() != MemberRole.MANAGER) {
-            throw new InvalidRoleException(INVALID_ROLE);
-        }
 
         List<Member> members = memberRepository.findByPlace_PlaceIdAndStatusIsFalse(placeId);
 
@@ -97,14 +92,9 @@ public class MemberService {
     }
 
     public void registerMember(Long memberId) {
-
-
         Member me = MemberContext.get();
         Long placeId = me.getPlace().getPlaceId();
 
-        if (me.getRole() != MemberRole.MANAGER) {
-            throw new InvalidRoleException(INVALID_ROLE);
-        }
 
         Member member = getMemberByMemberIdAndPlaceId(memberId, placeId);
 
@@ -112,13 +102,8 @@ public class MemberService {
     }
 
     public void removeWaitingMember(Long memberId) {
-
         Member me = MemberContext.get();
         Long placeId = me.getPlace().getPlaceId();
-
-        if (me.getRole() != MemberRole.MANAGER) {
-            throw new InvalidRoleException(INVALID_ROLE);
-        }
 
         Member member = getMemberByMemberIdAndPlaceId(memberId, placeId);
 
@@ -143,9 +128,6 @@ public class MemberService {
 
         Member me = MemberContext.get();
         Long placeId = me.getPlace().getPlaceId();
-        if (me.getRole() != MemberRole.MANAGER) {
-            throw new InvalidRoleException(INVALID_ROLE);
-        }
 
         Member member = getMemberByMemberIdAndPlaceId(memberId, placeId);
 
@@ -169,9 +151,6 @@ public class MemberService {
     @Transactional(readOnly = true)
     public GetMemberSearchResponse searchByNameInPlace(Long placeId, String name) {
         Member me = MemberContext.get();
-        if (me.getRole() != MemberRole.MANAGER) {
-            throw new InvalidRoleException(INVALID_ROLE);
-        }
 
         return memberRepository.findByPlace_PlaceIdAndName(placeId, name)
                 .map(GetMemberSearchResponse::of)
