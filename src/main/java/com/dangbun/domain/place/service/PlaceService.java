@@ -155,7 +155,7 @@ public class PlaceService {
         Set<String> information = member.getInformation().keySet();
         List<String> iList = information.stream().toList();
 
-        return PostCheckInviteCodeResponse.of(request.inviteCode(), iList);
+        return PostCheckInviteCodeResponse.of(place.getPlaceId(), iList);
     }
 
     public static String generateCode() {
@@ -203,7 +203,7 @@ public class PlaceService {
                 .orElseThrow(() -> new MemberNotFoundException(NO_SUCH_MEMBER));
 
         if (!member.getStatus()) {
-            return new GetPlaceResponse(member.getMemberId(), placeId, place.getName(), null, null);
+            return new GetPlaceResponse(member.getMemberId(), placeId, place.getName(), null,null, null);
         }
 
         List<MemberDuty> memberDuties = memberDutyRepository.findAllWithMemberAndPlaceByPlaceId(placeId);
