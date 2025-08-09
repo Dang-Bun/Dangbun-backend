@@ -15,6 +15,7 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -29,13 +30,13 @@ public class NotificationReceiverController {
     private final NotificationReceiverService notificationReceiverService;
 
     @Operation(summary = "받은 알림 목록 조회 (무한스크롤)", description = "현재 로그인한 멤버가 받은 알림들을 무한스크롤 방식으로 조회합니다.")
-    @GetMapping("notifications/received")
+    @GetMapping("/places/{placeId}/notifications/received")
     @DocumentedApiErrors(
             value = {NotificationExceptionResponse.class},
             includes = {""}
     )
     public ResponseEntity<GetNotificationReceivedListResponse> getReceivedNotifications(
-            @RequestParam Long placeId,
+            @PathVariable Long placeId,
             @ParameterObject
             @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC)
             Pageable pageable

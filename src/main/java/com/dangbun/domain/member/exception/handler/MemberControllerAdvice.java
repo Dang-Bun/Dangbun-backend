@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 public class MemberControllerAdvice {
 
     @ExceptionHandler(InvalidRoleException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseStatus(HttpStatus.FORBIDDEN)
     public BaseErrorResponse handleInvalidRoleException(InvalidRoleException e) {
         return new BaseErrorResponse(e.getExceptionStatus());
     }
@@ -29,7 +29,6 @@ public class MemberControllerAdvice {
         return new BaseErrorResponse(e.getExceptionStatus());
     }
 
-
     @ExceptionHandler(NameNotMatchedException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public BaseErrorResponse handleNameNotMatched(NameNotMatchedException e) {
@@ -37,6 +36,7 @@ public class MemberControllerAdvice {
     }
 
     @ExceptionHandler(PlaceMembershipUnauthorizedException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
     public BaseErrorResponse handleNameNotMatched(PlaceMembershipUnauthorizedException e) {
         return new BaseErrorResponse(e.getExceptionStatus());
     }

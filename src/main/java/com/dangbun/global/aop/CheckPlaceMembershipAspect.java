@@ -9,11 +9,13 @@ import com.dangbun.global.exception.RequiredParamMissingException;
 import com.dangbun.global.exception.UnautheniticatedException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.reflect.MethodSignature;
+import org.springframework.core.annotation.Order;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -30,6 +32,7 @@ import static com.dangbun.domain.member.response.status.MemberExceptionResponse.
 import static com.dangbun.global.response.status.BaseExceptionResponse.*;
 
 @Aspect
+@Order(1)
 @Component
 @RequiredArgsConstructor
 public class CheckPlaceMembershipAspect {
@@ -38,6 +41,7 @@ public class CheckPlaceMembershipAspect {
 
     @Around("@within(com.dangbun.global.aop.CheckPlaceMembership) || @annotation(com.dangbun.global.aop.CheckPlaceMembership)")
     public Object validate(ProceedingJoinPoint joinPoint) throws  Throwable {
+
         try {
             Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 

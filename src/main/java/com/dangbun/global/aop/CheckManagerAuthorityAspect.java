@@ -7,13 +7,14 @@ import com.dangbun.global.context.MemberContext;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 import static com.dangbun.domain.member.response.status.MemberExceptionResponse.*;
 
 
-@Slf4j
 @Aspect
+@Order(2)
 @Component
 public class CheckManagerAuthorityAspect {
 

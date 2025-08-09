@@ -25,7 +25,7 @@ import org.springframework.web.bind.annotation.*;
 @Tag(name = "Notification", description = "NotificationController - 알림함 관련 API")
 @CheckPlaceMembership()
 @RestController
-@RequestMapping("/notifications")
+@RequestMapping("/places/{placeId}/notifications")
 @RequiredArgsConstructor
 public class NotificationController {
 
@@ -38,7 +38,7 @@ public class NotificationController {
             includes = {}
     )
     public ResponseEntity<BaseResponse<GetMemberSearchListResponse>> searchMembers(
-            @RequestParam Long placeId,
+            @PathVariable Long placeId,
             @RequestParam(required = false) @Size(max = 20) String searchname,
             @ParameterObject Pageable pageable
     ) {
@@ -52,7 +52,7 @@ public class NotificationController {
             includes = {}
     )
     public ResponseEntity<BaseResponse<GetRecentSearchResponse>> getRecentSearches(
-            @RequestParam Long placeId) {
+            @PathVariable Long placeId) {
         return ResponseEntity.ok(BaseResponse.ok(notificationService.getRecentSearches()));
     }
 
@@ -63,7 +63,7 @@ public class NotificationController {
             includes = {"MEMBER_NOT_FOUND"}
     )
     public ResponseEntity<BaseResponse<PostNotificationCreateResponse>> createNotification(
-            @RequestParam Long placeId,
+            @PathVariable Long placeId,
             @Valid @RequestBody PostNotificationCreateRequest request
     ) {
 
@@ -77,7 +77,7 @@ public class NotificationController {
             includes = {""}
     )
     public ResponseEntity<BaseResponse<GetNotificationListResponse>> getNotifications(
-            @RequestParam Long placeId,
+            @PathVariable Long placeId,
             @ParameterObject
             @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC)
             Pageable pageable
@@ -92,7 +92,7 @@ public class NotificationController {
             includes = {"NOTIFICATION_NOT_FOUND", "NOTIFICATION_ACCESS_FORBIDDEN"}
     )
     public ResponseEntity<GetNotificationInfoResponse> getNotificationInfo(
-            @RequestParam Long placeId,
+            @PathVariable Long placeId,
             @PathVariable Long notificationId
     ) {
         return ResponseEntity.ok(notificationService.getNotificationInfo(notificationId));
