@@ -4,6 +4,7 @@ import com.dangbun.domain.duty.dto.request.*;
 import com.dangbun.domain.duty.dto.response.*;
 import com.dangbun.domain.duty.response.status.DutyExceptionResponse;
 import com.dangbun.domain.duty.service.DutyService;
+import com.dangbun.global.aop.CheckManagerAuthority;
 import com.dangbun.global.aop.CheckPlaceMembership;
 import com.dangbun.global.docs.DocumentedApiErrors;
 import com.dangbun.global.response.BaseResponse;
@@ -29,12 +30,13 @@ public class DutyController {
 
     private final DutyService dutyService;
 
-    @Operation(summary = "당번 생성", description = "플레이스에 새로운 당번을 생성합니다.")
+    @Operation(summary = "당번 생성", description = "플레이스에 새로운 당번을 생성합니다. (매니저용)")
     @PostMapping
     @DocumentedApiErrors(
             value = {DutyExceptionResponse.class},
             includes = {"PLACE_NOT_FOUND", "DUTY_ALREADY_EXISTS"}
     )
+    @CheckManagerAuthority
     public ResponseEntity<BaseResponse<PostDutyCreateResponse>> createDuty(
             @PathVariable Long placeId,
             @RequestBody @Valid PostDutyCreateRequest request
@@ -52,12 +54,13 @@ public class DutyController {
         return ResponseEntity.ok(BaseResponse.ok(dutyService.getDutyList()));
     }
 
-    @Operation(summary = "당번 수정", description = "해당 당번의 이름이나 아이콘을 수정합니다.")
+    @Operation(summary = "당번 수정", description = "해당 당번의 이름이나 아이콘을 수정합니다. (매니저용)")
     @PutMapping("/{dutyId}")
     @DocumentedApiErrors(
             value = {DutyExceptionResponse.class},
             includes = {"DUTY_NOT_FOUND"}
     )
+    @CheckManagerAuthority
     public ResponseEntity<BaseResponse<PutDutyUpdateResponse>> updateDuty(
             @PathVariable Long placeId,
             @PathVariable Long dutyId,
@@ -66,12 +69,13 @@ public class DutyController {
         return ResponseEntity.ok(BaseResponse.ok(dutyService.updateDuty(dutyId, request)));
     }
 
-    @Operation(summary = "당번 삭제", description = "해당 당번을 삭제합니다.")
+    @Operation(summary = "당번 삭제", description = "해당 당번을 삭제합니다. (매니저용)")
     @DeleteMapping("/{dutyId}")
     @DocumentedApiErrors(
             value = {DutyExceptionResponse.class},
             includes = {"DUTY_NOT_FOUND"}
     )
+    @CheckManagerAuthority
     public ResponseEntity<BaseResponse<Void>> deleteDuty(
             @PathVariable Long placeId,
             @PathVariable Long dutyId) {
@@ -103,12 +107,13 @@ public class DutyController {
         return ResponseEntity.ok(BaseResponse.ok(dutyService.getDutyCleaningNameList(dutyId)));
     }
 
-    @Operation(summary = "당번 정보 - 멤버 추가", description = "당번에 멤버를 추가합니다.")
+    @Operation(summary = "당번 정보 - 멤버 추가", description = "당번에 멤버를 추가합니다. (매니저용)")
     @PostMapping("/{dutyId}/members")
     @DocumentedApiErrors(
             value = {DutyExceptionResponse.class},
             includes = {"DUTY_NOT_FOUND", "MEMBER_NOT_FOUND"}
     )
+    @CheckManagerAuthority
     public ResponseEntity<BaseResponse<PostAddMembersResponse>> addMembers(
             @PathVariable Long placeId,
             @PathVariable Long dutyId,
@@ -117,12 +122,13 @@ public class DutyController {
         return ResponseEntity.ok(BaseResponse.ok(dutyService.addMembers(dutyId, request)));
     }
 
-    @Operation(summary = "당번 역할 분담 (공통/랜덤/직접)", description = "해당 당번에 해당하는 청소에 멤버를 지정합니다.")
+    @Operation(summary = "당번 역할 분담 (공통/랜덤/직접)", description = "해당 당번에 해당하는 청소에 멤버를 지정합니다. (매니저용)")
     @PatchMapping("/{dutyId}/cleanings/members")
     @DocumentedApiErrors(
             value = {DutyExceptionResponse.class},
             includes = {"DUTY_NOT_FOUND", "CLEANING_NOT_FOUND", "MEMBER_NOT_EXISTS"}
     )
+    @CheckManagerAuthority
     public ResponseEntity<BaseResponse<Void>> assignMember(
             @PathVariable Long placeId,
             @PathVariable Long dutyId,
@@ -145,12 +151,13 @@ public class DutyController {
     }
 
 
-    @Operation(summary = "당번 정보 - 미지정 청소 추가", description = "당번에 미지정 청소를 추가합니다.")
+    @Operation(summary = "당번 정보 - 미지정 청소 추가", description = "당번에 미지정 청소를 추가합니다. (매니저용)")
     @PostMapping("/{dutyId}/cleanings")
     @DocumentedApiErrors(
             value = {DutyExceptionResponse.class},
             includes = {"DUTY_NOT_FOUND"}
     )
+    @CheckManagerAuthority
     public ResponseEntity<BaseResponse<PostAddCleaningsResponse>> addCleanings(
             @PathVariable Long placeId,
             @PathVariable Long dutyId,
@@ -159,12 +166,13 @@ public class DutyController {
         return ResponseEntity.ok(BaseResponse.ok(dutyService.addCleanings(dutyId, request)));
     }
 
-    @Operation(summary = "당번에서 청소 항목 제거", description = "지정된 당번에서 특정 청소 항목을 제거하면 해당 청소는 미지정 상태로 되돌아갑니다.")
+    @Operation(summary = "당번에서 청소 항목 제거", description = "지정된 당번에서 특정 청소 항목을 제거하면 해당 청소는 미지정 상태로 되돌아갑니다. (매니저용)")
     @DeleteMapping("/{dutyId}/cleanings/{cleaningId}")
     @DocumentedApiErrors(
             value = DutyExceptionResponse.class,
             includes = {"DUTY_NOT_FOUND", "CLEANING_NOT_FOUND", "CLEANING_NOT_ASSIGNED"}
     )
+    @CheckManagerAuthority
     public ResponseEntity<BaseResponse<Void>> removeCleaning(
             @PathVariable Long placeId,
             @PathVariable Long dutyId,

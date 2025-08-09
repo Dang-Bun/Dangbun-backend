@@ -90,7 +90,7 @@ public class MemberController {
         return ResponseEntity.ok(BaseResponse.ok(memberService.getMember(memberId)));
     }
 
-    @Operation(summary = "플레이스 나가기", description = "플레이스에서 나갑니다")
+    @Operation(summary = "플레이스 나가기", description = "플레이스에서 나갑니다. (멤버용)")
     @DocumentedApiErrors(
             value = MemberExceptionResponse.class,
             includes = {"PLACE_ACCESS_DENIED","PLACE_NAME_NOT_MATCHED", "INVALID_ROLE"}
