@@ -203,7 +203,7 @@ public class PlaceService {
                 .orElseThrow(() -> new MemberNotFoundException(NO_SUCH_MEMBER));
 
         if (!member.getStatus()) {
-            return new GetPlaceResponse(member.getMemberId(), placeId, place.getName(), null, null);
+            return new GetPlaceResponse(member.getMemberId(), placeId, place.getName(), null,null, null);
         }
 
         List<MemberDuty> memberDuties = memberDutyRepository.findAllWithMemberAndPlaceByPlaceId(placeId);
