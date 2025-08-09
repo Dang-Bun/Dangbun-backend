@@ -1,31 +1,21 @@
 package com.dangbun.domain.place.dto.response;
 
-import com.dangbun.domain.member.entity.Member;
-import com.dangbun.domain.place.entity.Place;
+
 import io.swagger.v3.oas.annotations.media.Schema;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public record GetPlaceListResponse(
         @Schema(description = "플레이스 리스트") List<PlaceDto> places
 ) {
 
-    public static GetPlaceListResponse of(List<Member> memberList){
-        List<PlaceDto> placeDtos = new ArrayList<>();
-        for(Member member : memberList){
-            if(!member.getStatus()){
-                Place place = member.getPlace();
-                placeDtos.add(PlaceDto.of(place.getPlaceId(), place.getName(), null, null, null, null));
-            }else {
-                Place place = member.getPlace();
-                placeDtos.add(PlaceDto.of(place.getPlaceId(), place.getName(), 0,0,member.getRole().getDisplayName(), 0));
-            }
-        }
+
+
+    public static GetPlaceListResponse of(List<PlaceDto> placeDtos) {
         return new GetPlaceListResponse(placeDtos);
     }
 
-    @Schema(name = "GetPlaceListResponse.PlaceDto", description = "플레이스 DTO")
+    @Schema(name = "GetPlaceListResponse.PlaceDto", description = "플레이스 DTO (참여 대기 중인 플레이스일 경우 placeId, name를 제외한 모든 필드 값 NULL)")
     public record PlaceDto(
             @Schema(description = "플레이스 id", example = "1") Long placeId,
             @Schema(description = "플레이스 이름", example = "메가박스") String name,

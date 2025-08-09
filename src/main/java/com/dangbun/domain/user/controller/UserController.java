@@ -2,7 +2,7 @@ package com.dangbun.domain.user.controller;
 
 import com.dangbun.domain.user.dto.request.*;
 import com.dangbun.domain.user.dto.response.PostUserLoginResponse;
-import com.dangbun.domain.user.entity.CustomUserDetails;
+import com.dangbun.domain.user.entity.User;
 import com.dangbun.domain.user.response.status.UserExceptionResponse;
 import com.dangbun.domain.user.service.UserService;
 import com.dangbun.global.docs.DocumentedApiErrors;
@@ -29,15 +29,27 @@ public class UserController {
 
     private final UserService userService;
 
-    @Operation(summary = "인증번호 생성",description = "이메일 인증번호를 생성합니다.(회원가입 및 비밀번호 재설정 용)")
+    @Operation(summary = "인증번호 생성(비밀번호 재설정용)",description = "이메일 인증번호를 생성합니다.(비밀번호 재설정 용)")
+    @DocumentedApiErrors(
+            value = {UserExceptionResponse.class},
+            includes = {"INVALID_EMAIL"}
+    )
+    @PostMapping("/email-code")
+    public ResponseEntity<BaseResponse<?>> generatePasswordAuthCode(@RequestBody PostUserAuthCodeRequest request) {
+        String email = request.email();
+        userService.sendFindPasswordAuthCode(email);
+        return ResponseEntity.ok(BaseResponse.ok(null));
+    }
+
+    @Operation(summary = "인증번호 생성(회원가입 용)",description = "이메일 인증번호를 생성합니다.(회원가입 용)")
     @DocumentedApiErrors(
             value = {UserExceptionResponse.class},
             includes = {"EXIST_EMAIL"}
     )
-    @PostMapping("/email-code")
-    public ResponseEntity<BaseResponse<?>> generateAuthCode(@RequestBody PostUserCertCodeRequest request) {
+    @PostMapping("/signup/email-code")
+    public ResponseEntity<BaseResponse<?>> generateSignupAuthCode(@RequestBody PostUserAuthCodeRequest request) {
         String email = request.email();
-        userService.sendAuthCode(email);
+        userService.sendSignupAuthCode(email);
         return ResponseEntity.ok(BaseResponse.ok(null));
     }
 
@@ -95,10 +107,23 @@ public class UserController {
             includes = {"INVALID_PASSWORD"}
     )
     @DeleteMapping("/me")
-    public ResponseEntity<BaseResponse<?>> deleteCurrentUser(@AuthenticationPrincipal CustomUserDetails customUser,
+    public ResponseEntity<BaseResponse<?>> deleteCurrentUser(@AuthenticationPrincipal(expression = "user") User user,
                                                              @RequestBody DeleteUserAccountRequest request) {
-        userService.deleteCurrentUser(customUser, request);
+        userService.deleteCurrentUser(user, request);
         return ResponseEntity.ok(BaseResponse.ok(null));
+    }
+
+    @Operation(summary = "내 회원 정보 조회",description = "회원가입 시 입력한 이름, 이메일 정보를 조회합니다.")
+    @DocumentedApiErrors(
+            value = {UserExceptionResponse.class},
+            includes = {"INVALID_PASSWORD"}
+    )
+    @GetMapping("/me")
+    public ResponseEntity<BaseResponse<?>> getMyInfo(
+            @AuthenticationPrincipal(expression = "user") User user
+    ) {
+
+        return ResponseEntity.ok(BaseResponse.ok(userService.getMyInfo(user)));
     }
 
 }

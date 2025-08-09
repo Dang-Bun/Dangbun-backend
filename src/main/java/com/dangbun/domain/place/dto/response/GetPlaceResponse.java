@@ -6,6 +6,7 @@ import com.dangbun.domain.member.entity.Member;
 import com.dangbun.domain.membercleaning.entity.MemberCleaning;
 import com.dangbun.domain.memberduty.entity.MemberDuty;
 import com.dangbun.domain.place.entity.Place;
+import com.dangbun.domain.place.entity.PlaceCategory;
 import com.dangbun.domain.user.entity.User;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -15,6 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+@Schema(description = "아직 초대받지 않은 유저일 경우 본인 맴버 ID, 플레이스 ID, 플레이스 이름만 반환됨 (나머지 필드는 NULL)")
 public record GetPlaceResponse(
         @Schema(description = "본인 맴버 ID", example = "1")
         Long memberId,
@@ -24,6 +26,9 @@ public record GetPlaceResponse(
 
         @Schema(description = "플레이스 이름", example = "메가박스")
         String placeName,
+
+        @Schema(description = "플레이스 카테고리(CAFE, RESTAURANT, THEATER, DORMITORY, BUILDING, OFFICE, SCHOOL, GYM, ETC)", example = "CAFE")
+        PlaceCategory category,
 
         @Schema(description = "청소 마감 시간", example = "23:59")
         @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm")
@@ -62,6 +67,7 @@ public record GetPlaceResponse(
         return new GetPlaceResponse(member.getMemberId(),
                 placeId,
                 placeName,
+                place.getCategory(),
                 endTime,
                 duties);
     }

@@ -4,11 +4,11 @@ import com.dangbun.global.response.status.ResponseStatus;
 import lombok.Getter;
 
 @Getter
-public class InvalidCertCodeException extends RuntimeException {
+public class DeleteMemberException extends RuntimeException {
 
     private final ResponseStatus exceptionStatus;
 
-    public InvalidCertCodeException(ResponseStatus status) {
+    public DeleteMemberException(ResponseStatus status) {
         super(status.getMessage());
         this.exceptionStatus = status;
     }

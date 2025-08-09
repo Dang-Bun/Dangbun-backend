@@ -43,7 +43,14 @@ public class UserControllerAdvice {
 
     @ExceptionHandler(UserNotFoundException.class)
     public BaseErrorResponse handleUserNotFound(UserNotFoundException e){
+        log.error("[UserNotFoundException]",e);
         return new BaseErrorResponse(USER_NOT_FOUND);
+    }
+
+    @ExceptionHandler(DeleteMemberException.class)
+    public BaseErrorResponse handleUserNotFound(DeleteMemberException e){
+        log.error("[DeleteMemberException]",e);
+        return new BaseErrorResponse(DELETE_MEMBER);
     }
 
 

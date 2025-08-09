@@ -143,4 +143,16 @@ public class PlaceController {
         placeService.updateTime(request);
         return ResponseEntity.ok(BaseResponse.ok(null));
     }
+
+    @Operation(summary = "매니저-전체 진행률", description = "플레이스 내의 모든 당번에 대한 진행률을 보여줍니다.")
+    @DocumentedApiErrors(
+            value = {},
+            includes = {}
+    )
+    @CheckPlaceMembership(placeIdParam = "placeId")
+    @CheckManagerAuthority
+    @GetMapping("/{placeId}/duties/progress")
+    public ResponseEntity<BaseResponse<GetDutiesProgressResponse>> getDutiesProgress(@PathVariable Long placeId){
+        return ResponseEntity.ok(BaseResponse.ok(placeService.getDutiesProgress()));
+    }
 }
