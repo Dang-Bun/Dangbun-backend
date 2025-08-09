@@ -12,7 +12,6 @@ import com.dangbun.domain.member.repository.MemberRepository;
 import com.dangbun.domain.membercleaning.repository.MemberCleaningRepository;
 import com.dangbun.domain.memberduty.entity.MemberDuty;
 import com.dangbun.domain.memberduty.repository.MemberDutyRepository;
-import com.dangbun.global.exception.BadRequestException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -118,7 +117,7 @@ public class MemberService {
         }
 
         if (!me.getPlace().getName().equals(request.placeName())) {
-            throw new BadRequestException(PLACE_NAME_NOT_MATCHED);
+            throw new NameNotMatchedException(PLACE_NAME_NOT_MATCHED);
         }
 
         memberRepository.delete(me);

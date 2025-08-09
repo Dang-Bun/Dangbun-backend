@@ -1,10 +1,14 @@
 package com.dangbun.global.exception.handler;
 
 
-import com.dangbun.global.exception.BadRequestException;
+import com.dangbun.global.exception.InvalidJwtExcepetion;
+import com.dangbun.global.exception.InvalidRefreshJWTException;
+import com.dangbun.global.exception.RequiredParamMissingException;
+import com.dangbun.global.exception.UnautheniticatedException;
 import com.dangbun.global.response.BaseErrorResponse;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.coyote.BadRequestException;
 import org.hibernate.TypeMismatchException;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
@@ -56,18 +60,36 @@ public class GlobalControllerAdvice {
         return new BaseErrorResponse(REQUIRED_FIELD_MISSING);
     }
 
-    // RequestParam, PathVariable 등의 validation 실패 (예: @RequestParam 제약 위반)
+    // 필수 파라미터 누락
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    @ExceptionHandler(ConstraintViolationException.class)
-    public BaseErrorResponse handleConstraintViolation(Exception e) {
-        return new BaseErrorResponse(REQUIRED_FIELD_MISSING);
+    @ExceptionHandler({ConstraintViolationException.class, RequiredParamMissingException.class})
+    public BaseErrorResponse handleRequiredParamMissingExcpetion(Exception e) {
+        log.warn("[handle_RequiredParamMissing]", e);
+        return new BaseErrorResponse(REQUIRED_PARAM_MISSING);
     }
 
-    // 런타임 시 표현식 구문 오류, 변수 또는 속성 접근 실패 시 발생
-    // (@AuthenticationPrincipal(expression="user")에서 토큰 만료 시 발생 가능
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    @ExceptionHandler(SpelEvaluationException.class)
-    public void handleSpelEvaluation(Exception e){
-        log.error("[handle_SpelEvaluationException]",e);
+    // 인증되지 않은 사용자
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    @ExceptionHandler(UnautheniticatedException.class)
+    public BaseErrorResponse handleUnauthenticated(Exception e) {
+        log.warn("[handle_Unauthenticated]", e);
+        return new BaseErrorResponse(AUTH_UNAUTHENTICATED);
     }
+
+    // JWT 유효하지 않음
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    @ExceptionHandler(InvalidJwtExcepetion.class)
+    public BaseErrorResponse handleInvalidJWT(Exception e) {
+        log.warn("[handle_InvalidJWT]", e);
+        return new BaseErrorResponse(INVALID_JWT);
+    }
+
+    // Refresh Token 유효하지 않음
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    @ExceptionHandler(InvalidRefreshJWTException.class)
+    public BaseErrorResponse handleInvalidRefreshJWT(Exception e) {
+        log.warn("[handle_InvalidRefreshJWT]", e);
+        return new BaseErrorResponse(INVALID_REFRESH_TOKEN);
+    }
+
 }
