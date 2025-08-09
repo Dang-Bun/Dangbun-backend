@@ -22,6 +22,7 @@ import com.dangbun.domain.membercleaning.entity.MemberCleaning;
 import com.dangbun.domain.membercleaning.repository.MemberCleaningRepository;
 import com.dangbun.domain.place.entity.Place;
 import com.dangbun.domain.place.repository.PlaceRepository;
+import com.dangbun.global.context.MemberContext;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -42,7 +43,6 @@ public class CleaningService {
     private final CleaningRepository cleaningRepository;
     private final MemberRepository memberRepository;
     private final CleaningDateRepository cleaningDateRepository;
-    private final PlaceRepository placeRepository;
     private final ChecklistService checkListService;
     private final ChecklistRepository checkListRepository;
 
@@ -57,6 +57,7 @@ public class CleaningService {
                 .toList();
     }
 
+    @Transactional(readOnly = true)
     public List<GetCleaningDetailListResponse> getCleaningDetailList(Long dutyId, List<Long> memberIds) {
 
         Duty duty = dutyRepository.findById(dutyId)
@@ -78,10 +79,9 @@ public class CleaningService {
                 .toList();
     }
 
-    @Transactional()
+
     public PostCleaningResponse createCleaning(PostCleaningCreateRequest request) {
-        Place place = placeRepository.findById(request.placeId())
-                .orElseThrow(() -> new PlaceNotFoundException(PLACE_NOT_FOUND));
+        Place place = MemberContext.get().getPlace();
 
         Duty duty = null;
         if (request.dutyName() != null) {
@@ -142,7 +142,7 @@ public class CleaningService {
         return PostCleaningResponse.of(cleaning.getCleaningId());
     }
 
-    @Transactional
+
     public void updateCleaning(Long cleaningId, PutCleaningUpdateRequest request) {
         Cleaning cleaning = cleaningRepository.findWithDutyNullableById(cleaningId)
                 .orElseThrow(() -> new CleaningNotFoundException(CLEANING_NOT_FOUND));
@@ -194,7 +194,6 @@ public class CleaningService {
     }
 
 
-    @Transactional
     public void deleteCleaning(Long cleaningId) {
         Cleaning cleaning = cleaningRepository.findById(cleaningId)
                 .orElseThrow(() -> new DutyNotFoundException(DUTY_NOT_FOUND));
@@ -209,11 +208,9 @@ public class CleaningService {
         cleaningRepository.delete(cleaning);
     }
 
-
-    public List<GetCleaningUnassignedResponse> getUnassignedCleanings(Long placeId) {
-        if (!placeRepository.existsById(placeId)) {
-            throw new PlaceNotFoundException(PLACE_NOT_FOUND);
-        }
+    @Transactional(readOnly = true)
+    public List<GetCleaningUnassignedResponse> getUnassignedCleanings() {
+        Long placeId = MemberContext.get().getPlace().getPlaceId();
 
         List<Cleaning> cleanings = cleaningRepository.findUnassignedCleaningsByPlaceId(placeId);
 
