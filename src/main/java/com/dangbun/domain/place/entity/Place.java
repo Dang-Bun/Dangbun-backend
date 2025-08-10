@@ -31,6 +31,8 @@ public class Place extends BaseEntity {
     @NotNull
     private PlaceCategory category;
 
+    private String categoryName;
+
     @OneToMany(mappedBy = "place", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Duty> duties;
 
@@ -44,9 +46,10 @@ public class Place extends BaseEntity {
     private LocalTime endTime = LocalTime.MAX;
 
     @Builder
-    public Place(String name, PlaceCategory category) {
+    public Place(String name, PlaceCategory category, String categoryName) {
         this.name = name;
         this.category = category;
+        this.categoryName = categoryName;
     }
 
     public String createCode(String code){
