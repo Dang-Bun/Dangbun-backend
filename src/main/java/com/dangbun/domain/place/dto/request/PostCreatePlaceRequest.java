@@ -1,5 +1,6 @@
 package com.dangbun.domain.place.dto.request;
 
+import com.dangbun.domain.place.entity.PlaceCategory;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 
@@ -10,9 +11,9 @@ public record PostCreatePlaceRequest(
         @NotBlank
         String placeName,
 
-        @Schema(description = "카테고리", example = "카페")
+        @Schema(description = "카테고리(CAFE, RESTAURANT, THEATER, DORMITORY, BUILDING, OFFICE, SCHOOL, GYM, ETC)", example = "CAFE")
         @NotBlank
-        String category,
+        PlaceCategory category,
 
         @Schema(description = "매니저 이름", example = "홍길동")
         @NotBlank
