@@ -4,6 +4,7 @@ import com.dangbun.domain.duty.dto.request.*;
 import com.dangbun.domain.duty.dto.response.*;
 import com.dangbun.domain.duty.response.status.DutyExceptionResponse;
 import com.dangbun.domain.duty.service.DutyService;
+import com.dangbun.global.aop.CheckDutyMembership;
 import com.dangbun.global.aop.CheckManagerAuthority;
 import com.dangbun.global.aop.CheckPlaceMembership;
 import com.dangbun.global.docs.DocumentedApiErrors;
@@ -23,7 +24,7 @@ import java.util.List;
 @Validated
 @Tag(name = "Duty", description = "DutyController - 당번 관련 API")
 @RestController
-@CheckPlaceMembership()
+
 @RequestMapping("/places/{placeId}/duties")
 @RequiredArgsConstructor
 public class DutyController {
@@ -36,6 +37,7 @@ public class DutyController {
             value = {DutyExceptionResponse.class},
             includes = {"PLACE_NOT_FOUND", "DUTY_ALREADY_EXISTS"}
     )
+    @CheckPlaceMembership()
     @CheckManagerAuthority
     public ResponseEntity<BaseResponse<PostDutyCreateResponse>> createDuty(
             @PathVariable Long placeId,
@@ -50,6 +52,7 @@ public class DutyController {
             value = {DutyExceptionResponse.class},
             includes = {"PLACE_NOT_FOUND"}
     )
+    @CheckPlaceMembership()
     public ResponseEntity<BaseResponse<List<GetDutyListResponse>>> getDutyList(@PathVariable Long placeId) {
         return ResponseEntity.ok(BaseResponse.ok(dutyService.getDutyList()));
     }
@@ -60,13 +63,14 @@ public class DutyController {
             value = {DutyExceptionResponse.class},
             includes = {"DUTY_NOT_FOUND"}
     )
+    @CheckDutyMembership(placeIdParam = "placeId")
     @CheckManagerAuthority
     public ResponseEntity<BaseResponse<PutDutyUpdateResponse>> updateDuty(
             @PathVariable Long placeId,
             @PathVariable Long dutyId,
             @RequestBody @Valid PutDutyUpdateRequest request
     ) {
-        return ResponseEntity.ok(BaseResponse.ok(dutyService.updateDuty(dutyId, request)));
+        return ResponseEntity.ok(BaseResponse.ok(dutyService.updateDuty( request)));
     }
 
     @Operation(summary = "당번 삭제", description = "해당 당번을 삭제합니다. (매니저용)")
@@ -75,11 +79,12 @@ public class DutyController {
             value = {DutyExceptionResponse.class},
             includes = {"DUTY_NOT_FOUND"}
     )
+    @CheckDutyMembership(placeIdParam = "placeId")
     @CheckManagerAuthority
     public ResponseEntity<BaseResponse<Void>> deleteDuty(
             @PathVariable Long placeId,
             @PathVariable Long dutyId) {
-        dutyService.deleteDuty(dutyId);
+        dutyService.deleteDuty();
         return ResponseEntity.ok(BaseResponse.ok(null));
     }
 
@@ -89,10 +94,11 @@ public class DutyController {
             value = {DutyExceptionResponse.class},
             includes = {"DUTY_NOT_FOUND"}
     )
+    @CheckDutyMembership(placeIdParam = "placeId")
     public ResponseEntity<BaseResponse<List<GetDutyMemberNameListResponse>>> getDutyMemberNameList(
             @PathVariable Long placeId,
             @PathVariable Long dutyId) {
-        return ResponseEntity.ok(BaseResponse.ok(dutyService.getDutyMemberNameList(dutyId)));
+        return ResponseEntity.ok(BaseResponse.ok(dutyService.getDutyMemberNameList()));
     }
 
     @Operation(summary = "당번 정보 - 청소 이름 목록 조회", description = "당번의 청소 이름 목록을 조회합니다.")
@@ -101,10 +107,11 @@ public class DutyController {
             value = {DutyExceptionResponse.class},
             includes = {"DUTY_NOT_FOUND"}
     )
+    @CheckDutyMembership(placeIdParam = "placeId")
     public ResponseEntity<BaseResponse<List<GetDutyCleaningNameListResponse>>> getDutyCleaningNameList(
             @PathVariable Long placeId,
             @PathVariable Long dutyId) {
-        return ResponseEntity.ok(BaseResponse.ok(dutyService.getDutyCleaningNameList(dutyId)));
+        return ResponseEntity.ok(BaseResponse.ok(dutyService.getDutyCleaningNameList()));
     }
 
     @Operation(summary = "당번 정보 - 멤버 추가", description = "당번에 멤버를 추가합니다. (매니저용)")
@@ -113,13 +120,14 @@ public class DutyController {
             value = {DutyExceptionResponse.class},
             includes = {"DUTY_NOT_FOUND", "MEMBER_NOT_FOUND"}
     )
+    @CheckDutyMembership(placeIdParam = "placeId")
     @CheckManagerAuthority
     public ResponseEntity<BaseResponse<PostAddMembersResponse>> addMembers(
             @PathVariable Long placeId,
             @PathVariable Long dutyId,
             @RequestBody PostAddMembersRequest request
     ) {
-        return ResponseEntity.ok(BaseResponse.ok(dutyService.addMembers(dutyId, request)));
+        return ResponseEntity.ok(BaseResponse.ok(dutyService.addMembers(request)));
     }
 
     @Operation(summary = "당번 역할 분담 (공통/랜덤/직접)", description = "해당 당번에 해당하는 청소에 멤버를 지정합니다. (매니저용)")
@@ -128,13 +136,14 @@ public class DutyController {
             value = {DutyExceptionResponse.class},
             includes = {"DUTY_NOT_FOUND", "CLEANING_NOT_FOUND", "MEMBER_NOT_EXISTS"}
     )
+    @CheckDutyMembership(placeIdParam = "placeId")
     @CheckManagerAuthority
     public ResponseEntity<BaseResponse<Void>> assignMember(
             @PathVariable Long placeId,
             @PathVariable Long dutyId,
             @RequestBody @Valid PatchAssignMemberRequest request
     ) {
-        dutyService.assignMember(dutyId, request);
+        dutyService.assignMember(request);
         return ResponseEntity.ok(BaseResponse.ok(null));
     }
 
@@ -143,11 +152,12 @@ public class DutyController {
             value = {DutyExceptionResponse.class},
             includes = {"DUTY_NOT_FOUND"}
     )
+    @CheckDutyMembership(placeIdParam = "placeId")
     @GetMapping("/{dutyId}/cleaning-info")
     public ResponseEntity<BaseResponse<List<GetCleaningInfoListResponse>>> getCleaningInfoList(
             @PathVariable Long placeId,
             @PathVariable Long dutyId) {
-        return ResponseEntity.ok(BaseResponse.ok(dutyService.getCleaningInfoList(dutyId)));
+        return ResponseEntity.ok(BaseResponse.ok(dutyService.getCleaningInfoList()));
     }
 
 
@@ -157,13 +167,14 @@ public class DutyController {
             value = {DutyExceptionResponse.class},
             includes = {"DUTY_NOT_FOUND"}
     )
+    @CheckDutyMembership(placeIdParam = "placeId")
     @CheckManagerAuthority
     public ResponseEntity<BaseResponse<PostAddCleaningsResponse>> addCleanings(
             @PathVariable Long placeId,
             @PathVariable Long dutyId,
             @RequestBody PostAddCleaningsRequest request
     ) {
-        return ResponseEntity.ok(BaseResponse.ok(dutyService.addCleanings(dutyId, request)));
+        return ResponseEntity.ok(BaseResponse.ok(dutyService.addCleanings( request)));
     }
 
     @Operation(summary = "당번에서 청소 항목 제거", description = "지정된 당번에서 특정 청소 항목을 제거하면 해당 청소는 미지정 상태로 되돌아갑니다. (매니저용)")
@@ -172,12 +183,13 @@ public class DutyController {
             value = DutyExceptionResponse.class,
             includes = {"DUTY_NOT_FOUND", "CLEANING_NOT_FOUND", "CLEANING_NOT_ASSIGNED"}
     )
+    @CheckDutyMembership(placeIdParam = "placeId")
     @CheckManagerAuthority
     public ResponseEntity<BaseResponse<Void>> removeCleaning(
             @PathVariable Long placeId,
             @PathVariable Long dutyId,
             @PathVariable Long cleaningId) {
-        dutyService.removeCleaningFromDuty(dutyId, cleaningId);
+        dutyService.removeCleaningFromDuty(cleaningId);
         return ResponseEntity.ok(BaseResponse.ok(null));
     }
 

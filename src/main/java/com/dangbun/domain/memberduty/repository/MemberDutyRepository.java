@@ -29,12 +29,13 @@ public interface MemberDutyRepository extends JpaRepository<MemberDuty, MemberDu
     void deleteAllByMember(Member member);
 
     @Query("""
-    select md.member
-    from MemberDuty md
-      join fetch md.member m
-      join fetch m.place p
-    where md.duty.dutyId = :dutyId
-      and m.user.userId = :userId
+    SELECT md.member, md.duty
+    FROM MemberDuty md
+    JOIN FETCH md.member m
+    JOIN FETCH md.duty d
+    JOIN FETCH d.place
+    WHERE d.dutyId = :dutyId AND m.user.userId = :userId
     """)
-    Optional<Member> findMemberWithPlaceByDutyIdAndUserId(Long dutyId, Long userId);
+    Optional<MemberDuty> findMemberDutyWithDutyAndPlace(Long dutyId, Long userId);
+
 }

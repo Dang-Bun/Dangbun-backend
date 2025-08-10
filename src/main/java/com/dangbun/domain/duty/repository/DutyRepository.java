@@ -34,6 +34,4 @@ public interface DutyRepository extends JpaRepository<Duty, Long> {
     GROUP BY d.dutyId, d.name
 """)
     List<DutyProgressDto> findDutyProgressByPlaceToday(@Param("placeId") Long placeId);
-
-    boolean existsByDutyIdAndPlace_PlaceId(Long dutyId, Long placeId);
 }

@@ -1,13 +1,16 @@
 package com.dangbun.global.aop;
 
+import com.dangbun.domain.duty.entity.Duty;
 import com.dangbun.domain.duty.repository.DutyRepository;
 import com.dangbun.domain.member.entity.Member;
 import com.dangbun.domain.member.exception.custom.DutyAccessDeniedException;
+import com.dangbun.domain.memberduty.entity.MemberDuty;
 import com.dangbun.domain.memberduty.repository.MemberDutyRepository;
 import com.dangbun.domain.user.entity.CustomUserDetails;
 import com.dangbun.global.aop.support.AnnotationResolver;
 import com.dangbun.global.aop.support.RequestParamResolver;
 import com.dangbun.global.aop.support.SecuritySupport;
+import com.dangbun.global.context.DutyContext;
 import com.dangbun.global.context.MemberContext;
 import com.dangbun.global.exception.RequiredParamMissingException;
 import lombok.RequiredArgsConstructor;
@@ -40,9 +43,12 @@ public class CheckDutyMembershipAspect {
             throw new RequiredParamMissingException(REQUIRED_PARAM_MISSING);
         }
 
-        Member member = memberDutyRepository
-                .findMemberWithPlaceByDutyIdAndUserId(dutyId, userDetails.getUser().getUserId())
+        MemberDuty memberDuty = memberDutyRepository
+                .findMemberDutyWithDutyAndPlace(dutyId, userDetails.getUser().getUserId())
                 .orElseThrow(() -> new DutyAccessDeniedException(DUTY_ACCESS_DENIED));
+
+        Member member = memberDuty.getMember();
+        Duty duty = memberDuty.getDuty();
 
         String placeIdParam = checkDutyMembership.placeIdParam();
         if (placeIdParam != null && !placeIdParam.isBlank()) {
@@ -51,17 +57,18 @@ public class CheckDutyMembershipAspect {
                 throw new RequiredParamMissingException(REQUIRED_PARAM_MISSING);
             }
 
-            boolean matchesPlace = dutyRepository.existsByDutyIdAndPlace_PlaceId(dutyId, placeId);
-            if (!matchesPlace) {
+            if (!duty.getPlace().getPlaceId().equals(placeId)) {
                 throw new DutyAccessDeniedException(DUTY_ACCESS_DENIED);
             }
         }
 
         try {
             MemberContext.set(member);
+            DutyContext.set(duty);
             return joinPoint.proceed();
         } finally {
             MemberContext.clear();
+            DutyContext.clear();
         }
     }
 

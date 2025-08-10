@@ -196,7 +196,7 @@ public class CleaningService {
 
     public void deleteCleaning(Long cleaningId) {
         Cleaning cleaning = cleaningRepository.findById(cleaningId)
-                .orElseThrow(() -> new DutyNotFoundException(DUTY_NOT_FOUND));
+                .orElseThrow(() -> new CleaningNotFoundException(CLEANING_NOT_FOUND));
 
         cleaningDateRepository.deleteAllByCleaning_CleaningId(cleaningId);
 
