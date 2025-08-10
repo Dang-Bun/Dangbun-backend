@@ -37,7 +37,6 @@ public class DutyController {
             value = {DutyExceptionResponse.class},
             includes = {"PLACE_NOT_FOUND", "DUTY_ALREADY_EXISTS"}
     )
-    //@CheckPlaceMembership()
     @CheckManagerAuthority
     public ResponseEntity<BaseResponse<PostDutyCreateResponse>> createDuty(
             @PathVariable Long placeId,
@@ -52,7 +51,6 @@ public class DutyController {
             value = {DutyExceptionResponse.class},
             includes = {"PLACE_NOT_FOUND"}
     )
-    //@CheckPlaceMembership()
     public ResponseEntity<BaseResponse<List<GetDutyListResponse>>> getDutyList(@PathVariable Long placeId) {
         return ResponseEntity.ok(BaseResponse.ok(dutyService.getDutyList()));
     }
@@ -63,7 +61,6 @@ public class DutyController {
             value = {DutyExceptionResponse.class},
             includes = {"DUTY_NOT_FOUND"}
     )
-    //@CheckDutyMembership(placeIdParam = "placeId")
     @CheckDutyInPlace
     @CheckManagerAuthority
     public ResponseEntity<BaseResponse<PutDutyUpdateResponse>> updateDuty(
@@ -80,7 +77,6 @@ public class DutyController {
             value = {DutyExceptionResponse.class},
             includes = {"DUTY_NOT_FOUND"}
     )
-    //@CheckDutyMembership(placeIdParam = "placeId")
     @CheckDutyInPlace
     @CheckManagerAuthority
     public ResponseEntity<BaseResponse<Void>> deleteDuty(
@@ -96,7 +92,6 @@ public class DutyController {
             value = {DutyExceptionResponse.class},
             includes = {"DUTY_NOT_FOUND"}
     )
-    //@CheckDutyMembership(placeIdParam = "placeId")
     @CheckDutyInPlace
     public ResponseEntity<BaseResponse<List<GetDutyMemberNameListResponse>>> getDutyMemberNameList(
             @PathVariable Long placeId,
@@ -110,7 +105,6 @@ public class DutyController {
             value = {DutyExceptionResponse.class},
             includes = {"DUTY_NOT_FOUND"}
     )
-    //@CheckDutyMembership(placeIdParam = "placeId")
     @CheckDutyInPlace
     public ResponseEntity<BaseResponse<List<GetDutyCleaningNameListResponse>>> getDutyCleaningNameList(
             @PathVariable Long placeId,
@@ -124,7 +118,6 @@ public class DutyController {
             value = {DutyExceptionResponse.class},
             includes = {"DUTY_NOT_FOUND", "MEMBER_NOT_FOUND"}
     )
-    //@CheckDutyMembership(placeIdParam = "placeId")
     @CheckDutyInPlace
     @CheckManagerAuthority
     public ResponseEntity<BaseResponse<PostAddMembersResponse>> addMembers(
@@ -141,7 +134,6 @@ public class DutyController {
             value = {DutyExceptionResponse.class},
             includes = {"DUTY_NOT_FOUND", "CLEANING_NOT_FOUND", "MEMBER_NOT_EXISTS"}
     )
-    //@CheckDutyMembership(placeIdParam = "placeId")
     @CheckDutyInPlace
     @CheckManagerAuthority
     public ResponseEntity<BaseResponse<Void>> assignMember(
@@ -158,7 +150,6 @@ public class DutyController {
             value = {DutyExceptionResponse.class},
             includes = {"DUTY_NOT_FOUND"}
     )
-    //@CheckDutyMembership(placeIdParam = "placeId")
     @CheckDutyInPlace
     @GetMapping("/{dutyId}/cleaning-info")
     public ResponseEntity<BaseResponse<List<GetCleaningInfoListResponse>>> getCleaningInfoList(
@@ -174,7 +165,6 @@ public class DutyController {
             value = {DutyExceptionResponse.class},
             includes = {"DUTY_NOT_FOUND"}
     )
-    //@CheckDutyMembership(placeIdParam = "placeId")
     @CheckDutyInPlace
     @CheckManagerAuthority
     public ResponseEntity<BaseResponse<PostAddCleaningsResponse>> addCleanings(
@@ -191,7 +181,6 @@ public class DutyController {
             value = DutyExceptionResponse.class,
             includes = {"DUTY_NOT_FOUND", "CLEANING_NOT_FOUND", "CLEANING_NOT_ASSIGNED"}
     )
-    //@CheckDutyMembership(placeIdParam = "placeId")
     @CheckDutyInPlace
     @CheckManagerAuthority
     public ResponseEntity<BaseResponse<Void>> removeCleaning(
