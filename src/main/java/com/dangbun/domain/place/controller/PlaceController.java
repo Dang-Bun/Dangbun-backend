@@ -119,7 +119,7 @@ public class PlaceController {
     @DeleteMapping("/{placeId}")
     @CheckPlaceMembership()
     @CheckManagerAuthority
-    public ResponseEntity<BaseResponse<?>> deletePlace(@PathVariable Long placeId
+    public ResponseEntity<BaseResponse<?>> deletePlace(@PathVariable Long placeId,
                                                        @RequestBody DeletePlaceRequest request) {
         placeService.deletePlace(request);
         return ResponseEntity.ok(BaseResponse.ok(null));
