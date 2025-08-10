@@ -104,13 +104,13 @@ public class PlaceService {
 
 
         String placeName = request.placeName();
-        String category = request.category();
+        PlaceCategory category = request.category();
         String memberName = request.managerName();
         Map<String, String> info = request.information();
 
         Place place = Place.builder()
                 .name(placeName)
-                .category(PlaceCategory.findCategory(category))
+                .category(category)
                 .build();
 
         Place savedPlace = placeRepository.save(place);
