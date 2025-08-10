@@ -40,4 +40,9 @@ public class PlaceControllerAdvice {
         return new BaseErrorResponse(e.getExceptionStatus());
     }
 
+    @ExceptionHandler(InvalidPlaceNameException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public BaseErrorResponse handleInvalidPlaceNameException(InvalidPlaceNameException e) {
+        return new BaseErrorResponse(e.getExceptionStatus());
+    }
 }

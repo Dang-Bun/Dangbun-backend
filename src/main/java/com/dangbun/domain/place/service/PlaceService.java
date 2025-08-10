@@ -17,10 +17,7 @@ import com.dangbun.domain.membercleaning.repository.MemberCleaningRepository;
 import com.dangbun.domain.memberduty.entity.MemberDuty;
 import com.dangbun.domain.memberduty.repository.MemberDutyRepository;
 import com.dangbun.domain.notificationreceiver.repository.NotificationReceiverRepository;
-import com.dangbun.domain.place.dto.request.PatchUpdateTimeRequest;
-import com.dangbun.domain.place.dto.request.PostCheckInviteCodeRequest;
-import com.dangbun.domain.place.dto.request.PostCreatePlaceRequest;
-import com.dangbun.domain.place.dto.request.PostRegisterPlaceRequest;
+import com.dangbun.domain.place.dto.request.*;
 import com.dangbun.domain.place.dto.response.*;
 import com.dangbun.domain.place.entity.Place;
 import com.dangbun.domain.place.entity.PlaceCategory;
@@ -107,13 +104,13 @@ public class PlaceService {
 
 
         String placeName = request.placeName();
-        String category = request.category();
+        PlaceCategory category = request.category();
         String memberName = request.managerName();
         Map<String, String> info = request.information();
 
         Place place = Place.builder()
                 .name(placeName)
-                .category(PlaceCategory.findCategory(category))
+                .category(category)
                 .build();
 
         Place savedPlace = placeRepository.save(place);
@@ -223,7 +220,7 @@ public class PlaceService {
         return GetPlaceResponse.of(user, place, cleaningMap, memberCleanings);
     }
 
-    public void deletePlace(User user, Long placeId) {
+    public void deletePlace(User user, Long placeId, DeletePlaceRequest request) {
         Member runner = memberRepository.findWithPlaceByUserIdAndPlaceId(user.getUserId(), placeId)
                 .orElseThrow(() -> new MemberNotFoundException(NO_SUCH_MEMBER));
 
@@ -232,6 +229,11 @@ public class PlaceService {
         }
 
         Place place = runner.getPlace();
+
+        if(!place.getName().equals(request.placeName())){
+            throw new InvalidPlaceNameException(INVALID_NAME);
+        }
+
         List<Duty> duties = dutyRepository.findByPlace_PlaceId(placeId);
         for (Duty duty : duties) {
             dutyService.deleteDuty(duty.getDutyId());

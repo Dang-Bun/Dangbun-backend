@@ -1,10 +1,7 @@
 package com.dangbun.domain.place.controller;
 
 import com.dangbun.domain.member.response.status.MemberExceptionResponse;
-import com.dangbun.domain.place.dto.request.PatchUpdateTimeRequest;
-import com.dangbun.domain.place.dto.request.PostCheckInviteCodeRequest;
-import com.dangbun.domain.place.dto.request.PostCreatePlaceRequest;
-import com.dangbun.domain.place.dto.request.PostRegisterPlaceRequest;
+import com.dangbun.domain.place.dto.request.*;
 import com.dangbun.domain.place.dto.response.*;
 import com.dangbun.domain.place.response.status.PlaceExceptionResponse;
 import com.dangbun.domain.place.service.PlaceService;
@@ -114,12 +111,13 @@ public class PlaceController {
     @Operation(summary = "플레이스 삭제", description = "플레이스를 삭제합니다(매니저)")
     @DocumentedApiErrors(
             value = {MemberExceptionResponse.class},
-            includes = {"NO_SUCH_MEMBER", "INVALID_ROLE"}
+            includes = {"NO_SUCH_MEMBER", "INVALID_ROLE","INVALID_NAME"}
     )
     @DeleteMapping("/{placeId}")
     public ResponseEntity<BaseResponse<?>> deletePlace(@AuthenticationPrincipal(expression = "user") User user,
-                                                       @PathVariable Long placeId) {
-        placeService.deletePlace(user, placeId);
+                                                       @PathVariable Long placeId,
+                                                       @RequestBody DeletePlaceRequest request) {
+        placeService.deletePlace(user, placeId, request);
         return ResponseEntity.ok(BaseResponse.ok(null));
     }
 
