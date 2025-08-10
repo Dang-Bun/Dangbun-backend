@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface MemberDutyRepository extends JpaRepository<MemberDuty, MemberDutyId> {
 
@@ -26,4 +27,14 @@ public interface MemberDutyRepository extends JpaRepository<MemberDuty, MemberDu
     List<MemberDuty> findAllWithMemberAndPlaceByPlaceId(Long placeId);
 
     void deleteAllByMember(Member member);
+
+    @Query("""
+    select md.member
+    from MemberDuty md
+      join fetch md.member m
+      join fetch m.place p
+    where md.duty.dutyId = :dutyId
+      and m.user.userId = :userId
+    """)
+    Optional<Member> findMemberWithPlaceByDutyIdAndUserId(Long dutyId, Long userId);
 }

@@ -17,7 +17,7 @@ public interface DutyRepository extends JpaRepository<Duty, Long> {
     Optional<Duty> findByName(String name);
 
     @Query("select d from Duty d join fetch d.place p where p.placeId = :placeId")
-    List<Duty> findWithPlaceByPlaceId(@Param("placeId") Long placeId);
+    List<Duty> findWithPlaceByPlaceId(Long placeId);
 
     @Query("""
     SELECT new com.dangbun.domain.place.dto.response.DutyProgressDto(
@@ -34,4 +34,6 @@ public interface DutyRepository extends JpaRepository<Duty, Long> {
     GROUP BY d.dutyId, d.name
 """)
     List<DutyProgressDto> findDutyProgressByPlaceToday(@Param("placeId") Long placeId);
+
+    boolean existsByDutyIdAndPlace_PlaceId(Long dutyId, Long placeId);
 }
