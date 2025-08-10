@@ -106,12 +106,19 @@ public class PlaceService {
         String placeName = request.placeName();
         PlaceCategory category = request.category();
         String memberName = request.managerName();
+
+        String categoryName = request.categoryName() == null ? null : request.categoryName();
+
+        if(category!=PlaceCategory.ETC) categoryName = category.getDisplayName();
+
         Map<String, String> info = request.information();
 
         Place place = Place.builder()
                 .name(placeName)
                 .category(category)
+                .categoryName(categoryName)
                 .build();
+
 
         Place savedPlace = placeRepository.save(place);
 
@@ -200,7 +207,7 @@ public class PlaceService {
                 .orElseThrow(() -> new MemberNotFoundException(NO_SUCH_MEMBER));
 
         if (!member.getStatus()) {
-            return new GetPlaceResponse(member.getMemberId(), placeId, place.getName(), place.getCategory(),null, null);
+            return new GetPlaceResponse(member.getMemberId(), placeId, place.getName(), place.getCategory(),place.getCategoryName(),null, null);
         }
 
         List<MemberDuty> memberDuties = memberDutyRepository.findAllWithMemberAndPlaceByPlaceId(placeId);
