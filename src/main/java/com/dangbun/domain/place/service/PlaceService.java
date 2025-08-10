@@ -73,7 +73,7 @@ public class PlaceService {
         for (Member member : members) {
             if (!member.getStatus()) {
                 Place place = member.getPlace();
-                placeDtos.add(PlaceDto.of(place.getPlaceId(), place.getName(), null, null, null, null));
+                placeDtos.add(PlaceDto.of(place.getPlaceId(), place.getName(), place.getCategory(), place.getCategoryName(),null,null, null, null));
             } else {
                 Place place = member.getPlace();
 
@@ -93,7 +93,7 @@ public class PlaceService {
                 Integer notifyNumber = notificationReceiverRepository.countUnreadByMemberId(member.getMemberId());
 
 
-                placeDtos.add(PlaceDto.of(place.getPlaceId(), place.getName(), totalCleaning, endCleaning, member.getRole().getDisplayName(), notifyNumber));
+                placeDtos.add(PlaceDto.of(place.getPlaceId(), place.getName(),place.getCategory(),place.getCategoryName(), totalCleaning, endCleaning, member.getRole().getDisplayName(), notifyNumber));
             }
         }
 
