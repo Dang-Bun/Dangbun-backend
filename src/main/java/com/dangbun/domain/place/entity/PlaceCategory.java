@@ -20,13 +20,5 @@ public enum PlaceCategory {
         return displayName;
     }
 
-    public static PlaceCategory findCategory(String category){
-        for (PlaceCategory value : values()) {
-            if(value.displayName.equals(category)){
-                return value;
-            }
-        }
-        return ETC;
-    }
 
 }
