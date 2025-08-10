@@ -32,13 +32,11 @@ public class WebSecurityConfig {
             authorizeRequest
                     .requestMatchers(
                             "/users/logout"
+
                     ).authenticated()
                     .requestMatchers(
                             "/users/**",
-                            "/duties/**",
-                            "/cleanigs/**",
                             "/places/**",
-                            "/notifications/**",
 
                             // Swagger 관련 경로 허용
                             "/swagger-ui/**",
@@ -47,7 +45,8 @@ public class WebSecurityConfig {
                             "/swagger-resources/**",
                             "/webjars/**",
                             "/actuator/health"
-                    ).permitAll();
+                    ).permitAll()
+                    ;
             authorizeRequest.anyRequest().authenticated();
         });
 

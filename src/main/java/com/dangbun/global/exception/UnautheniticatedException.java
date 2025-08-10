@@ -1,13 +1,15 @@
-package com.dangbun.domain.duty.exception.custom;
+package com.dangbun.global.exception;
 
 import com.dangbun.global.response.status.ResponseStatus;
 import lombok.Getter;
 
+
 @Getter
-public class DutyNotFoundException extends RuntimeException {
+public class UnautheniticatedException extends RuntimeException {
+
     private final ResponseStatus exceptionStatus;
 
-    public DutyNotFoundException(ResponseStatus exceptionStatus) {
+    public UnautheniticatedException(ResponseStatus exceptionStatus) {
         super(exceptionStatus.getMessage());
         this.exceptionStatus = exceptionStatus;
     }

@@ -1,13 +1,14 @@
-package com.dangbun.domain.duty.exception.custom;
+package com.dangbun.global.exception;
 
 import com.dangbun.global.response.status.ResponseStatus;
 import lombok.Getter;
 
 @Getter
-public class PlaceNotFoundException extends RuntimeException {
+public class InvalidJwtExcepetion extends RuntimeException {
+
     private final ResponseStatus exceptionStatus;
 
-    public PlaceNotFoundException(ResponseStatus exceptionStatus) {
+    public InvalidJwtExcepetion(ResponseStatus exceptionStatus) {
         super(exceptionStatus.getMessage());
         this.exceptionStatus = exceptionStatus;
     }

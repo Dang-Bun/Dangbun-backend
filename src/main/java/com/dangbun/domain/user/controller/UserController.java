@@ -57,7 +57,7 @@ public class UserController {
     @Operation(summary = "회원가입")
     @DocumentedApiErrors(
             value = {UserExceptionResponse.class},
-            includes = {"EXIST_EMAIL","INVALID_PASSWORD"}
+            includes = {"EXIST_EMAIL","INVALID_PASSWORD", "INVALID_CERT_CODE"}
     )
     @PostMapping("/signup")
     public ResponseEntity<BaseResponse<?>> signUp(@RequestBody PostUserSignUpRequest request) {
@@ -68,7 +68,7 @@ public class UserController {
     @Operation(summary = "로그인")
     @DocumentedApiErrors(
             value = {UserExceptionResponse.class},
-            includes = {"NO_SUCH_USER","INVALID_PASSWORD"}
+            includes = {"NO_SUCH_USER","INVALID_PASSWORD", "DELETE_MEMBER"}
     )
     @PostMapping("/login")
     public ResponseEntity<BaseResponse<PostUserLoginResponse>> login(@RequestBody PostUserLoginRequest request) {
@@ -92,7 +92,7 @@ public class UserController {
     @Operation(summary = "비밀번호 재설정")
     @DocumentedApiErrors(
             value = {UserExceptionResponse.class},
-            includes = {"NO_SUCH_USER"}
+            includes = {"NO_SUCH_USER", "INVALID_CERT_CODE"}
     )
     @PostMapping("/me/password")
     public ResponseEntity<BaseResponse<?>> updatePassword(@RequestBody @Valid PostUserPasswordUpdateRequest request) {
@@ -104,7 +104,7 @@ public class UserController {
     @Operation(summary = "당번 서비스 탈퇴")
     @DocumentedApiErrors(
             value = {UserExceptionResponse.class},
-            includes = {"INVALID_PASSWORD"}
+            includes = { "INVALID_EMAIL"}
     )
     @DeleteMapping("/me")
     public ResponseEntity<BaseResponse<?>> deleteCurrentUser(@AuthenticationPrincipal(expression = "user") User user,
@@ -115,8 +115,8 @@ public class UserController {
 
     @Operation(summary = "내 회원 정보 조회",description = "회원가입 시 입력한 이름, 이메일 정보를 조회합니다.")
     @DocumentedApiErrors(
-            value = {UserExceptionResponse.class},
-            includes = {"INVALID_PASSWORD"}
+            value = {},
+            includes = {""}
     )
     @GetMapping("/me")
     public ResponseEntity<BaseResponse<?>> getMyInfo(

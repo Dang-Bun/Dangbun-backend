@@ -1,6 +1,7 @@
 package com.dangbun.domain.duty.service;
 
 import com.dangbun.domain.cleaning.entity.Cleaning;
+import com.dangbun.domain.cleaning.exception.custom.DutyNotFoundException;
 import com.dangbun.domain.cleaning.repository.CleaningRepository;
 import com.dangbun.domain.cleaning.service.CleaningService;
 import com.dangbun.domain.cleaningdate.repository.CleaningDateRepository;
@@ -16,10 +17,12 @@ import com.dangbun.domain.membercleaning.repository.MemberCleaningRepository;
 import com.dangbun.domain.memberduty.entity.MemberDuty;
 import com.dangbun.domain.memberduty.repository.MemberDutyRepository;
 import com.dangbun.domain.place.entity.Place;
-import com.dangbun.domain.place.repository.PlaceRepository;
-import jakarta.transaction.Transactional;
+import com.dangbun.global.context.DutyContext;
+import com.dangbun.global.context.MemberContext;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -28,10 +31,10 @@ import static com.dangbun.domain.duty.response.status.DutyExceptionResponse.*;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class DutyService {
 
     private final DutyRepository dutyRepository;
-    private final PlaceRepository placeRepository;
     private final MemberDutyRepository memberDutyRepository;
     private final CleaningRepository cleaningRepository;
     private final MemberRepository memberRepository;
@@ -39,12 +42,12 @@ public class DutyService {
     private final MemberCleaningRepository memberCleaningRepository;
     private final CleaningService cleaningService;
 
-    @Transactional
-    public PostDutyCreateResponse createDuty(Long placeId, PostDutyCreateRequest request) {
-        Place place = placeRepository.findById(placeId)
-                .orElseThrow(() -> new PlaceNotFoundException(PLACE_NOT_FOUND));
 
-        if (dutyRepository.existsByNameAndPlace_PlaceId(request.name(), placeId)) {
+    public PostDutyCreateResponse createDuty(PostDutyCreateRequest request) {
+
+        Place place = MemberContext.get().getPlace();
+
+        if (dutyRepository.existsByNameAndPlace_PlaceId(request.name(), place.getPlaceId())) {
             throw new DutyAlreadyExistsException(DUTY_ALREADY_EXISTS);
         }
 
@@ -58,11 +61,9 @@ public class DutyService {
         return PostDutyCreateResponse.of(saved.getDutyId());
     }
 
-    @Transactional
-    public List<GetDutyListResponse> getDutyList(Long placeId) {
-        if (!placeRepository.existsById(placeId)) {
-            throw new PlaceNotFoundException(PLACE_NOT_FOUND);
-        }
+    @Transactional(readOnly = true)
+    public List<GetDutyListResponse> getDutyList() {
+        Long placeId = MemberContext.get().getPlace().getPlaceId();
 
         List<Duty> duties = dutyRepository.findByPlace_PlaceId(placeId);
 
@@ -71,20 +72,21 @@ public class DutyService {
                 .toList();
     }
 
-    @Transactional
-    public PutDutyUpdateResponse updateDuty(Long dutyId, PutDutyUpdateRequest request) {
-        Duty duty = dutyRepository.findById(dutyId)
-                .orElseThrow(() -> new DutyNotFoundException(DUTY_NOT_FOUND));
+
+    public PutDutyUpdateResponse updateDuty( PutDutyUpdateRequest request) {
+        Duty duty = DutyContext.get();
 
         duty.update(request.name(), request.icon());
 
         return PutDutyUpdateResponse.of(duty.getDutyId(),duty.getName(), duty.getIcon());
     }
 
-    @Transactional
+
     public void deleteDuty(Long dutyId) {
+        //Duty duty = DutyContext.get();
+
         Duty duty = dutyRepository.findById(dutyId)
-                .orElseThrow(() -> new DutyNotFoundException(DUTY_NOT_FOUND));
+                .orElseThrow(() -> new DutyNotInPlaceFoundException(DUTY_NOT_IN_PLACE));
 
         List<Cleaning> cleanings = cleaningRepository.findAllByDuty(duty);
         cleaningDateRepository.deleteAllByCleaningIn(cleanings);
@@ -95,10 +97,9 @@ public class DutyService {
         dutyRepository.delete(duty);
     }
 
-    public List<GetDutyMemberNameListResponse> getDutyMemberNameList(Long dutyId) {
-        Duty duty = dutyRepository.findById(dutyId)
-                .orElseThrow(() -> new DutyNotFoundException(DUTY_NOT_FOUND));
-
+    @Transactional(readOnly = true)
+    public List<GetDutyMemberNameListResponse> getDutyMemberNameList() {
+        Duty duty = DutyContext.get();
         List<MemberDuty> members = memberDutyRepository.findAllByDuty(duty);
 
         return members.stream()
@@ -106,9 +107,9 @@ public class DutyService {
                 .toList();
     }
 
-    public List<GetDutyCleaningNameListResponse> getDutyCleaningNameList(Long dutyId) {
-        Duty duty = dutyRepository.findById(dutyId)
-                .orElseThrow(() -> new DutyNotFoundException(DUTY_NOT_FOUND));
+    @Transactional(readOnly = true)
+    public List<GetDutyCleaningNameListResponse> getDutyCleaningNameList() {
+        Duty duty = DutyContext.get();
 
         List<Cleaning> cleanings = cleaningRepository.findAllByDuty(duty);
 
@@ -118,10 +119,9 @@ public class DutyService {
     }
 
 
-    @Transactional
-    public PostAddMembersResponse addMembers(Long dutyId, PostAddMembersRequest request) {
-        Duty duty = dutyRepository.findById(dutyId)
-                .orElseThrow(() -> new DutyNotFoundException(DUTY_NOT_FOUND));
+
+    public PostAddMembersResponse addMembers(PostAddMembersRequest request) {
+        Duty duty = DutyContext.get();
 
         List<Long> requestedIds = request.memberIds();
 
@@ -155,10 +155,9 @@ public class DutyService {
         return PostAddMembersResponse.of(addedMemberIds);
     }
 
-    @Transactional
-    public void assignMember(Long dutyId, PatchAssignMemberRequest request) {
-        Duty duty = dutyRepository.findById(dutyId)
-                .orElseThrow(() -> new DutyNotFoundException(DUTY_NOT_FOUND));
+
+    public void assignMember( PatchAssignMemberRequest request) {
+        Duty duty = DutyContext.get();
 
         List<Cleaning> cleanings = cleaningRepository.findAllByDuty(duty);
         List<Member> allMembers = memberDutyRepository.findMembersByDuty(duty);
@@ -166,7 +165,7 @@ public class DutyService {
         switch (request.assignType()) {
 
             case CUSTOM -> {
-                Cleaning cleaning = cleaningRepository.findByCleaningIdAndDuty_DutyId(request.cleaningId(), dutyId)
+                Cleaning cleaning = cleaningRepository.findByCleaningIdAndDuty_DutyId(request.cleaningId(), duty.getDutyId())
                         .orElseThrow(() -> new CleaningNotFoundException(CLEANING_NOT_FOUND));
 
                 List<Member> selectedMembers = memberRepository.findAllById(request.memberIds());
@@ -200,13 +199,11 @@ public class DutyService {
         }
     }
 
-    @Transactional
-    public List<GetCleaningInfoListResponse> getCleaningInfoList(Long dutyId) {
-        Duty duty = dutyRepository.findById(dutyId)
-                .orElseThrow(() -> new DutyNotFoundException(DUTY_NOT_FOUND));
+    @Transactional(readOnly = true)
+    public List<GetCleaningInfoListResponse> getCleaningInfoList() {
+        Duty duty = DutyContext.get();
 
         List<Cleaning> cleanings = cleaningRepository.findAllByDuty(duty);
-        int dutyMemberCount = memberDutyRepository.findMembersByDuty(duty).size();
 
         return cleanings.stream()
                 .map(cleaning -> {
@@ -220,8 +217,6 @@ public class DutyService {
                             .limit(2)
                             .toList();
 
-                    boolean isCommon = members.size() == dutyMemberCount;
-
                     return GetCleaningInfoListResponse.of(
                             cleaning.getCleaningId(),
                             cleaning.getName(),
@@ -232,10 +227,9 @@ public class DutyService {
                 .toList();
     }
 
-    @Transactional
-    public PostAddCleaningsResponse addCleanings(Long dutyId, PostAddCleaningsRequest request) {
-        Duty duty = dutyRepository.findById(dutyId)
-                .orElseThrow(() -> new DutyNotFoundException(DUTY_NOT_FOUND));
+
+    public PostAddCleaningsResponse addCleanings(PostAddCleaningsRequest request) {
+        Duty duty = DutyContext.get();
 
         List<Cleaning> cleanings = cleaningRepository.findAllById(request.cleaningIds());
         List<Long> assignedIds = new ArrayList<>();
@@ -253,10 +247,9 @@ public class DutyService {
         return PostAddCleaningsResponse.of(assignedIds);
     }
 
-    @Transactional
-    public void removeCleaningFromDuty(Long dutyId, Long cleaningId) {
-        Duty duty = dutyRepository.findById(dutyId)
-                .orElseThrow(() -> new DutyNotFoundException(DUTY_NOT_FOUND));
+
+    public void removeCleaningFromDuty( Long cleaningId) {
+        Long dutyId = DutyContext.get().getDutyId();
 
         Cleaning cleaning = cleaningRepository.findById(cleaningId)
                 .orElseThrow(() -> new CleaningNotFoundException(CLEANING_NOT_FOUND));
@@ -266,8 +259,6 @@ public class DutyService {
         }
 
         cleaning.removeDuty();
-
-
 
     }
 

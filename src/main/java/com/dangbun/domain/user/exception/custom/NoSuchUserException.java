@@ -1,13 +1,13 @@
-package com.dangbun.domain.cleaning.exception.custom;
+package com.dangbun.domain.user.exception.custom;
 
 import com.dangbun.global.response.status.ResponseStatus;
 import lombok.Getter;
 
 @Getter
-public class PlaceNotFoundException extends RuntimeException {
+public class NoSuchUserException extends RuntimeException{
     private final ResponseStatus exceptionStatus;
 
-    public PlaceNotFoundException(ResponseStatus exceptionStatus) {
+    public NoSuchUserException(ResponseStatus exceptionStatus) {
         super(exceptionStatus.getMessage());
         this.exceptionStatus = exceptionStatus;
     }

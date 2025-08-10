@@ -1,13 +1,13 @@
-package com.dangbun.domain.user.exception.custom;
+package com.dangbun.domain.duty.exception.custom;
 
 import com.dangbun.global.response.status.ResponseStatus;
 import lombok.Getter;
 
 @Getter
-public class UserNotFoundException extends RuntimeException{
+public class DutyNotInPlaceFoundException extends RuntimeException {
     private final ResponseStatus exceptionStatus;
 
-    public UserNotFoundException(ResponseStatus exceptionStatus) {
+    public DutyNotInPlaceFoundException(ResponseStatus exceptionStatus) {
         super(exceptionStatus.getMessage());
         this.exceptionStatus = exceptionStatus;
     }

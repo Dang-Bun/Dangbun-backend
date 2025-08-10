@@ -2,6 +2,8 @@ package com.dangbun.global.docs;
 
 import com.dangbun.global.response.status.ResponseStatus;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.extensions.Extension;
+import io.swagger.v3.oas.annotations.extensions.ExtensionProperty;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.reflections.Reflections;
 import org.springframework.http.ResponseEntity;
@@ -11,7 +13,8 @@ import java.util.*;
 
 @RestController
 @RequestMapping("/docs")
-@Tag(name = "999. 응답 코드 문서", description = "당번의 전체 응답 코드 목록을 나타냅니다.")
+@Tag(name = "999. 응답 코드 문서", description = "당번의 전체 응답 코드 목록을 나타냅니다.",
+        extensions = {@Extension(name = "x-order", properties = @ExtensionProperty(name = "order", value = "999"))})
 public class DocsController {
 
     @Operation(summary = "전체 응답 코드 목록")

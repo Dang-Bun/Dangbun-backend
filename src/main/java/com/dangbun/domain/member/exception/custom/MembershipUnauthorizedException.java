@@ -1,14 +1,13 @@
-package com.dangbun.domain.place.exception.custom;
+package com.dangbun.domain.member.exception.custom;
 
 import com.dangbun.global.response.status.ResponseStatus;
 import lombok.Getter;
 
 @Getter
-public class NoSuchPlaceException extends RuntimeException {
-
+public class MembershipUnauthorizedException extends RuntimeException {
     private final ResponseStatus exceptionStatus;
 
-    public NoSuchPlaceException(ResponseStatus status) {
+    public MembershipUnauthorizedException(ResponseStatus status) {
         super(status.getMessage());
         this.exceptionStatus = status;
     }

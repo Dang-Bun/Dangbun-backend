@@ -7,6 +7,6 @@ import java.lang.annotation.Target;
 
 @Target({ElementType.TYPE, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
-public @interface CheckPlaceMembership {
-    String placeIdParam() default "placeId";
+public @interface CheckChecklistMembership {
+    String checklistIdParam() default "checklistId";
 }

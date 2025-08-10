@@ -1,6 +1,6 @@
 package com.dangbun.domain.checklist.service;
 
-import com.dangbun.domain.checklist.ChecklistContext;
+import com.dangbun.global.context.ChecklistContext;
 import com.dangbun.domain.checklist.dto.request.PostGetPresignedUrlRequest;
 import com.dangbun.domain.checklist.dto.request.PostSaveUploadResultRequest;
 import com.dangbun.domain.checklist.dto.response.GetImageUrlResponse;
@@ -20,7 +20,6 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;

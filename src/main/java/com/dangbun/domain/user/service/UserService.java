@@ -137,7 +137,7 @@ public class UserService {
     public void updatePassword(@Valid PostUserPasswordUpdateRequest request) {
 
         User user = userRepository.findByEmail(request.email())
-                .orElseThrow(() -> new UserNotFoundException(NO_SUCH_USER));
+                .orElseThrow(() -> new NoSuchUserException(NO_SUCH_USER));
 
         checkCertCode(request.email(), request.certCode());
 
@@ -163,7 +163,7 @@ public class UserService {
 
 
         User user = userRepository.findByEmail(request.email())
-                .orElseThrow(() -> new UserNotFoundException(NO_SUCH_USER));
+                .orElseThrow(() -> new NoSuchUserException(NO_SUCH_USER));
 
         if (!user.getEnabled()) {
             throw new DeleteMemberException(DELETE_MEMBER);

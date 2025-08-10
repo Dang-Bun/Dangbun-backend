@@ -1,6 +1,7 @@
 package com.dangbun.global.security;
 
 import com.dangbun.global.exception.InvalidRefreshJWTException;
+import com.dangbun.global.response.BaseErrorResponse;
 import com.dangbun.global.response.status.BaseExceptionResponse;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -26,37 +27,30 @@ public class JwtExceptionFilter extends OncePerRequestFilter {
             filterChain.doFilter(request, response);
         }catch (ExpiredJwtException e){
             // 토큰 유효기간 만료
-
+            logger.error(e);
+            setErrorResponse(AUTH_UNAUTHENTICATED, response, HttpStatus.UNAUTHORIZED);
         }catch (InvalidRefreshJWTException e){
             // 유효하지 않은 Refresh JWT
             logger.error(e);
-            setErrorResponse(INVALID_REFRESH_TOKEN, response, e);
+            setErrorResponse(INVALID_REFRESH_TOKEN, response, HttpStatus.UNAUTHORIZED);
         }
         catch(JwtException | IllegalStateException e){
             // 유효하지 않은 토큰
             logger.error(e);
-            setErrorResponse(INVALID_JWT, response,e);
+            setErrorResponse(INVALID_JWT, response,HttpStatus.UNAUTHORIZED);
         }
     }
 
-    private void setErrorResponse(BaseExceptionResponse baseExceptionResponse, HttpServletResponse response, RuntimeException e) {
+    private void setErrorResponse(BaseExceptionResponse exceptionResponse,
+                                  HttpServletResponse response,
+                                  HttpStatus status) throws IOException {
         ObjectMapper objectMapper = new ObjectMapper();
-        response.setStatus(HttpStatus.BAD_REQUEST.value());
-        response.setContentType("application/json; charset=UTF-8");
-        try {
-            response.getWriter().write(objectMapper.writeValueAsString(baseExceptionResponse));
-        } catch (JsonProcessingException ex) {
-            throw new RuntimeException(ex);
-        } catch (IOException ex) {
-            throw new RuntimeException(ex);
-        }
-    }
-
-    private void setErrorResponse(HttpStatus status, HttpServletResponse response, Throwable e) {
         response.setStatus(status.value());
         response.setContentType("application/json; charset=UTF-8");
-    }
 
+        BaseErrorResponse errorResponse = new BaseErrorResponse(exceptionResponse);
+        response.getWriter().write(objectMapper.writeValueAsString(errorResponse));
+    }
 
 
 }

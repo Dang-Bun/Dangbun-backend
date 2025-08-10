@@ -2,7 +2,7 @@ package com.dangbun.domain.calender.service;
 
 import com.dangbun.domain.calender.dto.*;
 import com.dangbun.domain.calender.exception.custom.InvalidDateException;
-import com.dangbun.domain.calender.exception.custom.InvalidRoleException;
+
 import com.dangbun.domain.calender.exception.custom.NoPhotoException;
 import com.dangbun.domain.checklist.entity.Checklist;
 import com.dangbun.domain.checklist.repository.ChecklistRepository;
@@ -44,9 +44,10 @@ public class CalenderService {
     private final ChecklistService checklistService;
 
     @Transactional(readOnly = true)
-    public GetChecklistsResponse getChecklists(Long placeId, LocalDate date) {
+    public GetChecklistsResponse getChecklists(LocalDate date) {
 
         Member me = MemberContext.get();
+        Long placeId = me.getPlace().getPlaceId();
 
         if (date.isAfter(LocalDate.now())) {
             throw new InvalidDateException(FUTURE_DATE_NOT_ALLOWED);
@@ -76,8 +77,9 @@ public class CalenderService {
 
 
     @Transactional(readOnly = true)
-    public GetProgressBarsResponse getProgressBars(Long placeId, int year, int month) {
+    public GetProgressBarsResponse getProgressBars(int year, int month) {
         Member me = MemberContext.get();
+        Long placeId = me.getPlace().getPlaceId();
         YearMonth current = YearMonth.of(year, month);
         LocalDateTime start = current.minusMonths(1).atDay(1).atStartOfDay();
         LocalDateTime end = current.plusMonths(1).atDay(1).atStartOfDay();
@@ -117,11 +119,8 @@ public class CalenderService {
         }
     }
 
-    public PatchUpdateChecklistToCompleteResponse finishChecklist(Long placeId, Long checklistId) {
+    public PatchUpdateChecklistToCompleteResponse finishChecklist(Long checklistId) {
         Member me = MemberContext.get();
-        if (me.getRole().equals(MemberRole.MEMBER)) {
-            throw new InvalidRoleException(INVALID_ROLE);
-        }
 
         Checklist checklist = checklistRepository.findById(checklistId)
                 .orElseThrow();
@@ -131,7 +130,7 @@ public class CalenderService {
         return PatchUpdateChecklistToCompleteResponse.of(me.getName(), LocalTime.now());
     }
 
-    public GetImageUrlResponse getPhotoUrl(Long placeId, Long checklistId) {
+    public GetImageUrlResponse getPhotoUrl(Long checklistId) {
         Checklist checklist = checklistRepository.findWithCleaningById(checklistId).orElseThrow();
 
         if (!checklist.getCleaning().getNeedPhoto()) {
@@ -142,7 +141,7 @@ public class CalenderService {
         return GetImageUrlResponse.of(imageUrl);
     }
 
-    public GetCleaningInfoResponse getCleaningInfo(Long placeId, Long checklistId) {
+    public GetCleaningInfoResponse getCleaningInfo( Long checklistId) {
         Checklist checklist = checklistRepository.findWithCleaningAndDutyById(checklistId).orElseThrow();
 
         Cleaning cleaning = checklist.getCleaning();
@@ -180,10 +179,6 @@ public class CalenderService {
 
     public void deleteChecklist(Long checklistId) {
         Member me = MemberContext.get();
-
-        if(me.getRole().equals(MemberRole.MEMBER)){
-            throw new InvalidRoleException(INVALID_ROLE);
-        }
 
         checklistService.deleteChecklist(checklistId);
     }

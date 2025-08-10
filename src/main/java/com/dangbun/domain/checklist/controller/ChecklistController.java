@@ -1,6 +1,7 @@
 package com.dangbun.domain.checklist.controller;
 
-import com.dangbun.domain.checklist.CheckChecklistMembership;
+import com.dangbun.domain.member.response.status.MemberExceptionResponse;
+import com.dangbun.global.aop.CheckChecklistMembership;
 import com.dangbun.domain.checklist.dto.request.PostGetPresignedUrlRequest;
 import com.dangbun.domain.checklist.dto.request.PostSaveUploadResultRequest;
 import com.dangbun.domain.checklist.dto.response.GetImageUrlResponse;
@@ -21,8 +22,8 @@ import org.springframework.web.bind.annotation.*;
 
 @RequiredArgsConstructor
 @RestController
-@CheckPlaceMembership(placeIdParam = "placeId")
-@CheckChecklistMembership(checklistIdParam = "checklistId")
+@CheckPlaceMembership()
+@CheckChecklistMembership()
 @Tag(name = "Checklist", description = "ChecklistController - 체크리스트 관련 API")
 @RequestMapping("/places/{placeId}/checkLists/{checklistId}")
 public class ChecklistController {
@@ -32,8 +33,8 @@ public class ChecklistController {
 
     @Operation(summary = "체크리스트 완료")
     @DocumentedApiErrors(
-            value = {ChecklistExceptionResponse.class},
-            includes = {"ALREADY_CHECKED"}
+            value = {MemberExceptionResponse.class, ChecklistExceptionResponse.class},
+            includes = {"PLACE_ACCESS_DENIED", "CHECKLIST_ACCESS_DENIED","ALREADY_CHECKED"}
     )
     @PostMapping("/actions/complete")
     public ResponseEntity<BaseResponse<PostCompleteChecklistResponse>> completeChecklist(@PathVariable("placeId") Long placeId,
@@ -44,8 +45,8 @@ public class ChecklistController {
 
     @Operation(summary = "체크리스트 해제")
     @DocumentedApiErrors(
-            value = {ChecklistExceptionResponse.class},
-            includes = {"ALREADY_UNCHECKED"}
+            value = {MemberExceptionResponse.class,ChecklistExceptionResponse.class},
+            includes = {"PLACE_ACCESS_DENIED", "CHECKLIST_ACCESS_DENIED","ALREADY_UNCHECKED"}
     )
     @PostMapping("/actions/incomplete")
     public ResponseEntity<BaseResponse<PostIncompleteChecklistResponse>> incompleteChecklist(@PathVariable("placeId") Long placeId,
@@ -55,6 +56,10 @@ public class ChecklistController {
 
     @Operation(summary = "이미지 등록 url 생성", description = "s3 이미지 업로드 url을 획득합니다.")
     @PostMapping("/photos/upload-url")
+    @DocumentedApiErrors(
+            value = {MemberExceptionResponse.class, ChecklistExceptionResponse.class},
+            includes = {"PLACE_ACCESS_DENIED", "CHECKLIST_ACCESS_DENIED"}
+    )
     public ResponseEntity<BaseResponse<PostGetPresignedUrlResponse>> getPresignedUrl(@PathVariable("placeId") Long placeId,
                                                                                      @PathVariable("checklistId") Long checklistId,
                                                                                      @RequestBody PostGetPresignedUrlRequest request) {
@@ -64,8 +69,8 @@ public class ChecklistController {
 
     @Operation(summary = "이미지 등록 성공", description = "FE에서 이미지 업로드를 완료 후 BE에 알리는 용도")
     @DocumentedApiErrors(
-            value = {ChecklistExceptionResponse.class},
-            includes = {"INVALID_S3_KEY"}
+            value = {MemberExceptionResponse.class, ChecklistExceptionResponse.class},
+            includes = {"PLACE_ACCESS_DENIED", "CHECKLIST_ACCESS_DENIED", "INVALID_S3_KEY"}
     )
     @PostMapping("/photos/complete")
     public ResponseEntity<?> saveUploadResult(@PathVariable("placeId") Long placeId,
@@ -77,8 +82,8 @@ public class ChecklistController {
 
     @Operation(summary = "이미지 확인 url 요청", description = "이미지 확인을 위한 url을 요청합니다.")
     @DocumentedApiErrors(
-            value = {CleaningImageExceptionResponse.class},
-            includes = {"NO_SUCH_IMAGE"}
+            value = {MemberExceptionResponse.class, CleaningImageExceptionResponse.class},
+            includes = {"PLACE_ACCESS_DENIED", "CHECKLIST_ACCESS_DENIED", "NO_SUCH_IMAGE"}
     )
     @GetMapping("/photos")
     public ResponseEntity<BaseResponse<GetImageUrlResponse>> getImageUrl(@PathVariable("placeId") Long placeId,

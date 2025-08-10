@@ -1,5 +1,6 @@
 package com.dangbun.domain.member.controller;
 
+import com.dangbun.global.aop.CheckManagerAuthority;
 import com.dangbun.global.aop.CheckPlaceMembership;
 import com.dangbun.domain.member.dto.request.DeleteMemberRequest;
 import com.dangbun.domain.member.dto.request.DeleteSelfFromPlaceRequest;
@@ -18,7 +19,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RequiredArgsConstructor
 @Validated
-@CheckPlaceMembership(placeIdParam = "placeId")
+@CheckPlaceMembership()
 @Tag(name = "Member", description = "MemberController - 맴버 관련 API")
 @RequestMapping("/places/{placeId}/members")
 @RestController
@@ -41,9 +42,10 @@ public class MemberController {
     @Operation(summary = "대기 맴버 목록 조회", description = "현재 플레이스 참가를 대기하고 있는 맴버들을 조회합니다.(매니저용)")
     @DocumentedApiErrors(
             value = MemberExceptionResponse.class,
-            includes = {"PLACE_ACCESS_DENIED","INVALID_ROLE"}
+            includes = {"PLACE_ACCESS_DENIED","INVALID_ROLE", "MEMBERSHIP_UNAUTHORIZED"}
     )
     @GetMapping("/waiting")
+    @CheckManagerAuthority
     public ResponseEntity<BaseResponse<GetWaitingMembersResponse>> getWaitingMembers(@PathVariable("placeId") Long placeId) {
         return ResponseEntity.ok(BaseResponse.ok(memberService.getWaitingMembers()));
     }
@@ -51,9 +53,10 @@ public class MemberController {
     @Operation(summary = "맴버 수락", description = "대기중인 맴버의 참가를 수락합니다.(매니저용)")
     @DocumentedApiErrors(
             value = MemberExceptionResponse.class,
-            includes = {"PLACE_ACCESS_DENIED","INVALID_ROLE","NO_SUCH_MEMBER"}
+            includes = {"PLACE_ACCESS_DENIED","INVALID_ROLE","MEMBERSHIP_UNAUTHORIZED", "MEMBER_NOT_FOUND"}
     )
     @PostMapping("/{memberId}/accept")
+    @CheckManagerAuthority
     public ResponseEntity<?> registerMember(@PathVariable("placeId") Long placeId,
                                             @PathVariable("memberId") Long memberId) {
         memberService.registerMember(memberId);
@@ -64,9 +67,10 @@ public class MemberController {
     @Operation(summary = "맴버 거절", description = "대기중인 맴버의 참가를 거절합니다.(매니저용)")
     @DocumentedApiErrors(
             value = MemberExceptionResponse.class,
-            includes = {"PLACE_ACCESS_DENIED","INVALID_ROLE","NO_SUCH_MEMBER"}
+            includes = {"PLACE_ACCESS_DENIED","INVALID_ROLE","MEMBERSHIP_UNAUTHORIZED", "MEMBER_NOT_FOUND"}
     )
     @DeleteMapping("/waiting/{memberId}")
+    @CheckManagerAuthority
     public ResponseEntity<?> removeWaitingMember(@PathVariable("placeId") Long placeId,
                                                  @PathVariable("memberId") Long memberId) {
 
@@ -76,8 +80,8 @@ public class MemberController {
 
     @Operation(summary = "맴버 정보 조회", description = "한 맴버에 대한 정보를 조회합니다.")
     @DocumentedApiErrors(
-            value = {},
-            includes = {"PLACE_ACCESS_DENIED","NO_SUCH_MEMBER"}
+            value = {MemberExceptionResponse.class},
+            includes = {"PLACE_ACCESS_DENIED","MEMBER_NOT_FOUND"}
     )
     @GetMapping("/{memberId}")
     public ResponseEntity<BaseResponse<GetMemberResponse>> getMember(@PathVariable("placeId") Long placeId,
@@ -86,7 +90,7 @@ public class MemberController {
         return ResponseEntity.ok(BaseResponse.ok(memberService.getMember(memberId)));
     }
 
-    @Operation(summary = "플레이스 나가기", description = "플레이스에서 나갑니다")
+    @Operation(summary = "플레이스 나가기", description = "플레이스에서 나갑니다. (멤버용)")
     @DocumentedApiErrors(
             value = MemberExceptionResponse.class,
             includes = {"PLACE_ACCESS_DENIED","PLACE_NAME_NOT_MATCHED", "INVALID_ROLE"}
@@ -98,12 +102,13 @@ public class MemberController {
         return ResponseEntity.ok(BaseResponse.ok(null));
     }
 
-    @Operation(summary = "맴버 추방", description = "현재 플레이스에 속해있는 맴버를 추방합니다")
+    @Operation(summary = "맴버 추방", description = "현재 플레이스에 속해있는 맴버를 추방합니다. (매니저용)")
     @DocumentedApiErrors(
             value = MemberExceptionResponse.class,
-            includes = {"PLACE_ACCESS_DENIED","INVALID_ROLE", "NO_SUCH_USER", "NAME_NOT_MATCHED"}
+            includes = {"PLACE_ACCESS_DENIED","INVALID_ROLE", "MEMBERSHIP_UNAUTHORIZED", "NO_SUCH_USER", "NAME_NOT_MATCHED"}
     )
     @DeleteMapping("/{memberId}")
+    @CheckManagerAuthority
     public ResponseEntity<?> removeMember(@PathVariable("placeId") Long placeId,
                                           @PathVariable("memberId") Long memberId,
                                           @RequestBody DeleteMemberRequest request) {
@@ -111,12 +116,13 @@ public class MemberController {
         return ResponseEntity.ok(BaseResponse.ok(null));
     }
 
-    @Operation(summary = "당번에 멤버 추가 - 플레이스에 속한 멤버 검색", description = "해당 플레이스에서 이름이 정확히 일치하는 멤버를 검색합니다.")
+    @Operation(summary = "당번에 멤버 추가 - 플레이스에 속한 멤버 검색", description = "해당 플레이스에서 이름이 정확히 일치하는 멤버를 검색합니다. (매니저용)")
     @DocumentedApiErrors(
             value = MemberExceptionResponse.class,
-            includes = {"PLACE_ACCESS_DENIED","INVALID_ROLE"}
+            includes = {"PLACE_ACCESS_DENIED","INVALID_ROLE", "MEMBERSHIP_UNAUTHORIZED"}
     )
     @GetMapping("/search")
+    @CheckManagerAuthority
     public ResponseEntity<BaseResponse<GetMemberSearchResponse>> searchMemberInPlace(@PathVariable("placeId") Long placeId,
                                                                                      @RequestParam String name) {
         return ResponseEntity.ok(BaseResponse.ok(memberService.searchByNameInPlace(placeId, name)));
