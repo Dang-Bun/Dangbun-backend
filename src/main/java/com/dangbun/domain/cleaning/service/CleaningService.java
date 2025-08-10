@@ -21,7 +21,7 @@ import com.dangbun.domain.member.repository.MemberRepository;
 import com.dangbun.domain.membercleaning.entity.MemberCleaning;
 import com.dangbun.domain.membercleaning.repository.MemberCleaningRepository;
 import com.dangbun.domain.place.entity.Place;
-import com.dangbun.domain.place.repository.PlaceRepository;
+import com.dangbun.global.context.DutyContext;
 import com.dangbun.global.context.MemberContext;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -58,14 +58,13 @@ public class CleaningService {
     }
 
     @Transactional(readOnly = true)
-    public List<GetCleaningDetailListResponse> getCleaningDetailList(Long dutyId, List<Long> memberIds) {
+    public List<GetCleaningDetailListResponse> getCleaningDetailList(List<Long> memberIds) {
 
-        Duty duty = dutyRepository.findById(dutyId)
-                .orElseThrow(() -> new DutyNotFoundException(DUTY_NOT_FOUND));
+        Duty duty = DutyContext.get();
 
         List<Cleaning> cleanings = (memberIds == null || memberIds.isEmpty())
                 ? cleaningRepository.findAllByDuty(duty)
-                : cleaningRepository.findByDutyIdAndMemberIdsWithMembersJoin(dutyId, memberIds);
+                : cleaningRepository.findByDutyIdAndMemberIdsWithMembersJoin(duty.getDutyId(), memberIds);
 
         return cleanings.stream()
                 .map(cleaning -> {

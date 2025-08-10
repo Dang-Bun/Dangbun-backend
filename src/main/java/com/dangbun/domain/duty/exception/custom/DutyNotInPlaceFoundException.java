@@ -4,10 +4,10 @@ import com.dangbun.global.response.status.ResponseStatus;
 import lombok.Getter;
 
 @Getter
-public class DutyNotFoundException extends RuntimeException {
+public class DutyNotInPlaceFoundException extends RuntimeException {
     private final ResponseStatus exceptionStatus;
 
-    public DutyNotFoundException(ResponseStatus exceptionStatus) {
+    public DutyNotInPlaceFoundException(ResponseStatus exceptionStatus) {
         super(exceptionStatus.getMessage());
         this.exceptionStatus = exceptionStatus;
     }

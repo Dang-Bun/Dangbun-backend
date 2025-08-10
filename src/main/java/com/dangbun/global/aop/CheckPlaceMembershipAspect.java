@@ -31,16 +31,19 @@ import static com.dangbun.global.response.status.BaseExceptionResponse.*;
 @RequiredArgsConstructor
 public class CheckPlaceMembershipAspect {
     private final MemberRepository memberRepository;
+    private final SecuritySupport securitySupport;
+    private final RequestParamResolver requestParamResolver;
+    private final AnnotationResolver annotationResolver;
 
     @Around("@within(com.dangbun.global.aop.CheckPlaceMembership) || @annotation(com.dangbun.global.aop.CheckPlaceMembership)")
     public Object validate(ProceedingJoinPoint joinPoint) throws  Throwable {
 
-        CustomUserDetails userDetails = SecuritySupport.currentUserOrThrow();
+        CustomUserDetails userDetails = securitySupport.currentUserOrThrow();
 
-        CheckPlaceMembership checkPlaceMembership = AnnotationResolver.resolve(joinPoint, CheckPlaceMembership.class);
+        CheckPlaceMembership checkPlaceMembership = annotationResolver.resolve(joinPoint, CheckPlaceMembership.class);
 
         String placeIdParamName = checkPlaceMembership.placeIdParam();
-        Long placeId = RequestParamResolver.resolveLong(joinPoint, placeIdParamName);
+        Long placeId = requestParamResolver.resolveLong(joinPoint, placeIdParamName);
         if (placeId == null) {
             throw new RequiredParamMissingException(REQUIRED_PARAM_MISSING);
         }

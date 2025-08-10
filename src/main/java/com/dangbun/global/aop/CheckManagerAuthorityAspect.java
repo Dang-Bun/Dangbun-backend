@@ -13,7 +13,7 @@ import static com.dangbun.domain.member.response.status.MemberExceptionResponse.
 
 
 @Aspect
-@Order(2)
+@Order(3)
 @Component
 public class CheckManagerAuthorityAspect {
 

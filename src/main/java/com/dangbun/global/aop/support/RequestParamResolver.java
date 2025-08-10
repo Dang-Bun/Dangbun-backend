@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.Signature;
 import org.aspectj.lang.reflect.MethodSignature;
+import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -13,12 +14,11 @@ import org.springframework.web.servlet.HandlerMapping;
 
 import java.util.Map;
 
-
+@Component
 public final class RequestParamResolver {
 
-    private RequestParamResolver() { }
 
-    public static Long resolveLong(JoinPoint jp, String name) {
+    public Long resolveLong(JoinPoint jp, String name) {
         // 1) PathVariable
         RequestAttributes ra = RequestContextHolder.getRequestAttributes();
         if (ra instanceof ServletRequestAttributes sra) {

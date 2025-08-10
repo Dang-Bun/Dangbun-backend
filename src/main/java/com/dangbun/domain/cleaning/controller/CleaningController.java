@@ -4,6 +4,7 @@ import com.dangbun.domain.cleaning.dto.request.*;
 import com.dangbun.domain.cleaning.dto.response.*;
 import com.dangbun.domain.cleaning.response.status.CleaningExceptionResponse;
 import com.dangbun.domain.cleaning.service.CleaningService;
+import com.dangbun.global.aop.CheckDutyInPlace;
 import com.dangbun.global.aop.CheckManagerAuthority;
 import com.dangbun.global.aop.CheckPlaceMembership;
 import com.dangbun.global.docs.DocumentedApiErrors;
@@ -46,11 +47,12 @@ public class CleaningController {
             value = {CleaningExceptionResponse.class},
             includes = {"DUTY_NOT_FOUND"}
     )
+    @CheckDutyInPlace
     public ResponseEntity<BaseResponse<List<GetCleaningDetailListResponse>>> getCleaningDetailList(
             @PathVariable Long placeId,
             @PathVariable Long dutyId,
             @RequestParam List<Long> memberIds) {
-        return ResponseEntity.ok(BaseResponse.ok(cleaningService.getCleaningDetailList(dutyId, memberIds)));
+        return ResponseEntity.ok(BaseResponse.ok(cleaningService.getCleaningDetailList(memberIds)));
     }
 
     @Operation(summary = "당번별 청소 생성", description = "입력한 정보들을 바탕으로 새로운 청소를 생성합니다. (매니저용)")

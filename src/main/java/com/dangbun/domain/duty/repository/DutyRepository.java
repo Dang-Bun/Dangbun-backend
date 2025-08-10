@@ -6,6 +6,7 @@ import io.lettuce.core.dynamic.annotation.Param;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
+import java.lang.ScopedValue;
 import java.util.List;
 import java.util.Optional;
 
@@ -34,4 +35,6 @@ public interface DutyRepository extends JpaRepository<Duty, Long> {
     GROUP BY d.dutyId, d.name
 """)
     List<DutyProgressDto> findDutyProgressByPlaceToday(@Param("placeId") Long placeId);
+
+    Optional<Duty> findByDutyIdAndPlace_PlaceId(Long dutyId, Long placeId);
 }

@@ -1,6 +1,7 @@
 package com.dangbun.domain.duty.service;
 
 import com.dangbun.domain.cleaning.entity.Cleaning;
+import com.dangbun.domain.cleaning.exception.custom.DutyNotFoundException;
 import com.dangbun.domain.cleaning.repository.CleaningRepository;
 import com.dangbun.domain.cleaning.service.CleaningService;
 import com.dangbun.domain.cleaningdate.repository.CleaningDateRepository;
@@ -81,8 +82,12 @@ public class DutyService {
     }
 
 
-    public void deleteDuty() {
-        Duty duty = DutyContext.get();
+    public void deleteDuty(Long dutyId) {
+        //Duty duty = DutyContext.get();
+
+        Duty duty = dutyRepository.findById(dutyId)
+                .orElseThrow(() -> new DutyNotInPlaceFoundException(DUTY_NOT_IN_PLACE));
+
         List<Cleaning> cleanings = cleaningRepository.findAllByDuty(duty);
         cleaningDateRepository.deleteAllByCleaningIn(cleanings);
 

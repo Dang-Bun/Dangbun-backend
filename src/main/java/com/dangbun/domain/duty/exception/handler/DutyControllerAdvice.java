@@ -1,5 +1,6 @@
 package com.dangbun.domain.duty.exception.handler;
 
+import com.dangbun.domain.cleaning.exception.custom.DutyNotFoundException;
 import com.dangbun.domain.duty.exception.custom.*;
 import com.dangbun.global.response.BaseErrorResponse;
 import org.springframework.http.HttpStatus;
@@ -24,10 +25,10 @@ public class DutyControllerAdvice {
         return new BaseErrorResponse(PLACE_NOT_FOUND);
     }
 
-    @ExceptionHandler(DutyNotFoundException.class)
+    @ExceptionHandler(DutyNotInPlaceFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public BaseErrorResponse handleDutyNotFoundException(DutyNotFoundException e) {
-        return new BaseErrorResponse(DUTY_NOT_FOUND);
+    public BaseErrorResponse handleDutyNotFoundException(DutyNotInPlaceFoundException e) {
+        return new BaseErrorResponse(DUTY_NOT_IN_PLACE);
     }
 
     @ExceptionHandler(MemberNotFoundException.class)
