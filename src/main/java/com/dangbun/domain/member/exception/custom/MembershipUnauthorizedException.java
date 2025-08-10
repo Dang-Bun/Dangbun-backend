@@ -4,10 +4,10 @@ import com.dangbun.global.response.status.ResponseStatus;
 import lombok.Getter;
 
 @Getter
-public class PlaceMembershipUnauthorizedException extends RuntimeException {
+public class MembershipUnauthorizedException extends RuntimeException {
     private final ResponseStatus exceptionStatus;
 
-    public PlaceMembershipUnauthorizedException(ResponseStatus status) {
+    public MembershipUnauthorizedException(ResponseStatus status) {
         super(status.getMessage());
         this.exceptionStatus = status;
     }

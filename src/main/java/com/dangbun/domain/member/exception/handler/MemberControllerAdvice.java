@@ -24,7 +24,7 @@ public class MemberControllerAdvice {
     }
 
     @ExceptionHandler(PlaceAccessDeniedException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseStatus(HttpStatus.FORBIDDEN)
     public BaseErrorResponse handlePlaceAccessDeniedException(PlaceAccessDeniedException e) {
         return new BaseErrorResponse(e.getExceptionStatus());
     }
@@ -35,9 +35,15 @@ public class MemberControllerAdvice {
         return new BaseErrorResponse(e.getExceptionStatus());
     }
 
-    @ExceptionHandler(PlaceMembershipUnauthorizedException.class)
+    @ExceptionHandler(MembershipUnauthorizedException.class)
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
-    public BaseErrorResponse handleNameNotMatched(PlaceMembershipUnauthorizedException e) {
+    public BaseErrorResponse handleNameNotMatched(MembershipUnauthorizedException e) {
+        return new BaseErrorResponse(e.getExceptionStatus());
+    }
+
+    @ExceptionHandler(DutyAccessDeniedException.class)
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    public BaseErrorResponse handleDutyAccessDeniedException(DutyAccessDeniedException e) {
         return new BaseErrorResponse(e.getExceptionStatus());
     }
 }

@@ -4,7 +4,6 @@ import com.dangbun.domain.member.entity.Member;
 import com.dangbun.domain.member.entity.MemberRole;
 import com.dangbun.domain.member.exception.custom.*;
 import com.dangbun.global.context.MemberContext;
-import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
 import org.springframework.core.annotation.Order;
@@ -22,7 +21,7 @@ public class CheckManagerAuthorityAspect {
     public void checkManagerAuthority() {
         Member me = MemberContext.get();
         if (me == null) {
-            throw new PlaceMembershipUnauthorizedException(PLACE_MEMBERSHIP_UNAUTHORIZED);
+            throw new MembershipUnauthorizedException(MEMBERSHIP_UNAUTHORIZED);
         }
 
         MemberRole role = me.getRole();
