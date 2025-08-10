@@ -114,7 +114,7 @@ public class PlaceController {
     @Operation(summary = "플레이스 삭제", description = "플레이스를 삭제합니다(매니저)")
     @DocumentedApiErrors(
             value = {MemberExceptionResponse.class},
-            includes = {"PLACE_ACCESS_DENIED", "MEMBERSHIP_UNAUTHORIZED", "INVALID_ROLE" "INVALID_NAME"}
+            includes = {"PLACE_ACCESS_DENIED", "MEMBERSHIP_UNAUTHORIZED", "INVALID_ROLE", "INVALID_NAME"}
     )
     @DeleteMapping("/{placeId}")
     @CheckPlaceMembership()
