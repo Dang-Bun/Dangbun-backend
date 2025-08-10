@@ -169,6 +169,6 @@ public class MemberService {
 
     private Member getMemberByMemberIdAndPlaceId(Long memberId, Long placeId) {
         return memberRepository.findByMemberIdAndPlace_PlaceId(memberId, placeId)
-                .orElseThrow(() -> new MemberNotFoundException(NO_SUCH_MEMBER));
+                .orElseThrow(() -> new MemberNotFoundException(MEMBER_NOT_FOUND));
     }
 }

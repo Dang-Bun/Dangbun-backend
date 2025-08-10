@@ -9,7 +9,6 @@ public enum CleaningExceptionResponse implements ResponseStatus {
     INVALID_DATE_FORMAT(110001, "유효하지 않는 날짜 형식입니다."),
     CLEANING_ALREADY_EXISTS(110002, "이미 존재하는 청소입니다."),
     CLEANING_NOT_FOUND(110003, "해당 청소가 존재하지 않습니다."),
-    PLACE_NOT_FOUND(110004, "해당 플레이스가 존재하지 않습니다."),
 
     ;
 

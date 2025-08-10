@@ -8,8 +8,6 @@ import com.dangbun.domain.duty.repository.DutyRepository;
 import com.dangbun.domain.duty.service.DutyService;
 import com.dangbun.domain.member.entity.Member;
 import com.dangbun.domain.member.entity.MemberRole;
-import com.dangbun.domain.member.exception.custom.InvalidRoleException;
-import com.dangbun.domain.member.exception.custom.MemberNotFoundException;
 import com.dangbun.domain.member.repository.MemberRepository;
 import com.dangbun.domain.member.service.MemberService;
 import com.dangbun.domain.membercleaning.entity.MemberCleaning;
@@ -27,7 +25,7 @@ import com.dangbun.domain.place.entity.PlaceCategory;
 import com.dangbun.domain.place.exception.custom.*;
 import com.dangbun.domain.place.repository.PlaceRepository;
 import com.dangbun.domain.user.entity.User;
-import com.dangbun.domain.user.exception.custom.UserNotFoundException;
+import com.dangbun.domain.user.exception.custom.NoSuchUserException;
 import com.dangbun.domain.user.repository.UserRepository;
 import com.dangbun.global.context.MemberContext;
 import lombok.RequiredArgsConstructor;
@@ -40,8 +38,6 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.dangbun.domain.member.response.status.MemberExceptionResponse.INVALID_ROLE;
-import static com.dangbun.domain.member.response.status.MemberExceptionResponse.NO_SUCH_MEMBER;
 import static com.dangbun.domain.place.dto.response.GetPlaceListResponse.PlaceDto;
 import static com.dangbun.domain.place.response.status.PlaceExceptionResponse.*;
 import static com.dangbun.domain.user.response.status.UserExceptionResponse.NO_SUCH_USER;
@@ -125,7 +121,7 @@ public class PlaceService {
                 .information(info)
                 .role(MemberRole.MANAGER)
                 .status(true)
-                .user(userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(NO_SUCH_USER)))
+                .user(userRepository.findById(userId).orElseThrow(() -> new NoSuchUserException(NO_SUCH_USER)))
                 .build();
 
         memberRepository.save(member);
@@ -147,7 +143,7 @@ public class PlaceService {
     public PostCheckInviteCodeResponse checkInviteCode(User user, PostCheckInviteCodeRequest request) {
         Place place = placeRepository.findByInviteCode(request.inviteCode());
         if (place == null) {
-            throw new InvalidInviteCodeException(NO_SUCH_INVITE_CODE);
+            throw new InvalidInviteCodeException(INVALID_INVITE_CODE);
         }
         if (memberRepository.findByPlaceAndUser(place, user).isPresent()) {
             throw new AlreadyInvitedException(ALREADY_INVITED);
@@ -172,7 +168,7 @@ public class PlaceService {
 
 
         Member tempMember = memberRepository.findFirstWithPlaceByInviteCode(request.inviteCode())
-                .orElseThrow(() -> new InvalidInviteCodeException(NO_SUCH_INVITE_CODE));
+                .orElseThrow(() -> new InvalidInviteCodeException(INVALID_INVITE_CODE));
 
         Place place = tempMember.getPlace();
 

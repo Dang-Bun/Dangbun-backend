@@ -8,8 +8,6 @@ import java.util.Optional;
 
 public interface CleaningImageRepository extends JpaRepository<CleaningImage, Long> {
 
-    CleaningImage getByChecklist(Checklist checklist);
-
     Optional<CleaningImage> getByChecklist_ChecklistId(Long checklistChecklistId);
 
     void deleteByChecklist_ChecklistId(Long checklistChecklistId);

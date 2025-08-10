@@ -19,12 +19,6 @@ public class DutyControllerAdvice {
         return new BaseErrorResponse(DUTY_ALREADY_EXISTS);
     }
 
-    @ExceptionHandler(PlaceNotFoundException.class)
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    public BaseErrorResponse handlePlaceNotFoundException(PlaceNotFoundException e) {
-        return new BaseErrorResponse(PLACE_NOT_FOUND);
-    }
-
     @ExceptionHandler(DutyNotInPlaceFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public BaseErrorResponse handleDutyNotFoundException(DutyNotInPlaceFoundException e) {

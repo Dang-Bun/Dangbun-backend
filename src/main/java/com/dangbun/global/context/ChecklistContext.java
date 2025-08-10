@@ -1,4 +1,4 @@
-package com.dangbun.domain.checklist;
+package com.dangbun.global.context;
 
 import com.dangbun.domain.checklist.entity.Checklist;
 

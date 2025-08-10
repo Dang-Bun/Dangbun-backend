@@ -1,5 +1,6 @@
 package com.dangbun.domain.notificationreceiver.controller;
 
+import com.dangbun.domain.member.response.status.MemberExceptionResponse;
 import com.dangbun.domain.notification.response.status.NotificationExceptionResponse;
 import com.dangbun.domain.notificationreceiver.dto.response.GetNotificationReceivedListResponse;
 import com.dangbun.domain.notificationreceiver.service.NotificationReceiverService;
@@ -32,8 +33,8 @@ public class NotificationReceiverController {
     @Operation(summary = "받은 알림 목록 조회 (무한스크롤)", description = "현재 로그인한 멤버가 받은 알림들을 무한스크롤 방식으로 조회합니다.")
     @GetMapping("/places/{placeId}/notifications/received")
     @DocumentedApiErrors(
-            value = {NotificationExceptionResponse.class},
-            includes = {""}
+            value = {MemberExceptionResponse.class},
+            includes = {"PLACE_ACCESS_DENIED"}
     )
     public ResponseEntity<GetNotificationReceivedListResponse> getReceivedNotifications(
             @PathVariable Long placeId,

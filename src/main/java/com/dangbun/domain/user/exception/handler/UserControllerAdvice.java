@@ -5,8 +5,6 @@ import com.dangbun.global.response.BaseErrorResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -41,10 +39,10 @@ public class UserControllerAdvice {
         return new BaseErrorResponse(INVALID_EMAIL);
     }
 
-    @ExceptionHandler(UserNotFoundException.class)
-    public BaseErrorResponse handleUserNotFound(UserNotFoundException e){
+    @ExceptionHandler(NoSuchUserException.class)
+    public BaseErrorResponse handleUserNotFound(NoSuchUserException e){
         log.error("[UserNotFoundException]",e);
-        return new BaseErrorResponse(USER_NOT_FOUND);
+        return new BaseErrorResponse(NO_SUCH_USER);
     }
 
     @ExceptionHandler(DeleteMemberException.class)
