@@ -89,7 +89,7 @@ public class DutyController {
     }
 
     @Operation(summary = "당번 정보 - 멤버 이름 목록 조회", description = "당번의 멤버 이름 목록을 조회합니다.")
-    @GetMapping("/{dutyId}/member-names")
+    @GetMapping("/{dutyId}/members")
     @DocumentedApiErrors(
             value = {DutyExceptionResponse.class},
             includes = {"DUTY_NOT_FOUND"}
@@ -102,7 +102,7 @@ public class DutyController {
     }
 
     @Operation(summary = "당번 정보 - 청소 이름 목록 조회", description = "당번의 청소 이름 목록을 조회합니다.")
-    @GetMapping("/{dutyId}/cleaning-names")
+    @GetMapping("/{dutyId}/cleanings")
     @DocumentedApiErrors(
             value = {DutyExceptionResponse.class},
             includes = {"DUTY_NOT_FOUND"}
