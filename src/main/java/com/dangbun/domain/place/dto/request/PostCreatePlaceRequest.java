@@ -16,7 +16,7 @@ public record PostCreatePlaceRequest(
         @NotBlank
         PlaceCategory category,
 
-        @Schema(description = "자유입력 세부 카테고리 (ETC일 때 필수)", example = "서점")
+        @Schema(description = "자유입력 세부 카테고리 (ETC일 때 필수)", example = "")
         String categoryName,
 
         @Schema(description = "매니저 이름", example = "홍길동")
