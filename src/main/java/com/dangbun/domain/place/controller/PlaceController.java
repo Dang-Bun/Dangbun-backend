@@ -1,10 +1,7 @@
 package com.dangbun.domain.place.controller;
 
 import com.dangbun.domain.member.response.status.MemberExceptionResponse;
-import com.dangbun.domain.place.dto.request.PatchUpdateTimeRequest;
-import com.dangbun.domain.place.dto.request.PostCheckInviteCodeRequest;
-import com.dangbun.domain.place.dto.request.PostCreatePlaceRequest;
-import com.dangbun.domain.place.dto.request.PostRegisterPlaceRequest;
+import com.dangbun.domain.place.dto.request.*;
 import com.dangbun.domain.place.dto.response.*;
 import com.dangbun.domain.place.response.status.PlaceExceptionResponse;
 import com.dangbun.domain.place.service.PlaceService;
@@ -117,13 +114,14 @@ public class PlaceController {
     @Operation(summary = "플레이스 삭제", description = "플레이스를 삭제합니다(매니저)")
     @DocumentedApiErrors(
             value = {MemberExceptionResponse.class},
-            includes = {"PLACE_ACCESS_DENIED", "MEMBERSHIP_UNAUTHORIZED", "INVALID_ROLE" }
+            includes = {"PLACE_ACCESS_DENIED", "MEMBERSHIP_UNAUTHORIZED", "INVALID_ROLE" "INVALID_NAME"}
     )
     @DeleteMapping("/{placeId}")
     @CheckPlaceMembership()
     @CheckManagerAuthority
-    public ResponseEntity<BaseResponse<?>> deletePlace(@PathVariable Long placeId) {
-        placeService.deletePlace();
+    public ResponseEntity<BaseResponse<?>> deletePlace(@PathVariable Long placeId
+                                                       @RequestBody DeletePlaceRequest request) {
+        placeService.deletePlace(request);
         return ResponseEntity.ok(BaseResponse.ok(null));
     }
 

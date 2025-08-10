@@ -30,6 +30,9 @@ public record GetPlaceResponse(
         @Schema(description = "플레이스 카테고리(CAFE, RESTAURANT, THEATER, DORMITORY, BUILDING, OFFICE, SCHOOL, GYM, ETC)", example = "CAFE")
         PlaceCategory category,
 
+        @Schema(description = "카테고리 이름",example = "카페")
+        String categoryName,
+
         @Schema(description = "청소 마감 시간", example = "23:59")
         @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm")
         LocalTime endTime,
@@ -68,6 +71,7 @@ public record GetPlaceResponse(
                 placeId,
                 placeName,
                 place.getCategory(),
+                place.getCategoryName(),
                 endTime,
                 duties);
     }

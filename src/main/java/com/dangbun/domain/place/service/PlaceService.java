@@ -15,10 +15,7 @@ import com.dangbun.domain.membercleaning.repository.MemberCleaningRepository;
 import com.dangbun.domain.memberduty.entity.MemberDuty;
 import com.dangbun.domain.memberduty.repository.MemberDutyRepository;
 import com.dangbun.domain.notificationreceiver.repository.NotificationReceiverRepository;
-import com.dangbun.domain.place.dto.request.PatchUpdateTimeRequest;
-import com.dangbun.domain.place.dto.request.PostCheckInviteCodeRequest;
-import com.dangbun.domain.place.dto.request.PostCreatePlaceRequest;
-import com.dangbun.domain.place.dto.request.PostRegisterPlaceRequest;
+import com.dangbun.domain.place.dto.request.*;
 import com.dangbun.domain.place.dto.response.*;
 import com.dangbun.domain.place.entity.Place;
 import com.dangbun.domain.place.entity.PlaceCategory;
@@ -73,7 +70,7 @@ public class PlaceService {
         for (Member member : members) {
             if (!member.getStatus()) {
                 Place place = member.getPlace();
-                placeDtos.add(PlaceDto.of(place.getPlaceId(), place.getName(), null, null, null, null));
+                placeDtos.add(PlaceDto.of(place.getPlaceId(), place.getName(), place.getCategory(), place.getCategoryName(),null,null, null, null));
             } else {
                 Place place = member.getPlace();
 
@@ -93,7 +90,7 @@ public class PlaceService {
                 Integer notifyNumber = notificationReceiverRepository.countUnreadByMemberId(member.getMemberId());
 
 
-                placeDtos.add(PlaceDto.of(place.getPlaceId(), place.getName(), totalCleaning, endCleaning, member.getRole().getDisplayName(), notifyNumber));
+                placeDtos.add(PlaceDto.of(place.getPlaceId(), place.getName(),place.getCategory(),place.getCategoryName(), totalCleaning, endCleaning, member.getRole().getDisplayName(), notifyNumber));
             }
         }
 
@@ -104,14 +101,21 @@ public class PlaceService {
 
 
         String placeName = request.placeName();
-        String category = request.category();
+        PlaceCategory category = request.category();
         String memberName = request.managerName();
+
+        String categoryName = request.categoryName() == null ? null : request.categoryName();
+
+        if(category!=PlaceCategory.ETC) categoryName = category.getDisplayName();
+
         Map<String, String> info = request.information();
 
         Place place = Place.builder()
                 .name(placeName)
-                .category(PlaceCategory.findCategory(category))
+                .category(category)
+                .categoryName(categoryName)
                 .build();
+
 
         Place savedPlace = placeRepository.save(place);
 
@@ -197,7 +201,7 @@ public class PlaceService {
         Long placeId = place.getPlaceId();
 
         if (!member.getStatus()) {
-            return new GetPlaceResponse(member.getMemberId(), placeId, place.getName(), place.getCategory(),null, null);
+            return new GetPlaceResponse(member.getMemberId(), placeId, place.getName(), place.getCategory(),place.getCategoryName(),null, null);
         }
 
         List<MemberDuty> memberDuties = memberDutyRepository.findAllWithMemberAndPlaceByPlaceId(placeId);
@@ -217,12 +221,16 @@ public class PlaceService {
         return GetPlaceResponse.of(member, place, cleaningMap, memberCleanings);
     }
 
-    public void deletePlace() {
+    public void deletePlace(DeletePlaceRequest request) {
         Member runner = MemberContext.get();
 
         Place place = runner.getPlace();
+        if(!place.getName().equals(request.placeName())){
+            throw new InvalidPlaceNameException(INVALID_NAME);
+        }
+  
         List<Duty> duties = dutyRepository.findByPlace_PlaceId(place.getPlaceId());
-
+  
         for (Duty duty : duties) {
             dutyService.deleteDuty(duty.getDutyId());
         }
