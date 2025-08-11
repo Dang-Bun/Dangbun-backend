@@ -250,12 +250,18 @@ public class PlaceService {
         memberRepository.delete(member);
     }
 
-    public void updateTime(PatchUpdateTimeRequest request) {
-        if(request.startTime().isAfter(request.endTime())&& request.isToday()){
+
+    public PatchUpdateTimeResponse updateTime(PatchUpdateTimeRequest request) {
+        boolean computedIsToday = !request.startTime().isAfter(request.endTime());
+
+        if(!Objects.equals(request.isToday(), computedIsToday)){
             throw new InvalidTimeException(INVALID_TIME);
         }
+
         Place place = MemberContext.get().getPlace();
         place.setTime(request.startTime(), request.endTime());
+
+        return PatchUpdateTimeResponse.of(place, computedIsToday);
     }
 
     public GetDutiesProgressResponse getDutiesProgress() {

@@ -138,8 +138,8 @@ public class PlaceController {
     public ResponseEntity<BaseResponse<?>> updateTime(
                                                       @PathVariable Long placeId,
                                                       @RequestBody PatchUpdateTimeRequest request){
-        placeService.updateTime(request);
-        return ResponseEntity.ok(BaseResponse.ok(null));
+
+        return ResponseEntity.ok(BaseResponse.ok(placeService.updateTime(request)));
     }
 
     @Operation(summary = "매니저-전체 진행률", description = "플레이스 내의 모든 당번에 대한 진행률을 보여줍니다.")

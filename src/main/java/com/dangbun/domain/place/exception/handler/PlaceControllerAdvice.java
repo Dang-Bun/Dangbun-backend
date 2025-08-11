@@ -33,7 +33,7 @@ public class PlaceControllerAdvice {
     @ExceptionHandler(InvalidTimeException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public BaseErrorResponse handleInvalidTimeException(InvalidTimeException e) {
-        return new BaseErrorResponse(INVALID_INFORMATION);
+        return new BaseErrorResponse(INVALID_TIME);
     }
 
     @ExceptionHandler(InvalidPlaceNameException.class)
