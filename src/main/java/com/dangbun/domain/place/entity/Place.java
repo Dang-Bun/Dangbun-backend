@@ -45,6 +45,9 @@ public class Place extends BaseEntity {
     @Column(name = "end_time")
     private LocalTime endTime = LocalTime.MAX;
 
+    @Column(name = "is_today")
+    private Boolean isToday = true;
+
     @Builder
     public Place(String name, PlaceCategory category, String categoryName) {
         this.name = name;
