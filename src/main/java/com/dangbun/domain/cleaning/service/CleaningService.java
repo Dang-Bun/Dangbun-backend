@@ -3,6 +3,7 @@ package com.dangbun.domain.cleaning.service;
 import com.dangbun.domain.checklist.entity.Checklist;
 import com.dangbun.domain.checklist.repository.ChecklistRepository;
 import com.dangbun.domain.checklist.service.ChecklistService;
+import com.dangbun.domain.checklist.service.CreateChecklistService;
 import com.dangbun.domain.cleaning.dto.request.PostCleaningCreateRequest;
 import com.dangbun.domain.cleaning.dto.request.PutCleaningUpdateRequest;
 import com.dangbun.domain.cleaning.dto.response.GetCleaningDetailListResponse;
@@ -30,6 +31,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.dangbun.domain.cleaning.entity.CleaningRepeatType.WEEKLY;
 import static com.dangbun.domain.cleaning.response.status.CleaningExceptionResponse.*;
@@ -45,6 +47,7 @@ public class CleaningService {
     private final CleaningDateRepository cleaningDateRepository;
     private final ChecklistService checkListService;
     private final ChecklistRepository checkListRepository;
+    private final CreateChecklistService createChecklistService;
 
 
     public List<GetCleaningListResponse> getCleaningList(List<Long> memberIds) {
@@ -135,7 +138,7 @@ public class CleaningService {
                         .cleaning(cleaning)
                         .build())
                 .toList();
-
+        createChecklistService.createChecklistByDateAndTime(cleaning, cleaningDates, place);
         cleaningDateRepository.saveAll(cleaningDates);
 
         return PostCleaningResponse.of(cleaning.getCleaningId());
@@ -161,7 +164,8 @@ public class CleaningService {
                 request.needPhoto(),
                 request.repeatType(),
                 request.repeatType() == WEEKLY && request.repeatDays() != null
-                        ? String.join(",", request.repeatDays())
+                        ? request.repeatDays().stream()
+                        .map(Enum::name).collect(Collectors.joining(","))
                         : null,
                 duty
         );
@@ -200,7 +204,7 @@ public class CleaningService {
         cleaningDateRepository.deleteAllByCleaning_CleaningId(cleaningId);
 
         List<Checklist> checkLists = checkListRepository.findByCleaning_CleaningId(cleaningId);
-        for(Checklist checkList : checkLists) {
+        for (Checklist checkList : checkLists) {
             checkListService.deleteChecklist(checkList.getChecklistId());
         }
 
