@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 
+import java.time.DayOfWeek;
 import java.util.List;
 
 public record PutCleaningUpdateRequest(
@@ -27,7 +28,7 @@ public record PutCleaningUpdateRequest(
         CleaningRepeatType repeatType,
 
         @Schema(description = "청소 반복 요일 목록 (repeatType = WEEKLY일 때 사용)", example = "[\"MONDAY\", \"FRIDAY\"]")
-        List<String> repeatDays,
+        List<DayOfWeek> repeatDays,
 
         @Schema(description = "선택한 청소 날짜 목록", example = "[\"2025-08-01\", \"2025-08-08\"]")
         @NotEmpty
