@@ -125,7 +125,17 @@ public class PlaceController {
         return ResponseEntity.ok(BaseResponse.ok(null));
     }
 
-
+    @Operation(summary = "체크리스트 시간 조회", description = "플레이스의 체크리스트 시작시간/종료시간 및 isToday를 조회합니다.(매니저)")
+    @DocumentedApiErrors(
+            value = {},
+            includes = {""}
+    )
+    @GetMapping("/{placeId}/settings/time")
+    @CheckPlaceMembership()
+    @CheckManagerAuthority
+    public ResponseEntity<BaseResponse<GetTimeResponse>> getTime(@PathVariable Long placeId){
+        return ResponseEntity.ok(BaseResponse.ok(placeService.getTimeAndIsToday()));
+    }
 
     @Operation(summary = "체크리스트 시간 설정", description = "플레이스의 체크리스트 시작시간/종료시간을 설정합니다.(매니저)")
     @DocumentedApiErrors(
@@ -135,7 +145,7 @@ public class PlaceController {
     @PatchMapping("/{placeId}/settings/time")
     @CheckPlaceMembership()
     @CheckManagerAuthority
-    public ResponseEntity<BaseResponse<?>> updateTime(
+    public ResponseEntity<BaseResponse<PatchUpdateTimeResponse>> updateTime(
                                                       @PathVariable Long placeId,
                                                       @RequestBody PatchUpdateTimeRequest request){
 

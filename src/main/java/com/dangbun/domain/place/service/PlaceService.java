@@ -32,6 +32,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.security.SecureRandom;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -252,16 +253,15 @@ public class PlaceService {
 
 
     public PatchUpdateTimeResponse updateTime(PatchUpdateTimeRequest request) {
-        boolean computedIsToday = !request.startTime().isAfter(request.endTime());
+        Place place = MemberContext.get().getPlace();
 
-        if(!Objects.equals(request.isToday(), computedIsToday)){
+        if(request.isToday()&&request.startTime().isAfter(request.endTime())){
             throw new InvalidTimeException(INVALID_TIME);
         }
 
-        Place place = MemberContext.get().getPlace();
         place.setTime(request.startTime(), request.endTime());
 
-        return PatchUpdateTimeResponse.of(place, computedIsToday);
+        return PatchUpdateTimeResponse.of(place, place.getIsToday());
     }
 
     public GetDutiesProgressResponse getDutiesProgress() {
@@ -273,5 +273,13 @@ public class PlaceService {
     }
 
 
+    public GetTimeResponse getTimeAndIsToday() {
+        Place place = MemberContext.get().getPlace();
 
+        LocalTime startTime = place.getStartTime();
+        LocalTime endTime = place.getEndTime();
+        boolean isToday = place.getIsToday();
+
+        return GetTimeResponse.of(startTime, endTime, isToday);
+    }
 }
