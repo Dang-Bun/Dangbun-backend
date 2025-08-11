@@ -63,8 +63,9 @@ public class Place extends BaseEntity {
         return this.inviteCode;
     }
 
-    public void setTime(LocalTime startTime, LocalTime endTime){
+    public void setTime(LocalTime startTime, LocalTime endTime, Boolean isToday){
         this.startTime = startTime;
         this.endTime = endTime;
+        this.isToday = isToday;
     }
 }

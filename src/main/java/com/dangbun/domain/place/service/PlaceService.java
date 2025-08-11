@@ -259,7 +259,7 @@ public class PlaceService {
             throw new InvalidTimeException(INVALID_TIME);
         }
 
-        place.setTime(request.startTime(), request.endTime());
+        place.setTime(request.startTime(), request.endTime(), request.isToday());
 
         return PatchUpdateTimeResponse.of(place, place.getIsToday());
     }
