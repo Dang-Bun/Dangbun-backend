@@ -4,6 +4,8 @@ import com.dangbun.domain.member.response.status.MemberExceptionResponse;
 import com.dangbun.domain.place.dto.request.*;
 import com.dangbun.domain.place.dto.response.*;
 import com.dangbun.domain.place.response.status.PlaceExceptionResponse;
+import com.dangbun.domain.place.service.PlaceCommandService;
+import com.dangbun.domain.place.service.PlaceQueryService;
 import com.dangbun.domain.place.service.PlaceService;
 import com.dangbun.domain.user.entity.User;
 import com.dangbun.domain.user.response.status.UserExceptionResponse;
@@ -29,6 +31,8 @@ import java.util.List;
 public class PlaceController {
 
     private final PlaceService placeService;
+    private final PlaceQueryService placeQueryService;
+    private final PlaceCommandService placeCommandService;
 
     @Operation(summary = " 플레이스 목록 조회", description = "사용자의 모든 플레이스를 조회하기 위해 사용됩니다(플레이스 선택 화면)")
     @DocumentedApiErrors(
@@ -37,7 +41,7 @@ public class PlaceController {
     )
     @GetMapping()
     public ResponseEntity<BaseResponse<GetPlaceListResponse>> getPlaces(@AuthenticationPrincipal(expression = "user") User user) {
-        return ResponseEntity.ok(BaseResponse.ok(placeService.getPlaces(user.getUserId())));
+        return ResponseEntity.ok(BaseResponse.ok(placeQueryService.getPlaces(user.getUserId())));
     }
 
     @Operation(summary = "플레이스 생성", description = "플레이스를 생성합니다. 플레이스를 생성한 user는 매니저가 됩니다.")
@@ -50,7 +54,7 @@ public class PlaceController {
                                                        @RequestBody PostCreatePlaceRequest request) {
 
 
-        return ResponseEntity.ok(BaseResponse.ok(placeService.createPlaceWithManager(user.getUserId(), request)));
+        return ResponseEntity.ok(BaseResponse.ok(placeCommandService.createPlaceWithManager(user.getUserId(), request)));
     }
 
     @Operation(summary = "참여코드 생성", description = "플레이스의 참여코드를 생성합니다.(매니저)")
@@ -62,7 +66,7 @@ public class PlaceController {
     @CheckPlaceMembership()
     @CheckManagerAuthority
     public ResponseEntity<BaseResponse<PostCreateInviteCodeResponse>> createInviteCode(@PathVariable Long placeId) {
-        PostCreateInviteCodeResponse data = placeService.createInviteCode();
+        PostCreateInviteCodeResponse data = placeCommandService.createInviteCode();
         return ResponseEntity.ok(BaseResponse.ok(data));
     }
 
@@ -75,7 +79,7 @@ public class PlaceController {
     public ResponseEntity<BaseResponse<PostCheckInviteCodeResponse>> checkInviteCode(@AuthenticationPrincipal(expression = "user") User user,
                                                                                      @RequestBody PostCheckInviteCodeRequest request) {
 
-        PostCheckInviteCodeResponse response = placeService.checkInviteCode(user, request);
+        PostCheckInviteCodeResponse response = placeQueryService.checkInviteCode(user, request);
         return ResponseEntity.ok(BaseResponse.ok(response));
 
     }
@@ -89,14 +93,14 @@ public class PlaceController {
     public ResponseEntity<BaseResponse<PostRegisterPlaceResponse>> registerPlace(@AuthenticationPrincipal(expression = "user") User user,
                                                                                  @RequestBody PostRegisterPlaceRequest request) {
 
-        return ResponseEntity.ok(BaseResponse.ok(placeService.joinRequest(user, request)));
+        return ResponseEntity.ok(BaseResponse.ok(placeCommandService.joinRequest(user, request)));
     }
 
     @Operation(summary = "참여 취소",description = "대기중인 플레이스의 참여 신청을 철회합니다")
     @DeleteMapping("/{placeId}/join-requests")
     @CheckPlaceMembership()
     public ResponseEntity<BaseResponse<?>> deleteRegisterPlace(@PathVariable Long placeId){
-        placeService.cancelRegister();
+        placeCommandService.cancelRegister();
         return ResponseEntity.ok(BaseResponse.ok(null));
     }
 
@@ -108,7 +112,7 @@ public class PlaceController {
     @CheckPlaceMembership()
     @GetMapping("/{placeId}")
     public ResponseEntity<BaseResponse<GetPlaceResponse>> getPlace(@PathVariable Long placeId) {
-        return ResponseEntity.ok(BaseResponse.ok(placeService.getPlace()));
+        return ResponseEntity.ok(BaseResponse.ok(placeQueryService.getPlace()));
     }
 
     @Operation(summary = "플레이스 삭제", description = "플레이스를 삭제합니다(매니저)")
@@ -121,7 +125,7 @@ public class PlaceController {
     @CheckManagerAuthority
     public ResponseEntity<BaseResponse<?>> deletePlace(@PathVariable Long placeId,
                                                        @RequestBody DeletePlaceRequest request) {
-        placeService.deletePlace(request);
+        placeCommandService.deletePlace(request);
         return ResponseEntity.ok(BaseResponse.ok(null));
     }
 
@@ -134,7 +138,7 @@ public class PlaceController {
     @CheckPlaceMembership()
     @CheckManagerAuthority
     public ResponseEntity<BaseResponse<GetTimeResponse>> getTime(@PathVariable Long placeId){
-        return ResponseEntity.ok(BaseResponse.ok(placeService.getTimeAndIsToday()));
+        return ResponseEntity.ok(BaseResponse.ok(placeQueryService.getTimeAndIsToday()));
     }
 
     @Operation(summary = "체크리스트 시간 설정", description = "플레이스의 체크리스트 시작시간/종료시간을 설정합니다.(매니저)")
@@ -149,7 +153,7 @@ public class PlaceController {
                                                       @PathVariable Long placeId,
                                                       @RequestBody PatchUpdateTimeRequest request){
 
-        return ResponseEntity.ok(BaseResponse.ok(placeService.updateTime(request)));
+        return ResponseEntity.ok(BaseResponse.ok(placeCommandService.updateTime(request)));
     }
 
     @Operation(summary = "매니저-전체 진행률", description = "플레이스 내의 모든 당번에 대한 진행률을 보여줍니다.")
@@ -161,6 +165,6 @@ public class PlaceController {
     @CheckManagerAuthority
     @GetMapping("/{placeId}/duties/progress")
     public ResponseEntity<BaseResponse<GetDutiesProgressResponse>> getDutiesProgress(@PathVariable Long placeId){
-        return ResponseEntity.ok(BaseResponse.ok(placeService.getDutiesProgress()));
+        return ResponseEntity.ok(BaseResponse.ok(placeQueryService.getDutiesProgress()));
     }
 }
