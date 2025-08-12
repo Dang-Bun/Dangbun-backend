@@ -9,6 +9,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
@@ -18,7 +19,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
-import static com.dangbun.domain.user.response.status.UserExceptionResponse.INVALID_EMAIL;
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -28,7 +28,7 @@ import static org.mockito.Mockito.when;
 @SpringBootTest
 @ActiveProfiles("test")
 @Transactional
-class UserServiceTest {
+class UserAccountServiceTest {
 
     @Mock
     UserRepository userRepository;
@@ -38,7 +38,9 @@ class UserServiceTest {
     PasswordEncoder passwordEncoder;
 
     @InjectMocks
-    private UserService userService;
+    private UserAccountService userAccountService;
+    @Autowired
+    private VerificationService verificationService;
 
     @Test
     @DisplayName("repository에 저장되지 않은 이메일은 오류 발생")
@@ -48,7 +50,7 @@ class UserServiceTest {
         when(userRepository.findByEmail(toEmail)).thenReturn(Optional.empty());
 
         // when & then
-        assertThrows(InvalidEmailException.class,()-> userService.sendFindPasswordAuthCode(toEmail));
+        assertThrows(InvalidEmailException.class,()-> verificationService.sendFindPasswordAuthCode(toEmail));
     }
 
     @Test
@@ -86,7 +88,7 @@ class UserServiceTest {
         when(userRepository.save(any(User.class))).thenReturn(testUser);
 
         // when
-        User user = userService.signup(request);
+        User user = userAccountService.signup(request);
 
         // then
         assertThat(user).isNotNull();
