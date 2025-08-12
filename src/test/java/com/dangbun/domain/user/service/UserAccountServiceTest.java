@@ -40,7 +40,7 @@ class UserAccountServiceTest {
     @InjectMocks
     private UserAccountService userAccountService;
     @Autowired
-    private VerificationService verificationService;
+    private AuthCodeService authCodeService;
 
     @Test
     @DisplayName("repository에 저장되지 않은 이메일은 오류 발생")
@@ -50,7 +50,7 @@ class UserAccountServiceTest {
         when(userRepository.findByEmail(toEmail)).thenReturn(Optional.empty());
 
         // when & then
-        assertThrows(InvalidEmailException.class,()-> verificationService.sendFindPasswordAuthCode(toEmail));
+        assertThrows(InvalidEmailException.class,()-> authCodeService.sendFindPasswordAuthCode(toEmail));
     }
 
     @Test

@@ -20,7 +20,7 @@ import static com.dangbun.domain.user.response.status.UserExceptionResponse.*;
 
 @Service
 @RequiredArgsConstructor
-public class VerificationService {
+public class AuthCodeService {
 
 
     private final UserRepository userRepository;
@@ -58,7 +58,7 @@ public class VerificationService {
         }
     }
 
-    public void checkCertCode(String email, String certCode) {
+    public void checkAuthCode(String email, String certCode) {
         if (!redisService.getValues(CERT_CODE_PREFIX + email).equals(certCode)) {
             throw new InvalidCertCodeException(INVALID_CERT_CODE);
         }
@@ -70,9 +70,9 @@ public class VerificationService {
 
     private void sendAuthCode(String toEmail) {
         String title = "당번 이메일 인증 번호";
-        String certCode = authCodeGenerator.createAuthCode();
-        emailService.sendEmail(toEmail, title, certCode);
-        redisService.setValues(CERT_CODE_PREFIX + toEmail, certCode, Duration.ofMillis(this.authCodeExpirationMillis));
+        String authCode = authCodeGenerator.createAuthCode();
+        emailService.sendEmail(toEmail, title, authCode);
+        redisService.setValues(CERT_CODE_PREFIX + toEmail, authCode, Duration.ofMillis(this.authCodeExpirationMillis));
     }
 
 

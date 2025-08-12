@@ -23,7 +23,7 @@ public class UserAccountService {
 
     private final PasswordPolicy passwordPolicy;
     private final UserRepository userRepository;
-    private final VerificationService verificationService;
+    private final AuthCodeService authCodeService;
     private final PasswordEncoder passwordEncoder;
 
 
@@ -40,7 +40,7 @@ public class UserAccountService {
             throw new ExistEmailException(EXIST_EMAIL);
         }
 
-        verificationService.checkCertCode(email, certCode);
+        authCodeService.checkAuthCode(email, certCode);
 
         if (passwordPolicy.isValidPassword(rawPassword)) {
             throw new InvalidPasswordException(INVALID_PASSWORD);
@@ -64,7 +64,7 @@ public class UserAccountService {
         User user = userRepository.findByEmail(request.email())
                 .orElseThrow(() -> new NoSuchUserException(NO_SUCH_USER));
 
-        verificationService.checkCertCode(request.email(), request.certCode());
+        authCodeService.checkAuthCode(request.email(), request.certCode());
 
         if (passwordPolicy.isValidPassword(request.password())) {
             String encodedPassword = passwordEncoder.encode(request.password());

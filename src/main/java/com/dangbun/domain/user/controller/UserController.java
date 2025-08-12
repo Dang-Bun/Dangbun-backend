@@ -6,7 +6,7 @@ import com.dangbun.domain.user.entity.User;
 import com.dangbun.domain.user.response.status.UserExceptionResponse;
 import com.dangbun.domain.user.service.AuthService;
 import com.dangbun.domain.user.service.UserAccountService;
-import com.dangbun.domain.user.service.VerificationService;
+import com.dangbun.domain.user.service.AuthCodeService;
 import com.dangbun.global.docs.DocumentedApiErrors;
 import com.dangbun.global.response.BaseResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -31,7 +31,7 @@ public class UserController {
 
     private final UserAccountService userAccountService;
     private final AuthService authService;
-    private final VerificationService verificationService;
+    private final AuthCodeService authCodeService;
 
     @Operation(summary = "인증번호 생성(비밀번호 재설정용)",description = "이메일 인증번호를 생성합니다.(비밀번호 재설정 용)")
     @DocumentedApiErrors(
@@ -41,7 +41,7 @@ public class UserController {
     @PostMapping("/email-code")
     public ResponseEntity<BaseResponse<?>> generatePasswordAuthCode(@RequestBody PostUserAuthCodeRequest request) {
         String email = request.email();
-        verificationService.sendFindPasswordAuthCode(email);
+        authCodeService.sendFindPasswordAuthCode(email);
         return ResponseEntity.ok(BaseResponse.ok(null));
     }
 
@@ -53,7 +53,7 @@ public class UserController {
     @PostMapping("/signup/email-code")
     public ResponseEntity<BaseResponse<?>> generateSignupAuthCode(@RequestBody PostUserAuthCodeRequest request) {
         String email = request.email();
-        verificationService.sendSignupAuthCode(email);
+        authCodeService.sendSignupAuthCode(email);
         return ResponseEntity.ok(BaseResponse.ok(null));
     }
 
