@@ -94,7 +94,7 @@ public class UserService {
         }
     }
 
-    public void signup(@Valid PostUserSignUpRequest request) {
+    public User signup(@Valid PostUserSignUpRequest request) {
 
         String name = request.name();
         String rawPassword = request.password();
@@ -121,7 +121,7 @@ public class UserService {
                 .email(email)
                 .build();
 
-        userRepository.save(user);
+        return userRepository.save(user);
     }
 
     private void checkCertCode(String email, String certCode) {
