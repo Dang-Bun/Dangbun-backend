@@ -12,7 +12,6 @@ import org.apache.coyote.BadRequestException;
 import org.hibernate.TypeMismatchException;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
-import org.springframework.expression.spel.SpelEvaluationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
@@ -23,7 +22,7 @@ import org.springframework.web.servlet.NoHandlerFoundException;
 
 import static com.dangbun.global.response.status.BaseExceptionResponse.*;
 
-@Order(Ordered.LOWEST_PRECEDENCE)
+@Order
 @Slf4j
 @RestControllerAdvice
 public class GlobalControllerAdvice {
