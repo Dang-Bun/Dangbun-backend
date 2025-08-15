@@ -6,7 +6,6 @@ import com.dangbun.domain.place.dto.response.*;
 import com.dangbun.domain.place.response.status.PlaceExceptionResponse;
 import com.dangbun.domain.place.service.PlaceCommandService;
 import com.dangbun.domain.place.service.PlaceQueryService;
-import com.dangbun.domain.place.service.PlaceService;
 import com.dangbun.domain.user.entity.User;
 import com.dangbun.domain.user.response.status.UserExceptionResponse;
 import com.dangbun.global.aop.CheckManagerAuthority;
@@ -21,7 +20,6 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 
 @RestController
 @Validated
@@ -30,7 +28,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class PlaceController {
 
-    private final PlaceService placeService;
     private final PlaceQueryService placeQueryService;
     private final PlaceCommandService placeCommandService;
 
