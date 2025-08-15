@@ -218,7 +218,7 @@ public class CleaningService {
         List<Cleaning> cleanings = cleaningRepository.findUnassignedCleaningsByPlaceId(placeId);
 
         return cleanings.stream()
-                .map(cleaning -> GetCleaningUnassignedResponse.of(cleaning.getName()))
+                .map(cleaning -> GetCleaningUnassignedResponse.of(cleaning.getCleaningId(), cleaning.getName()))
                 .toList();
     }
 }
