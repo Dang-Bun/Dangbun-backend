@@ -15,22 +15,16 @@ import java.util.Date;
 @Component
 public class JwtUtil {
 
-    private final String secret;
+    @Value("${jwt.secret}")
+    private String SECRET;
 
     private Key key;
     private JwtParser parser;
 
-    public JwtUtil(@Value("${jwt.secret}") String secret) {
-        this.secret = secret;
-    }
 
     @PostConstruct
     void init() {
-        byte[] secretBytes = tryBase64Decode(secret);
-        if (secretBytes == null) { // 평문이라면 UTF-8 바이트 사용
-            secretBytes = secret.getBytes(StandardCharsets.UTF_8);
-        }
-        this.key = Keys.hmacShaKeyFor(secretBytes);
+        this.key = Keys.hmacShaKeyFor(SECRET.getBytes());
 
         this.parser = Jwts.parserBuilder()
                 .setSigningKey(this.key)
