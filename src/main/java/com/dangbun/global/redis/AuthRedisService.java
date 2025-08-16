@@ -6,8 +6,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
+import java.time.Duration;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
+
+import static com.dangbun.global.security.TokenProvider.REFRESH_VALIDATION_MS;
 
 @RequiredArgsConstructor
 @Service
@@ -30,6 +33,11 @@ public class AuthRedisService {
 
         redisTemplate.opsForValue()
                 .set("blacklist:" + accessToken, "logout", expirationMs, TimeUnit.MILLISECONDS);
+    }
+
+    public void saveRefreshToken(Long userId, String refreshToken) {
+        redisTemplate.opsForValue()
+                .set("refreshToken:" + userId, refreshToken, Duration.ofMillis(REFRESH_VALIDATION_MS));
     }
 }
 

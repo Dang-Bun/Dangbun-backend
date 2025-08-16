@@ -14,6 +14,8 @@ import com.dangbun.global.redis.AuthRedisService;
 import com.dangbun.global.redis.RedisService;
 import com.dangbun.global.security.JwtUtil;
 import com.dangbun.global.security.TokenProvider;
+import com.dangbun.global.security.refactor.JwtService;
+import com.dangbun.global.security.refactor.TokenName;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -26,11 +28,13 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.time.Duration;
 import java.util.Date;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
 import static com.dangbun.domain.user.response.status.UserExceptionResponse.*;
+import static com.dangbun.global.security.refactor.TokenName.*;
 
 @Service
 @Transactional
@@ -44,8 +48,8 @@ public class UserService {
     private final EmailService emailService;
     private final RedisService redisService;
     private final PasswordEncoder passwordEncoder;
-    private final TokenProvider tokenProvider;
     private final AuthRedisService authRedisService;
+    private final JwtService jwtService;
 
     @Value("${spring.mail.auth-code-expiration-millis}")
     private Long authCodeExpirationMillis;
@@ -173,12 +177,10 @@ public class UserService {
             throw new InvalidPasswordException(INVALID_PASSWORD);
         }
 
-        final String accessToken = tokenProvider.createAccessToken(user);
-        final String refreshToken = tokenProvider.createRefreshToken(user);
+        Map<String, String> tokenMap = jwtService.generateToken(user);
+        authRedisService.saveRefreshToken(user.getUserId(), tokenMap.get(REFRESH.getName()));
 
-        tokenProvider.saveRefreshToken(user.getUserId(), refreshToken);
-
-        return new PostUserLoginResponse(accessToken, refreshToken);
+        return new PostUserLoginResponse(tokenMap.get(ACCESS.getName()), tokenMap.get(REFRESH.getName()));
     }
 
     public void logout(String bearerToken) {
