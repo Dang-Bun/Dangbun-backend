@@ -4,6 +4,8 @@ import com.dangbun.domain.user.dto.request.*;
 import com.dangbun.domain.user.dto.response.PostUserLoginResponse;
 import com.dangbun.domain.user.entity.User;
 import com.dangbun.domain.user.response.status.UserExceptionResponse;
+import com.dangbun.domain.user.service.UserCommandService;
+import com.dangbun.domain.user.service.UserQueryService;
 import com.dangbun.domain.user.service.UserService;
 import com.dangbun.global.docs.DocumentedApiErrors;
 import com.dangbun.global.response.BaseResponse;
@@ -27,7 +29,8 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
 
 
-    private final UserService userService;
+    private final UserCommandService userCommandService;
+    private final UserQueryService userQueryService;
 
     @Operation(summary = "인증번호 생성(비밀번호 재설정용)",description = "이메일 인증번호를 생성합니다.(비밀번호 재설정 용)")
     @DocumentedApiErrors(
@@ -37,7 +40,7 @@ public class UserController {
     @PostMapping("/email-code")
     public ResponseEntity<BaseResponse<?>> generatePasswordAuthCode(@RequestBody PostUserAuthCodeRequest request) {
         String email = request.email();
-        userService.sendFindPasswordAuthCode(email);
+        userQueryService.sendFindPasswordAuthCode(email);
         return ResponseEntity.ok(BaseResponse.ok(null));
     }
 
@@ -49,7 +52,7 @@ public class UserController {
     @PostMapping("/signup/email-code")
     public ResponseEntity<BaseResponse<?>> generateSignupAuthCode(@RequestBody PostUserAuthCodeRequest request) {
         String email = request.email();
-        userService.sendSignupAuthCode(email);
+        userCommandService.sendSignupAuthCode(email);
         return ResponseEntity.ok(BaseResponse.ok(null));
     }
 
@@ -61,7 +64,7 @@ public class UserController {
     )
     @PostMapping("/signup")
     public ResponseEntity<BaseResponse<?>> signUp(@RequestBody PostUserSignUpRequest request) {
-        userService.signup(request);
+        userCommandService.signup(request);
         return ResponseEntity.ok(BaseResponse.ok(null));
     }
 
@@ -72,7 +75,7 @@ public class UserController {
     )
     @PostMapping("/login")
     public ResponseEntity<BaseResponse<PostUserLoginResponse>> login(@RequestBody PostUserLoginRequest request) {
-        return ResponseEntity.ok(BaseResponse.ok(userService.login(request)));
+        return ResponseEntity.ok(BaseResponse.ok(userQueryService.login(request)));
     }
 
 
@@ -83,7 +86,7 @@ public class UserController {
     )
     @PostMapping("/logout")
     public ResponseEntity<BaseResponse<?>> logout(@RequestHeader("Authorization") String bearerToken) {
-        userService.logout(bearerToken);
+        userQueryService.logout(bearerToken);
         return ResponseEntity.ok(BaseResponse.ok(null));
 
     }
@@ -96,7 +99,7 @@ public class UserController {
     )
     @PostMapping("/me/password")
     public ResponseEntity<BaseResponse<?>> updatePassword(@RequestBody @Valid PostUserPasswordUpdateRequest request) {
-        userService.updatePassword(request);
+        userCommandService.updatePassword(request);
         return ResponseEntity.ok(BaseResponse.ok(null));
     }
 
@@ -109,7 +112,7 @@ public class UserController {
     @DeleteMapping("/me")
     public ResponseEntity<BaseResponse<?>> deleteCurrentUser(@AuthenticationPrincipal(expression = "user") User user,
                                                              @RequestBody DeleteUserAccountRequest request) {
-        userService.deleteCurrentUser(user, request);
+        userCommandService.deleteCurrentUser(user, request);
         return ResponseEntity.ok(BaseResponse.ok(null));
     }
 
@@ -123,7 +126,7 @@ public class UserController {
             @AuthenticationPrincipal(expression = "user") User user
     ) {
 
-        return ResponseEntity.ok(BaseResponse.ok(userService.getMyInfo(user)));
+        return ResponseEntity.ok(BaseResponse.ok(userQueryService.getMyInfo(user)));
     }
 
 }

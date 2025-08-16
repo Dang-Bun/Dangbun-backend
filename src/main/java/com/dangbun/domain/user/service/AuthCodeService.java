@@ -34,7 +34,7 @@ public class AuthCodeService {
         authRedisService.saveAuthCode(AUTH_CODE_PREFIX + toEmail, authCode, Duration.ofMillis(this.authCodeExpirationMillis));
     }
 
-    public void checkCertCode(String email, String authCode) {
+    public void checkAuthCode(String email, String authCode) {
         if (!authRedisService.getAuthCode(AUTH_CODE_PREFIX + email).equals(authCode)) {
             throw new InvalidCertCodeException(INVALID_CERT_CODE);
         }

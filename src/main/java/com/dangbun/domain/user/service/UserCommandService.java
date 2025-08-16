@@ -1,61 +1,32 @@
 package com.dangbun.domain.user.service;
 
 import com.dangbun.domain.user.dto.request.DeleteUserAccountRequest;
-import com.dangbun.domain.user.dto.request.PostUserLoginRequest;
 import com.dangbun.domain.user.dto.request.PostUserPasswordUpdateRequest;
 import com.dangbun.domain.user.dto.request.PostUserSignUpRequest;
-import com.dangbun.domain.user.dto.response.GetUserMyInfoResponse;
-import com.dangbun.domain.user.dto.response.PostUserLoginResponse;
 import com.dangbun.domain.user.entity.User;
-import com.dangbun.domain.user.exception.custom.*;
+import com.dangbun.domain.user.exception.custom.ExistEmailException;
+import com.dangbun.domain.user.exception.custom.InvalidEmailException;
+import com.dangbun.domain.user.exception.custom.InvalidPasswordException;
+import com.dangbun.domain.user.exception.custom.NoSuchUserException;
 import com.dangbun.domain.user.repository.UserRepository;
-import com.dangbun.global.email.EmailService;
-import com.dangbun.global.redis.AuthRedisService;
-import com.dangbun.global.redis.RedisService;
-import com.dangbun.global.security.JwtUtil;
-import com.dangbun.global.security.TokenProvider;
-import com.dangbun.global.security.refactor.JwtService;
-import com.dangbun.global.security.refactor.TokenName;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
-import java.time.Duration;
-import java.util.Date;
-import java.util.Map;
 import java.util.Optional;
-import java.util.Random;
-import java.util.concurrent.TimeUnit;
 
 import static com.dangbun.domain.user.response.status.UserExceptionResponse.*;
-import static com.dangbun.global.security.refactor.TokenName.*;
 
-@Service
 @RequiredArgsConstructor
-public class UserService {
+@Service
+public class UserCommandService {
+    private final AuthCodeService authCodeService;
+    private final UserRepository userRepository;
 
     private static final String PASSWORD_PATTERN = "^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d]{8,20}$";
-
-    private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-    private final AuthRedisService authRedisService;
-    private final JwtService jwtService;
-    private final AuthCodeService authCodeService;
-
-    @Transactional(readOnly = true)
-    public void sendFindPasswordAuthCode(String toEmail) {
-        if (getUserByEmail(toEmail).isPresent()) {
-            authCodeService.sendAuthCode(toEmail);
-        } else{
-            throw new InvalidEmailException(INVALID_EMAIL);
-        }
-    }
 
     @Transactional
     public void sendSignupAuthCode(String toEmail) {
@@ -73,12 +44,6 @@ public class UserService {
         throw new ExistEmailException(EXIST_EMAIL);
     }
 
-
-    private Optional<User> getUserByEmail(String email) {
-        return userRepository.findByEmail(email);
-    }
-
-
     @Transactional
     public void signup(@Valid PostUserSignUpRequest request) {
 
@@ -92,7 +57,7 @@ public class UserService {
             throw new ExistEmailException(EXIST_EMAIL);
         }
 
-        authCodeService.checkCertCode(email, certCode);
+        authCodeService.checkAuthCode(email, certCode);
 
         if (!isValidPassword(rawPassword)) {
             throw new InvalidPasswordException(INVALID_PASSWORD);
@@ -110,18 +75,13 @@ public class UserService {
         userRepository.save(user);
     }
 
-
-    private boolean isValidPassword(String password) {
-        return password != null && password.matches(PASSWORD_PATTERN);
-    }
-
     @Transactional
     public void updatePassword(@Valid PostUserPasswordUpdateRequest request) {
 
         User user = userRepository.findByEmail(request.email())
                 .orElseThrow(() -> new NoSuchUserException(NO_SUCH_USER));
 
-        authCodeService.checkCertCode(request.email(), request.certCode());
+        authCodeService.checkAuthCode(request.email(), request.certCode());
 
         if (isValidPassword(request.password())) {
             String encodedPassword = passwordEncoder.encode(request.password());
@@ -142,33 +102,12 @@ public class UserService {
         throw new InvalidEmailException(INVALID_EMAIL);
     }
 
-    @Transactional(readOnly = true)
-    public PostUserLoginResponse login(@Valid PostUserLoginRequest request) {
-
-
-        User user = userRepository.findByEmail(request.email())
-                .orElseThrow(() -> new NoSuchUserException(NO_SUCH_USER));
-
-        if (!user.getEnabled()) {
-            throw new DeleteMemberException(DELETE_MEMBER);
-        }
-
-        if (!passwordEncoder.matches(request.password(), user.getPassword())) {
-            throw new InvalidPasswordException(INVALID_PASSWORD);
-        }
-
-        Map<String, String> tokenMap = jwtService.generateToken(user);
-        authRedisService.saveRefreshToken(user.getUserId(), tokenMap.get(REFRESH.getName()));
-
-        return new PostUserLoginResponse(tokenMap.get(ACCESS.getName()), tokenMap.get(REFRESH.getName()));
+    private Optional<User> getUserByEmail(String email) {
+        return userRepository.findByEmail(email);
     }
 
-    public void logout(String bearerToken) {
-        authRedisService.deleteAndSetBlacklist(bearerToken);
-    }
-
-    public GetUserMyInfoResponse getMyInfo(User user) {
-        return GetUserMyInfoResponse.from(user);
+    private boolean isValidPassword(String password) {
+        return password != null && password.matches(PASSWORD_PATTERN);
     }
 
 }
