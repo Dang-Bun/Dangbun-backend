@@ -26,7 +26,7 @@ public record GetMembersResponse(
     public record MemberDto(
             @Schema(description = "맴버 ID", example = "1")
             Long memberId,
-            @Schema(description = "맴버 역할", example = "MEMBER")
+            @Schema(description = "맴버 역할", example = "멤버")
             String role,
             @Schema(description = "맴버 이름", example = "홍길동")
             String name,
