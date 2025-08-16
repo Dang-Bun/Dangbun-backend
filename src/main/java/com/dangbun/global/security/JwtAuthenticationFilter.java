@@ -44,10 +44,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         try {
             String path = request.getRequestURI();
-            if(path.contains("/users/login")){
+
+            String bearer = request.getHeader("Authorization");
+
+            if (!StringUtils.hasText(bearer) || !bearer.startsWith("Bearer ")) {
                 filterChain.doFilter(request, response);
                 return;
             }
+
             String token = jwtUtil.parseAccessToken(request.getHeader("Authorization"));
 
             log.info("jwt filter is running");
@@ -61,6 +65,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             filterChain.doFilter(request, response);
         } catch (RuntimeException e) {
             createErrorResponse(response);
+
             logger.error(e);
         }
     }
