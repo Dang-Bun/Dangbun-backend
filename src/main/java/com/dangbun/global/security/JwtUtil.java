@@ -20,7 +20,7 @@ public class JwtUtil {
     private Key key;
     private JwtParser parser;
 
-    public JwtUtil(@Value("${jwt.secret") String secret) {
+    public JwtUtil(@Value("${jwt.secret}") String secret) {
         this.secret = secret;
     }
 
@@ -57,7 +57,8 @@ public class JwtUtil {
         if (token.isEmpty()) {
             throw new IllegalArgumentException("Bearer token is empty");
         }
-        return token;    }
+        return token;
+    }
 
     public Claims parseClaims(String token) {
         return parser
@@ -70,11 +71,11 @@ public class JwtUtil {
     }
 
     public String validateAndGetUserId(String token) {
-        try{
+        try {
             return parseClaims(token).getSubject();
-        }catch (ExpiredJwtException e){
+        } catch (ExpiredJwtException e) {
             throw e;
-        } catch (UnsupportedJwtException | MalformedJwtException e){
+        } catch (UnsupportedJwtException | MalformedJwtException e) {
             throw e;
         }
     }

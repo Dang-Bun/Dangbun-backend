@@ -2,6 +2,7 @@ package com.dangbun.global.security.refactor;
 
 import com.dangbun.domain.user.entity.User;
 import com.dangbun.global.security.TokenProvider;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
@@ -9,14 +10,12 @@ import java.util.Map;
 
 import static com.dangbun.global.security.refactor.TokenName.*;
 
+@RequiredArgsConstructor
 @Service
 public class JwtService {
 
     private final TokenProvider tokenProvider;
 
-    public JwtService(TokenProvider tokenProvider) {
-        this.tokenProvider = tokenProvider;
-    }
 
     public Map<String, String> generateToken(User user) {
 
