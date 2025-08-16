@@ -40,24 +40,18 @@ import static com.dangbun.global.security.refactor.TokenName.*;
 @RequiredArgsConstructor
 public class UserService {
 
-    private static final String CERT_CODE_PREFIX = "AuthCode";
     private static final String PASSWORD_PATTERN = "^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d]{8,20}$";
 
     private final UserRepository userRepository;
-    private final EmailService emailService;
-    private final RedisService redisService;
     private final PasswordEncoder passwordEncoder;
     private final AuthRedisService authRedisService;
     private final JwtService jwtService;
-
-    @Value("${spring.mail.auth-code-expiration-millis}")
-    private Long authCodeExpirationMillis;
-
+    private final AuthCodeService authCodeService;
 
     @Transactional(readOnly = true)
     public void sendFindPasswordAuthCode(String toEmail) {
         if (getUserByEmail(toEmail).isPresent()) {
-            sendAuthCode(toEmail);
+            authCodeService.sendAuthCode(toEmail);
         } else{
             throw new InvalidEmailException(INVALID_EMAIL);
         }
@@ -66,14 +60,14 @@ public class UserService {
     @Transactional
     public void sendSignupAuthCode(String toEmail) {
         if (getUserByEmail(toEmail).isEmpty()) {
-            sendAuthCode(toEmail);
+            authCodeService.sendAuthCode(toEmail);
             return;
         }
 
         User user = getUserByEmail(toEmail).get();
         if(!user.getEnabled()){
             userRepository.delete(user);
-            sendAuthCode(toEmail);
+            authCodeService.sendAuthCode(toEmail);
             return;
         }
         throw new ExistEmailException(EXIST_EMAIL);
@@ -84,19 +78,6 @@ public class UserService {
         return userRepository.findByEmail(email);
     }
 
-    private String createAuthCode() {
-        int length = 6;
-        try {
-            Random random = SecureRandom.getInstanceStrong();
-            StringBuilder builder = new StringBuilder();
-            for (int i = 0; i < length; i++) {
-                builder.append(random.nextInt(10));
-            }
-            return builder.toString();
-        } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException();
-        }
-    }
 
     @Transactional
     public void signup(@Valid PostUserSignUpRequest request) {
@@ -111,7 +92,7 @@ public class UserService {
             throw new ExistEmailException(EXIST_EMAIL);
         }
 
-        checkCertCode(email, certCode);
+        authCodeService.checkCertCode(email, certCode);
 
         if (!isValidPassword(rawPassword)) {
             throw new InvalidPasswordException(INVALID_PASSWORD);
@@ -129,11 +110,6 @@ public class UserService {
         userRepository.save(user);
     }
 
-    private void checkCertCode(String email, String certCode) {
-        if (!redisService.getValues(CERT_CODE_PREFIX + email).equals(certCode)) {
-            throw new InvalidCertCodeException(INVALID_CERT_CODE);
-        }
-    }
 
     private boolean isValidPassword(String password) {
         return password != null && password.matches(PASSWORD_PATTERN);
@@ -145,7 +121,7 @@ public class UserService {
         User user = userRepository.findByEmail(request.email())
                 .orElseThrow(() -> new NoSuchUserException(NO_SUCH_USER));
 
-        checkCertCode(request.email(), request.certCode());
+        authCodeService.checkCertCode(request.email(), request.certCode());
 
         if (isValidPassword(request.password())) {
             String encodedPassword = passwordEncoder.encode(request.password());
@@ -195,11 +171,4 @@ public class UserService {
         return GetUserMyInfoResponse.from(user);
     }
 
-
-    private void sendAuthCode(String toEmail) {
-        String title = "당번 이메일 인증 번호";
-        String certCode = createAuthCode();
-        emailService.sendEmail(toEmail, title, certCode);
-        redisService.setValues(CERT_CODE_PREFIX + toEmail, certCode, Duration.ofMillis(this.authCodeExpirationMillis));
-    }
 }

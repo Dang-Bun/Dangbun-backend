@@ -10,14 +10,16 @@ import java.time.Duration;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
-import static com.dangbun.global.security.TokenProvider.REFRESH_VALIDATION_MS;
-
 @RequiredArgsConstructor
 @Service
 public class AuthRedisService {
+
     private final StringRedisTemplate redisTemplate;
     private final JwtUtil jwtUtil;
     private final TokenProvider tokenProvider;
+
+    public final static Long REFRESH_VALIDATION_MS = 1000L * 60 * 60 * 24 * 15;
+
 
     public void deleteAndSetBlacklist(String bearerToken){
         String accessToken = jwtUtil.parseAccessToken(bearerToken);
@@ -38,6 +40,15 @@ public class AuthRedisService {
     public void saveRefreshToken(Long userId, String refreshToken) {
         redisTemplate.opsForValue()
                 .set("refreshToken:" + userId, refreshToken, Duration.ofMillis(REFRESH_VALIDATION_MS));
+    }
+
+    public void saveAuthCode(String toEmail, String authCode, Duration duration){
+        redisTemplate.opsForValue()
+                .set(toEmail, authCode, duration);
+    }
+
+    public String getAuthCode(String email) {
+        return redisTemplate.opsForValue().get(email);
     }
 }
 
