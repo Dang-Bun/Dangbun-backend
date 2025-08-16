@@ -37,7 +37,6 @@ import static com.dangbun.domain.user.response.status.UserExceptionResponse.*;
 import static com.dangbun.global.security.refactor.TokenName.*;
 
 @Service
-@Transactional
 @RequiredArgsConstructor
 public class UserService {
 
@@ -55,6 +54,7 @@ public class UserService {
     private Long authCodeExpirationMillis;
 
 
+    @Transactional(readOnly = true)
     public void sendFindPasswordAuthCode(String toEmail) {
         if (getUserByEmail(toEmail).isPresent()) {
             sendAuthCode(toEmail);
@@ -63,7 +63,7 @@ public class UserService {
         }
     }
 
-
+    @Transactional
     public void sendSignupAuthCode(String toEmail) {
         if (getUserByEmail(toEmail).isEmpty()) {
             sendAuthCode(toEmail);
@@ -98,6 +98,7 @@ public class UserService {
         }
     }
 
+    @Transactional
     public void signup(@Valid PostUserSignUpRequest request) {
 
         String name = request.name();
@@ -138,6 +139,7 @@ public class UserService {
         return password != null && password.matches(PASSWORD_PATTERN);
     }
 
+    @Transactional
     public void updatePassword(@Valid PostUserPasswordUpdateRequest request) {
 
         User user = userRepository.findByEmail(request.email())
@@ -154,6 +156,7 @@ public class UserService {
 
     }
 
+    @Transactional
     public void deleteCurrentUser(User user, DeleteUserAccountRequest request) {
         if (request.email() != null && user.getEmail().equals(request.email())) {
             user.deactivate();
@@ -163,6 +166,7 @@ public class UserService {
         throw new InvalidEmailException(INVALID_EMAIL);
     }
 
+    @Transactional(readOnly = true)
     public PostUserLoginResponse login(@Valid PostUserLoginRequest request) {
 
 
