@@ -16,14 +16,13 @@ public class AuthRedisService {
 
     private final StringRedisTemplate redisTemplate;
     private final JwtUtil jwtUtil;
-    private final TokenProvider tokenProvider;
 
     public final static Long REFRESH_VALIDATION_MS = 1000L * 60 * 60 * 24 * 15;
 
 
     public void deleteAndSetBlacklist(String bearerToken){
         String accessToken = jwtUtil.parseAccessToken(bearerToken);
-        String userId = tokenProvider.validateAndGetUserId(accessToken);
+        String userId = jwtUtil.validateAndGetUserId(accessToken);
 
 
 

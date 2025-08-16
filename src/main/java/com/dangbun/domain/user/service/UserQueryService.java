@@ -28,6 +28,7 @@ import static com.dangbun.global.security.refactor.TokenName.REFRESH;
 @RequiredArgsConstructor
 @Service
 public class UserQueryService {
+
     private final AuthCodeService authCodeService;
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;

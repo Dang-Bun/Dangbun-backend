@@ -22,11 +22,12 @@ import static com.dangbun.domain.user.response.status.UserExceptionResponse.*;
 @RequiredArgsConstructor
 @Service
 public class UserCommandService {
+
     private final AuthCodeService authCodeService;
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
     private static final String PASSWORD_PATTERN = "^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d]{8,20}$";
-    private final PasswordEncoder passwordEncoder;
 
     @Transactional
     public void sendSignupAuthCode(String toEmail) {

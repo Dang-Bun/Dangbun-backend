@@ -34,9 +34,12 @@ import static com.dangbun.global.response.status.BaseExceptionResponse.*;
 @Slf4j
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
+
     private final TokenProvider tokenProvider;
     private final UserRepository userRepository;
     private final RedisTemplate<Object, Object> redisTemplate;
+
+    private final JwtUtil jwtUtil;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
@@ -58,7 +61,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private void authenticate(HttpServletRequest request, HttpServletResponse response, String accessToken) {
         try {
 
-            String userId = tokenProvider.validateAndGetUserId(accessToken);
+            String userId = jwtUtil.validateAndGetUserId(accessToken);
             log.info("Authenticated user ID : " + userId);
             AbstractAuthenticationToken authentication = createAuthenticationToken(request, userId);
 
@@ -88,7 +91,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private void  refreshAuthentication(HttpServletRequest request, HttpServletResponse response)  {
         try {
             String refreshToken = getRefreshToken(request);
-            Claims claims = tokenProvider.parseClaims(refreshToken);
+            Claims claims = jwtUtil.parseClaims(refreshToken);
             if (!isValidRefreshToken(refreshToken,claims)) {
                 throw new RuntimeException("Invalid refresh Token");
             }

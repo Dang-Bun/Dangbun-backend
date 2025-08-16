@@ -6,7 +6,6 @@ import com.dangbun.domain.user.entity.User;
 import com.dangbun.domain.user.response.status.UserExceptionResponse;
 import com.dangbun.domain.user.service.UserCommandService;
 import com.dangbun.domain.user.service.UserQueryService;
-import com.dangbun.domain.user.service.UserService;
 import com.dangbun.global.docs.DocumentedApiErrors;
 import com.dangbun.global.response.BaseResponse;
 import io.swagger.v3.oas.annotations.Operation;
