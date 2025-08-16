@@ -55,7 +55,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             if (token != null && !token.equalsIgnoreCase("null")) {
                 boolean authenticated = authenticate(request, response, token);
                 if (!authenticated) {
-                    return; // Stop filter chain if authentication failed
+                    filterChain.doFilter(request, response);
                 }
             }
             filterChain.doFilter(request, response);
