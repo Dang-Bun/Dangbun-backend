@@ -28,6 +28,7 @@ public class TokenProvider {
 
     public final static Long TOKEN_VALIDATION_MS = 1000L * 60 * 60 * 24 * 15;
     public final static Long REFRESH_VALIDATION_MS = 1000L * 60 * 60 * 24 * 15;
+    public final static String issuer = "dangbun app";
 
 
     @PostConstruct
@@ -37,11 +38,11 @@ public class TokenProvider {
 
     public String createAccessToken(User user){
 
-        return buildToken(user.getUserId(), "dangbun app", "access");
+        return buildToken(user.getUserId(), issuer, "access");
     }
 
     public String createRefreshToken(User user){
-        return buildToken(user.getUserId(), "dangbun app", "refresh");
+        return buildToken(user.getUserId(), issuer, "refresh");
     }
 
     public String validateAndGetUserId(String token){

@@ -10,6 +10,7 @@ import com.dangbun.domain.user.entity.User;
 import com.dangbun.domain.user.exception.custom.*;
 import com.dangbun.domain.user.repository.UserRepository;
 import com.dangbun.global.email.EmailService;
+import com.dangbun.global.redis.AuthRedisService;
 import com.dangbun.global.redis.RedisService;
 import com.dangbun.global.security.JwtUtil;
 import com.dangbun.global.security.TokenProvider;
@@ -44,8 +45,7 @@ public class UserService {
     private final RedisService redisService;
     private final PasswordEncoder passwordEncoder;
     private final TokenProvider tokenProvider;
-    private final JwtUtil jwtUtil;
-    private final RedisTemplate<Object, Object> redisTemplate;
+    private final AuthRedisService authRedisService;
 
     @Value("${spring.mail.auth-code-expiration-millis}")
     private Long authCodeExpirationMillis;
@@ -182,18 +182,7 @@ public class UserService {
     }
 
     public void logout(String bearerToken) {
-        String accessToken = jwtUtil.parseAccessToken(bearerToken);
-        String userId = tokenProvider.validateAndGetUserId(accessToken);
-
-        redisTemplate.delete("refreshToken:" + userId);
-
-        Date expiration = jwtUtil.getExpiration(accessToken);
-        Long now = System.currentTimeMillis();
-        Long expirationMs = expiration.getTime() - now;
-
-        redisTemplate.opsForValue()
-                .set("blacklist:" + accessToken, "logout", expirationMs, TimeUnit.MILLISECONDS);
-
+        authRedisService.deleteAndSetBlacklist(bearerToken);
     }
 
     public GetUserMyInfoResponse getMyInfo(User user) {
