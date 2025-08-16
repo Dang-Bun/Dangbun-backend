@@ -60,6 +60,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             }
             filterChain.doFilter(request, response);
         } catch (RuntimeException e) {
+            createErrorResponse(response);
             logger.error(e);
         }
     }
@@ -114,13 +115,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             log.warn("refreshAuthentication 실패: {}", e.getMessage());
 
             SecurityContextHolder.clearContext();
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            response.setContentType("application/json;charset=UTF-8");
-            try {
-                response.getWriter().write("{\"code\":"+INVALID_JWT.getCode()+",\"message\":\"토큰이 만료되었습니다. 다시 로그인해주세요.\"}");
-            } catch (IOException ex) {
-                log.error("Error writing response", ex);
-            }
+            createErrorResponse(response);
             return false;
         }
     }
@@ -169,5 +164,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             logger.error(e);
         }
         return null;
+    }
+
+    private static void createErrorResponse(HttpServletResponse response) {
+        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        response.setContentType("application/json;charset=UTF-8");
+        try {
+            response.getWriter().write("{\"code\":"+INVALID_JWT.getCode()+",\"message\":\"토큰이 만료되었습니다. 다시 로그인해주세요.\"}");
+        } catch (IOException ex) {
+            log.error("Error writing response", ex);
+        }
     }
 }
