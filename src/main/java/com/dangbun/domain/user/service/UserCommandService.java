@@ -1,5 +1,7 @@
 package com.dangbun.domain.user.service;
 
+import com.dangbun.domain.member.entity.Member;
+import com.dangbun.domain.member.repository.MemberRepository;
 import com.dangbun.domain.user.dto.request.DeleteUserAccountRequest;
 import com.dangbun.domain.user.dto.request.PostUserPasswordUpdateRequest;
 import com.dangbun.domain.user.dto.request.PostUserSignUpRequest;
@@ -15,6 +17,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 
 import static com.dangbun.domain.user.response.status.UserExceptionResponse.*;
@@ -24,8 +27,9 @@ import static com.dangbun.domain.user.response.status.UserExceptionResponse.*;
 public class UserCommandService {
 
     private final AuthCodeService authCodeService;
-    private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final UserRepository userRepository;
+    private final MemberRepository memberRepository;
 
     private static final String PASSWORD_PATTERN = "^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d]{8,20}$";
 
@@ -98,6 +102,10 @@ public class UserCommandService {
         if (request.email() != null && user.getEmail().equals(request.email())) {
             user.deactivate();
             userRepository.save(user);
+
+            List<Member> members = memberRepository.findALLByUser(user);
+            memberRepository.deleteAll(members);
+
             return;
         }
         throw new InvalidEmailException(INVALID_EMAIL);

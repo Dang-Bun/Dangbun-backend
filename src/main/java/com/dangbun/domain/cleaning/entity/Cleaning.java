@@ -37,7 +37,6 @@ public class Cleaning {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "duty_id")
-    @OnDelete(action = OnDeleteAction.CASCADE)
     private Duty duty;
 
     @Column(name = "need_photo", nullable = false)
@@ -47,10 +46,6 @@ public class Cleaning {
     @JoinColumn(name = "place_id", nullable = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Place place;
-
-    @OneToMany(mappedBy = "cleaning")
-    private List<MemberCleaning> memberCleanings = new ArrayList<>();
-
 
     @Builder
     public Cleaning(String name, CleaningRepeatType repeatType, String repeatDays, Duty duty, Boolean needPhoto, Place place) {
