@@ -25,7 +25,7 @@ import org.springframework.web.bind.annotation.*;
 @CheckPlaceMembership()
 @CheckChecklistMembership()
 @Tag(name = "Checklist", description = "ChecklistController - 체크리스트 관련 API")
-@RequestMapping("/places/{placeId}/checkLists/{checklistId}")
+@RequestMapping("/places/{placeId}/checklists/{checklistId}")
 public class ChecklistController {
 
     private final ChecklistService checklistService;

@@ -62,7 +62,7 @@ public class ChecklistService {
                 .generateUrl(request.originalFileName(), request.contentType(),checklist.getChecklistId());
 
 
-        return new PostGetPresignedUrlResponse(uploadUrlAndKey.get("uploadUrl"), uploadUrlAndKey.get("key"));
+        return new PostGetPresignedUrlResponse(uploadUrlAndKey.get("uploadUrl"), uploadUrlAndKey.get("s3Key"));
     }
 
     public void saveUploadResult(PostSaveUploadResultRequest request) {

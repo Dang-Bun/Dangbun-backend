@@ -19,7 +19,7 @@ import java.time.LocalDate;
 
 @Validated
 @CheckPlaceMembership()
-@RequestMapping("/place/{placeId}/calender")
+@RequestMapping("/places/{placeId}/calender")
 @RequiredArgsConstructor
 @Tag(name = "Calender", description = "CalenderController - 캘린더 관련 API")
 @RestController
