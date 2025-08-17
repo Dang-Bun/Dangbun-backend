@@ -6,6 +6,8 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import java.time.LocalDate;
 
@@ -25,6 +27,7 @@ public class CleaningDate {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "cleaning_id", nullable = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Cleaning cleaning;
 
     @Builder

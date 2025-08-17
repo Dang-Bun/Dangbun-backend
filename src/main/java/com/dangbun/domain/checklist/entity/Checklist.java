@@ -10,6 +10,8 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import java.time.LocalDateTime;
 
@@ -27,6 +29,7 @@ public class Checklist extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "cleaning_id")
     @NotNull
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Cleaning cleaning;
 
     @Column(name = "is_complete")
