@@ -111,24 +111,17 @@ public class DutyService {
 
 
 
-    public PostAddMembersResponse addMembers(PostAddMembersRequest request) {
+    public PutAddMembersResponse putMembers(PutAddMembersRequest request) {
         Duty duty = DutyContext.get();
 
         List<Long> requestedIds = request.memberIds();
 
         List<Member> members = memberRepository.findAllById(requestedIds);
-        Set<Long> foundIds = members.stream()
-                .map(Member::getMemberId)
-                .collect(Collectors.toSet());
-
-        List<Long> notFoundIds = requestedIds.stream()
-                .filter(id -> !foundIds.contains(id))
-                .toList();
-
-        if (!notFoundIds.isEmpty()) {
+        if (members.size() != requestedIds.size()) {
             throw new MemberNotFoundException(MEMBER_NOT_FOUND);
         }
 
+        memberDutyRepository.deleteAllByDuty(duty);
 
         List<Long> addedMemberIds = new ArrayList<>();
         for (Member member : members) {
@@ -143,7 +136,7 @@ public class DutyService {
             }
         }
 
-        return PostAddMembersResponse.of(addedMemberIds);
+        return PutAddMembersResponse.of(addedMemberIds);
     }
 
 
