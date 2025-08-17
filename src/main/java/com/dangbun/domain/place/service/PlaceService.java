@@ -272,7 +272,7 @@ public class PlaceService {
 
     }
 
-
+    @Transactional(readOnly = true)
     public GetTimeResponse getTimeAndIsToday() {
         Place place = MemberContext.get().getPlace();
 
@@ -281,5 +281,16 @@ public class PlaceService {
         boolean isToday = place.getIsToday();
 
         return GetTimeResponse.of(startTime, endTime, isToday);
+    }
+
+    @Transactional(readOnly = true)
+    public GetPlaceInvitedCodeResponse getInviteCode() {
+        Place place = MemberContext.get().getPlace();
+        String code = place.getInviteCode();
+
+        if (code==null || code.isBlank()) {
+            throw new InviteCodeNotExistsException(INVITE_CODE_NOT_EXISTS);
+        }
+        return GetPlaceInvitedCodeResponse.of(code);
     }
 }
