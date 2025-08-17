@@ -192,7 +192,7 @@ public class DutyService {
                             .toList();
 
                     List<MemberCleaning> mappings = assigned.stream()
-                            .map(m -> MemberCleaning.builder().member(m).cleaning(c).build())
+                            .map(m -> MemberCleaning.builder().member(m).cleaning(cleaning).build())
                             .toList();
                     memberCleaningRepository.saveAll(mappings);
                 }
