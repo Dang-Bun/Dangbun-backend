@@ -50,12 +50,6 @@ public class Member extends BaseEntity {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @OneToMany(mappedBy = "member")
-    private List<MemberCleaning> memberCleanings = new ArrayList<>();
-
-    @OneToMany(mappedBy = "member")
-    private List<MemberDuty> memberDuties = new ArrayList<>();
-
     @Builder
     public Member(MemberRole role,String name, Boolean status, Map information, Place place, User user) {
        this.role = role;

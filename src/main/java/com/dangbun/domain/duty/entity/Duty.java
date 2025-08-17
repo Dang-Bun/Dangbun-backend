@@ -32,9 +32,6 @@ public class Duty {
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Place place;
 
-    @OneToMany(mappedBy = "duty")
-    private List<MemberDuty> memberDuties = new ArrayList<>();
-
     @Builder
     public Duty(String name, DutyIcon icon, Place place) {
         this.name = name;
