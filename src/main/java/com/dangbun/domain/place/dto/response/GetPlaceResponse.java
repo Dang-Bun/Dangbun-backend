@@ -101,7 +101,7 @@ public record GetPlaceResponse(
                     endCleaning++;
                 }
             }
-            return new DutyDto(dutyName, checkLists, checkLists.size(), endCleaning);
+            return new DutyDto(dutyName, checkLists.size(),endCleaning, checkLists);
         }
     }
 
