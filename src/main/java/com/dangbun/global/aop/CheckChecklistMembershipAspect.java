@@ -49,7 +49,7 @@ public class CheckChecklistMembershipAspect {
         Member me = MemberContext.get();
 
         Checklist checklist = checklistRepository
-                .findByChecklistIdAndCleaning_MemberCleanings_Member_MemberId(checklistId, me.getMemberId())
+                .findByChecklistAndMemberId(checklistId, me.getMemberId())
                 .orElseThrow(() -> new ChecklistAccessDeniedException(CHECKLIST_ACCESS_DENIED));
 
         try {

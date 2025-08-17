@@ -31,6 +31,7 @@ public class Place extends BaseEntity {
     @NotNull
     private PlaceCategory category;
 
+    @Column(name="category_name", length = 10)
     private String categoryName;
 
     @Column(name = "invite_code")

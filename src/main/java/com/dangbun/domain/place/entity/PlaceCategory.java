@@ -1,7 +1,9 @@
 package com.dangbun.domain.place.entity;
 
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
+@Getter
 @RequiredArgsConstructor
 public enum PlaceCategory {
     CAFE("카페"),
@@ -15,10 +17,6 @@ public enum PlaceCategory {
     ETC("기타");
 
     private final String displayName;
-
-    public String getDisplayName(){
-        return displayName;
-    }
 
     public static PlaceCategory findCategory(String category){
         for (PlaceCategory value : values()) {

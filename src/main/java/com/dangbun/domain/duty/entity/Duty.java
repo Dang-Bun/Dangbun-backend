@@ -1,20 +1,17 @@
 package com.dangbun.domain.duty.entity;
 
-import com.dangbun.domain.memberduty.entity.MemberDuty;
 import com.dangbun.domain.place.entity.Place;
+import com.dangbun.global.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
-import java.util.ArrayList;
-import java.util.List;
-
 @Entity
 @Table(name = "duty")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Duty {
+public class Duty extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "duty_id")

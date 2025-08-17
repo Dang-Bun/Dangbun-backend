@@ -26,7 +26,13 @@ public interface ChecklistRepository extends JpaRepository<Checklist, Long> {
     @Query("select ch from Checklist ch join fetch Cleaning c join fetch Duty d where ch.checklistId = :checklistId")
     Optional<Checklist> findWithCleaningAndDutyById(Long checklistId);
 
-    Optional<Checklist> findByChecklistIdAndCleaning_MemberCleanings_Member_MemberId(Long checklistId, Long memberId);
+    @Query("SELECT c FROM Checklist c " +
+            "JOIN c.cleaning cl " +
+            "JOIN MemberCleaning mc ON cl.cleaningId = mc.cleaning.cleaningId " +
+            "JOIN Member m ON mc.member.memberId = m.memberId " +
+            "WHERE c.checklistId = :checklistId AND m.memberId = :memberId")
+    Optional<Checklist> findByChecklistAndMemberId(@Param("checklistId") Long checklistId, @Param("memberId") Long memberId);
+
 
     Boolean existsByCleaningAndCreatedAt(@NotNull Cleaning cleaning, LocalDateTime createdAt);
 

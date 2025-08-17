@@ -19,6 +19,7 @@ public class CleaningImage extends BaseEntity {
     Long id;
 
     @Getter
+    @Column(name = "s3_key")
     String s3Key;
 
     String uploader;

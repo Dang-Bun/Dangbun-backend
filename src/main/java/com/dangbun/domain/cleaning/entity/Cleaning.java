@@ -1,9 +1,8 @@
 package com.dangbun.domain.cleaning.entity;
 
 import com.dangbun.domain.duty.entity.Duty;
-import com.dangbun.domain.member.entity.Member;
-import com.dangbun.domain.membercleaning.entity.MemberCleaning;
 import com.dangbun.domain.place.entity.Place;
+import com.dangbun.global.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -12,14 +11,10 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
-import java.time.DayOfWeek;
-import java.util.ArrayList;
-import java.util.List;
-
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Cleaning {
+public class Cleaning extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "cleaning_id")
