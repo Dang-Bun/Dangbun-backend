@@ -163,4 +163,16 @@ public class PlaceController {
     public ResponseEntity<BaseResponse<GetDutiesProgressResponse>> getDutiesProgress(@PathVariable Long placeId){
         return ResponseEntity.ok(BaseResponse.ok(placeService.getDutiesProgress()));
     }
+
+    @Operation(summary = "참여코드 조회", description = "플레이스의 참여코드를 조회합니다.(매니저)")
+    @DocumentedApiErrors(
+            value = {MemberExceptionResponse.class, PlaceExceptionResponse.class},
+            includes = {"PLACE_ACCESS_DENIED", "INVALID_ROLE", "MEMBERSHIP_UNAUTHORIZED", "INVITE_CODE_NOT_EXISTS"}
+    )
+    @GetMapping("/{placeId}/invite-code")
+    @CheckPlaceMembership()
+    @CheckManagerAuthority
+    public ResponseEntity<BaseResponse<GetPlaceInvitedCodeResponse>> getInviteCode(@PathVariable Long placeId) {
+        return ResponseEntity.ok(BaseResponse.ok(placeService.getInviteCode()));
+    }
 }
