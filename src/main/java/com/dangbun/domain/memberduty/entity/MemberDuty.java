@@ -7,6 +7,8 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 
 @Entity
@@ -20,11 +22,13 @@ public class MemberDuty {
     @MapsId("memberId")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id", nullable = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Member member;
 
     @MapsId("dutyId") // 복합키 클래스의 필드명
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "duty_id", nullable = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Duty duty;
 
 
