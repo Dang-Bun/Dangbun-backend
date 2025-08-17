@@ -27,8 +27,6 @@ public class MemberService {
 
     private final MemberRepository memberRepository;
     private final MemberDutyRepository memberDutyRepository;
-    private final MemberCleaningRepository memberCleaningRepository;
-
 
     @Transactional(readOnly = true)
     public GetMembersResponse getMembers() {
@@ -133,9 +131,6 @@ public class MemberService {
         if (!member.getName().equals(request.memberName())) {
             throw new NameNotMatchedException(NAME_NOT_MATCHED);
         }
-
-        List<MemberDuty> memberDuties = memberDutyRepository.findAllByMember(member);
-        memberDutyRepository.deleteAll(memberDuties);
 
         memberRepository.delete(member);
     }
