@@ -10,7 +10,9 @@ public enum PlaceExceptionResponse implements ResponseStatus {
     ALREADY_INVITED(80001, "이미 초대된 사용자입니다."),
     INVALID_INFORMATION(80002, "플레이스가 요구한 맴버정보와 요청이 일치하지 않습니다."),
     INVALID_TIME(80003,"요청한 시간 설정이 올바르지 않습니다."),
-    INVALID_NAME(80004, "요청 값의 플레이스 이름이 현재 이름과 맞지 않습니다.");
+    INVALID_NAME(80004, "요청 값의 플레이스 이름이 현재 이름과 맞지 않습니다."),
+    INVITE_CODE_NOT_EXISTS(80005, "해당 플레이스의 초대코드가 없습니다."),
+    ;
 
     private final int code;
     private final String message;
