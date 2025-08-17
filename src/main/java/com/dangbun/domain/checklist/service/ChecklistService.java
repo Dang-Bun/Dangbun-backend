@@ -30,19 +30,9 @@ import java.util.Map;
 @Service
 public class ChecklistService {
 
-
-    private final ChecklistRepository checklistRepository;
     private final CleaningImageService cleaningImageService;
     private final MemberCleaningRepository memberCleaningRepository;
     private final ChecklistGenerateService checklistGenerateService;
-    private final CleaningImageRepository cleaningImageRepository;
-
-    public void deleteChecklist(Long checklistId) {
-
-        cleaningImageRepository.deleteByChecklist_ChecklistId(checklistId);
-
-        checklistRepository.deleteById(checklistId);
-    }
 
     public PostCompleteChecklistResponse completeChecklist() {
         Member member = MemberContext.get();

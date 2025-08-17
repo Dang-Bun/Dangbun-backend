@@ -13,6 +13,7 @@ import com.dangbun.domain.cleaning.dto.response.PostCleaningResponse;
 import com.dangbun.domain.cleaning.entity.Cleaning;
 import com.dangbun.domain.cleaning.exception.custom.*;
 import com.dangbun.domain.cleaning.repository.CleaningRepository;
+import com.dangbun.domain.cleaningImage.repository.CleaningImageRepository;
 import com.dangbun.domain.cleaningdate.entity.CleaningDate;
 import com.dangbun.domain.cleaningdate.repository.CleaningDateRepository;
 import com.dangbun.domain.duty.entity.Duty;
@@ -24,6 +25,7 @@ import com.dangbun.domain.membercleaning.repository.MemberCleaningRepository;
 import com.dangbun.domain.place.entity.Place;
 import com.dangbun.global.context.DutyContext;
 import com.dangbun.global.context.MemberContext;
+import com.dangbun.global.s3.S3Service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -47,6 +49,9 @@ public class CleaningService {
     private final MemberRepository memberRepository;
     private final CleaningDateRepository cleaningDateRepository;
     private final CreateChecklistService createChecklistService;
+    private final ChecklistRepository checklistRepository;
+    private final CleaningImageRepository cleaningImageRepository;
+    private final S3Service s3Service;
 
     @Transactional(readOnly = true)
     public List<GetCleaningListResponse> getCleaningList(List<Long> memberIds) {
@@ -202,6 +207,12 @@ public class CleaningService {
     public void deleteCleaning(Long cleaningId) {
         Cleaning cleaning = cleaningRepository.findById(cleaningId)
                 .orElseThrow(() -> new CleaningNotFoundException(CLEANING_NOT_FOUND));
+
+        List<Checklist> checklists = checklistRepository.findByCleaning_CleaningId(cleaning.getCleaningId());
+        for (Checklist checklist : checklists) {
+            cleaningImageRepository.findByChecklist_ChecklistId(checklist.getChecklistId())
+                    .ifPresent(img -> s3Service.deleteFile(img.getS3Key()));
+        }
 
         cleaningRepository.delete(cleaning);
     }
