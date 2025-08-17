@@ -37,6 +37,7 @@ public class Cleaning {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "duty_id")
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Duty duty;
 
     @Column(name = "need_photo", nullable = false)
@@ -67,17 +68,6 @@ public class Cleaning {
         this.repeatType = repeatType;
         this.repeatDays = repeatDays;
         this.duty = duty;
-    }
-
-    public void updateMembers(List<Member> newMembers) {
-        this.memberCleanings.removeIf(mc -> true);
-        for (Member member : newMembers) {
-            MemberCleaning mc = MemberCleaning.builder()
-                    .cleaning(this)
-                    .member(member)
-                    .build();
-            this.memberCleanings.add(mc);
-        }
     }
 
     public void assignToDuty(Duty duty) {

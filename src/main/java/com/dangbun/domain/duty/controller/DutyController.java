@@ -83,7 +83,7 @@ public class DutyController {
     public ResponseEntity<BaseResponse<Void>> deleteDuty(
             @PathVariable Long placeId,
             @PathVariable Long dutyId) {
-        dutyService.deleteDuty(dutyId);
+        dutyService.deleteDuty();
         return ResponseEntity.ok(BaseResponse.ok(null));
     }
 
