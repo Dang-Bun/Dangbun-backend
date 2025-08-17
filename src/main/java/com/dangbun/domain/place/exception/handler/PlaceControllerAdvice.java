@@ -44,4 +44,10 @@ public class PlaceControllerAdvice {
     public BaseErrorResponse handleInvalidPlaceNameException(InvalidPlaceNameException e) {
         return new BaseErrorResponse(e.getExceptionStatus());
     }
+
+    @ExceptionHandler(InviteCodeNotExistsException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public BaseErrorResponse handleInviteCodeNotExistsException(InviteCodeNotExistsException e) {
+        return new BaseErrorResponse(e.getExceptionStatus());
+    }
 }
