@@ -1,5 +1,6 @@
 package com.dangbun.domain.place.dto.response;
 
+import com.dangbun.domain.calender.dto.GetChecklistsResponse;
 import com.dangbun.domain.checklist.entity.Checklist;
 import com.dangbun.domain.cleaning.entity.Cleaning;
 import com.dangbun.domain.member.entity.Member;
@@ -30,7 +31,7 @@ public record GetPlaceResponse(
         @Schema(description = "플레이스 카테고리(CAFE, RESTAURANT, THEATER, DORMITORY, BUILDING, OFFICE, SCHOOL, GYM, ETC)", example = "CAFE")
         PlaceCategory category,
 
-        @Schema(description = "카테고리 이름",example = "카페")
+        @Schema(description = "카테고리 이름", example = "카페")
         String categoryName,
 
         @Schema(description = "청소 마감 시간", example = "23:59")
@@ -82,11 +83,25 @@ public record GetPlaceResponse(
             @Schema(description = "당번 이름", example = "로비 청소")
             String dutyName,
 
+
+            @Schema(description = "해당 날의 청소 수", example = "10")
+            Integer totalCleaning,
+
+            @Schema(description = "완료된 청소 수", example = "7")
+            Integer endCleaning,
+
             @Schema(description = "청소 리스트")
             List<CheckListDto> checkLists
+
     ) {
         public static DutyDto of(String dutyName, List<CheckListDto> checkLists) {
-            return new DutyDto(dutyName, checkLists);
+            Integer endCleaning = 0;
+            for (CheckListDto checkListDto : checkLists) {
+                if (checkListDto.completeTime != null) {
+                    endCleaning++;
+                }
+            }
+            return new DutyDto(dutyName, checkLists.size(),endCleaning, checkLists);
         }
     }
 
@@ -113,7 +128,7 @@ public record GetPlaceResponse(
 
             List<MemberDto> memberDtos = members.stream()
                     .map(MemberDto::of).toList();
-            return new CheckListDto(checkList.getChecklistId(), memberDtos, checkList.getCleaning().getName(), null, checkList.getCleaning().getNeedPhoto());
+            return new CheckListDto(checkList.getChecklistId(), memberDtos, checkList.getCleaning().getName(), checkList.getCompleteTime().toLocalTime(), checkList.getCleaning().getNeedPhoto());
         }
     }
 
