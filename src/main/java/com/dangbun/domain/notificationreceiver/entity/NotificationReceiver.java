@@ -8,6 +8,8 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 @Entity
 @Getter
@@ -21,11 +23,13 @@ public class NotificationReceiver extends BaseEntity {
     @MapsId("receiverId")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "receiver_id")
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Member receiver;
 
     @MapsId("notificationId")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "notification_id")
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Notification notification;
 
     @Column(name = "is_read", nullable = false)
