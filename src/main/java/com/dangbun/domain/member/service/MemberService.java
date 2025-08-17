@@ -160,12 +160,6 @@ public class MemberService {
      * 해당 함수는 연관된 클래스에서 Member 클래스를 삭제하기 위해 호출하는 함수임
      * 탈퇴 및 추방 등 Member 도메인에서 직접 호출하는 로직 같은 경우는 removeX 메서드를 사용
      */
-    public void deleteMember(Member member) {
-        memberCleaningRepository.deleteAllByMember(member);
-        memberDutyRepository.deleteAllByMember(member);
-
-        memberRepository.delete(member);
-    }
 
     private Member getMemberByMemberIdAndPlaceId(Long memberId, Long placeId) {
         return memberRepository.findByMemberIdAndPlace_PlaceId(memberId, placeId)

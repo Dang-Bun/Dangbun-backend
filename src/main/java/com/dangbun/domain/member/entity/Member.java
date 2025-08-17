@@ -50,7 +50,7 @@ public class Member extends BaseEntity {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "member")
     private List<MemberCleaning> memberCleanings = new ArrayList<>();
 
     @OneToMany(mappedBy = "member")

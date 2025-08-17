@@ -47,7 +47,7 @@ public class Cleaning {
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Place place;
 
-    @OneToMany(mappedBy = "cleaning", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "cleaning")
     private List<MemberCleaning> memberCleanings = new ArrayList<>();
 
 

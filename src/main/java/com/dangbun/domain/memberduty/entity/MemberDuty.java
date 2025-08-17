@@ -25,7 +25,7 @@ public class MemberDuty {
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Member member;
 
-    @MapsId("dutyId") // 복합키 클래스의 필드명
+    @MapsId("dutyId")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "duty_id", nullable = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
