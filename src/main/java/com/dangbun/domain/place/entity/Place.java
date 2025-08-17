@@ -33,9 +33,6 @@ public class Place extends BaseEntity {
 
     private String categoryName;
 
-    @OneToMany(mappedBy = "place", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Duty> duties;
-
     @Column(name = "invite_code")
     private String inviteCode;
 

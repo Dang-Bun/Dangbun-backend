@@ -229,17 +229,6 @@ public class PlaceService {
         if(!place.getName().equals(request.placeName())){
             throw new InvalidPlaceNameException(INVALID_NAME);
         }
-  
-        List<Duty> duties = dutyRepository.findByPlace_PlaceId(place.getPlaceId());
-  
-        for (Duty duty : duties) {
-            dutyService.deleteDuty(duty.getDutyId());
-        }
-
-        List<Member> members = memberRepository.findAllByPlace(place);
-        for (Member member : members) {
-            memberService.deleteMember(member);
-        }
 
         placeRepository.delete(place);
 

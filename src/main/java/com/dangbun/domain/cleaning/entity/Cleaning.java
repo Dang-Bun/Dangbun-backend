@@ -9,6 +9,8 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import java.time.DayOfWeek;
 import java.util.ArrayList;
@@ -42,6 +44,7 @@ public class Cleaning {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "place_id", nullable = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Place place;
 
     @OneToMany(mappedBy = "cleaning", cascade = CascadeType.ALL, orphanRemoval = true)
