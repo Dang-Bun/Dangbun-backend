@@ -113,20 +113,20 @@ public class DutyController {
         return ResponseEntity.ok(BaseResponse.ok(dutyService.getDutyCleaningNameList()));
     }
 
-    @Operation(summary = "당번 정보 - 멤버 추가", description = "당번에 멤버를 추가합니다. (매니저용)")
-    @PostMapping("/{dutyId}/members")
+    @Operation(summary = "당번 정보 - 멤버 수정", description = "당번의 멤버를 수정합니다. (매니저용)")
+    @PutMapping("/{dutyId}/members")
     @DocumentedApiErrors(
             value = {MemberExceptionResponse.class, DutyExceptionResponse.class},
             includes = {"PLACE_ACCESS_DENIED", "DUTY_NOT_IN_PLACE","MEMBERSHIP_UNAUTHORIZED", "INVALID_ROLE",  "MEMBER_NOT_FOUND"}
     )
     @CheckDutyInPlace
     @CheckManagerAuthority
-    public ResponseEntity<BaseResponse<PostAddMembersResponse>> addMembers(
+    public ResponseEntity<BaseResponse<PutAddMembersResponse>> putAddMembers(
             @PathVariable Long placeId,
             @PathVariable Long dutyId,
-            @RequestBody PostAddMembersRequest request
+            @RequestBody PutAddMembersRequest request
     ) {
-        return ResponseEntity.ok(BaseResponse.ok(dutyService.addMembers(request)));
+        return ResponseEntity.ok(BaseResponse.ok(dutyService.putMembers(request)));
     }
 
     @Operation(summary = "당번 역할 분담 (공통/랜덤/직접)", description = "해당 당번에 해당하는 청소에 멤버를 지정합니다. (매니저용)")
