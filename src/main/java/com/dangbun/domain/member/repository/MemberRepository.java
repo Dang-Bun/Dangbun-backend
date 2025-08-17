@@ -31,15 +31,9 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
 
     List<Member> findByPlace_PlaceId(Long placeId);
 
-    @Query("select count(m)>0 from Member m where m.user.userId = :userId and m.place.placeId = :placeId")
-    boolean existsByUserIdAndPlaceId(@Param("userId") Long userId, @Param("placeId") Long placeId);
-
-
     List<Member> findByPlace_PlaceIdAndStatusIsFalse(Long placeId);
 
     Optional<Member> findByMemberIdAndPlace_PlaceId(Long memberId, Long placeId);
-
-    Optional<Member> findByMemberId(Long memberId);
 
     Optional<Member> findByPlace_PlaceIdAndName(Long placeId, String name);
 
@@ -47,8 +41,6 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
 
     Page<Member> findByPlace_PlaceIdAndNameContaining(Long placeId, String name, Pageable pageable);
 
-    List<Member> findAllByPlace(Place place);
-
-    List<Member> findByUser(User user);
+    List<Member> findALLByUser(User user);
 
 }

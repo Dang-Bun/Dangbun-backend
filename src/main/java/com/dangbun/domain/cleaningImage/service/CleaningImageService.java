@@ -46,7 +46,7 @@ public class CleaningImageService {
     }
 
     public String getImageUrl(Long checklistId) {
-        CleaningImage cleaningImage = cleaningImageRepository.getByChecklist_ChecklistId(checklistId).get();
+        CleaningImage cleaningImage = cleaningImageRepository.findByChecklist_ChecklistId(checklistId).get();
         String s3Key = cleaningImage.getS3Key();
 
         String accessUrl = s3Service.generateDownloadUrl(s3Key);

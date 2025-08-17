@@ -1,18 +1,17 @@
 package com.dangbun.domain.duty.entity;
 
-import com.dangbun.domain.memberduty.entity.MemberDuty;
 import com.dangbun.domain.place.entity.Place;
+import com.dangbun.global.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
-
-import java.util.ArrayList;
-import java.util.List;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 @Entity
 @Table(name = "duty")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Duty {
+public class Duty extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "duty_id")
@@ -27,10 +26,8 @@ public class Duty {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "place_id", nullable = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Place place;
-
-    @OneToMany(mappedBy = "duty", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<MemberDuty> memberDuties = new ArrayList<>();
 
     @Builder
     public Duty(String name, DutyIcon icon, Place place) {

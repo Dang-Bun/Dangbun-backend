@@ -17,25 +17,18 @@ public interface CleaningRepository extends JpaRepository<Cleaning, Long> {
     boolean existsByNameAndDutyAndCleaningIdNot(String name, Duty duty, Long cleaningId);
 
     @Query("""
-        SELECT DISTINCT c FROM Cleaning c
-        JOIN FETCH c.memberCleanings mc
-        JOIN FETCH mc.member
-        WHERE c.duty.dutyId = :dutyId AND c.cleaningId IN (
-            SELECT c2.cleaningId FROM Cleaning c2
-            JOIN c2.memberCleanings mc2
-            WHERE mc2.member.memberId IN :memberIds
-        )
-    """)
+            SELECT c FROM Cleaning c
+            JOIN c.duty d
+            JOIN MemberCleaning mc ON c.cleaningId = mc.cleaning.cleaningId
+            WHERE d.dutyId = :dutyId AND mc.member.memberId IN :memberIds
+            """)
     List<Cleaning> findByDutyIdAndMemberIdsWithMembersJoin(Long dutyId, List<Long> memberIds);
 
     @Query("SELECT c FROM Cleaning c LEFT JOIN FETCH c.duty WHERE c.cleaningId = :cleaningId")
     Optional<Cleaning> findWithDutyNullableById(Long cleaningId);
 
-    void deleteAllByDuty(Duty duty);
 
     Optional<Cleaning> findByCleaningIdAndDuty_DutyId(Long cleaningId, Long dutyId);
-
-    // CleaningRepository.java
 
     @Query("""
     SELECT c

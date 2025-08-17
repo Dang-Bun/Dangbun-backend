@@ -82,18 +82,9 @@ public class DutyService {
     }
 
 
-    public void deleteDuty(Long dutyId) {
-        //Duty duty = DutyContext.get();
+    public void deleteDuty() {
+        Duty duty = DutyContext.get();
 
-        Duty duty = dutyRepository.findById(dutyId)
-                .orElseThrow(() -> new DutyNotInPlaceFoundException(DUTY_NOT_IN_PLACE));
-
-        List<Cleaning> cleanings = cleaningRepository.findAllByDuty(duty);
-        cleaningDateRepository.deleteAllByCleaningIn(cleanings);
-
-        for(Cleaning cleaning : cleanings) {
-            cleaningService.deleteCleaning(cleaning.getCleaningId());
-        }
         dutyRepository.delete(duty);
     }
 
@@ -168,33 +159,43 @@ public class DutyService {
                 Cleaning cleaning = cleaningRepository.findByCleaningIdAndDuty_DutyId(request.cleaningId(), duty.getDutyId())
                         .orElseThrow(() -> new CleaningNotFoundException(CLEANING_NOT_FOUND));
 
+                memberCleaningRepository.deleteAllByCleaning_CleaningId(cleaning.getCleaningId());
                 List<Member> selectedMembers = memberRepository.findAllById(request.memberIds());
-                cleaning.updateMembers(selectedMembers);
-                cleaningRepository.save(cleaning);
+                List<MemberCleaning> mappings = selectedMembers.stream()
+                        .map(m -> MemberCleaning.builder().member(m).cleaning(cleaning).build())
+                        .toList();
+                memberCleaningRepository.saveAll(mappings);
             }
 
             case COMMON -> {
                 if (allMembers.isEmpty()) {
                     throw new MemberNotExistsException(MEMBER_NOT_EXISTS);
                 }
-                for (Cleaning cleaning : cleanings) {
-                    cleaning.updateMembers(allMembers);
+                for (Cleaning c : cleanings) {
+                    memberCleaningRepository.deleteAllByCleaning_CleaningId(c.getCleaningId());
+                    List<MemberCleaning> mappings = allMembers.stream()
+                            .map(m -> MemberCleaning.builder().member(m).cleaning(c).build())
+                            .toList();
+                    memberCleaningRepository.saveAll(mappings);
                 }
-                cleaningRepository.saveAll(cleanings);
             }
 
             case RANDOM -> {
                 Random random = new Random();
                 for (Cleaning cleaning : cleanings) {
+                    memberCleaningRepository.deleteAllByCleaning_CleaningId(cleaning.getCleaningId());
 
                     List<Member> shuffled = new ArrayList<>(allMembers);
                     Collections.shuffle(shuffled, random);
                     List<Member> assigned = shuffled.stream()
                             .limit(request.assignCount())
                             .toList();
-                    cleaning.updateMembers(assigned);
+
+                    List<MemberCleaning> mappings = assigned.stream()
+                            .map(m -> MemberCleaning.builder().member(m).cleaning(cleaning).build())
+                            .toList();
+                    memberCleaningRepository.saveAll(mappings);
                 }
-                cleaningRepository.saveAll(cleanings);
             }
         }
     }
@@ -241,8 +242,6 @@ public class DutyService {
             }
         }
         cleaningRepository.saveAll(cleanings);
-
-
 
         return PostAddCleaningsResponse.of(assignedIds);
     }

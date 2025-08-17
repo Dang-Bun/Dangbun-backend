@@ -10,6 +10,8 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 @Entity
 @Getter
@@ -22,11 +24,13 @@ public class MemberCleaning {
     @MapsId("memberId")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id", nullable = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Member member;
 
-    @MapsId("cleaningId") // 복합키 클래스의 필드명
+    @MapsId("cleaningId")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "cleaning_id", nullable = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Cleaning cleaning;
 
     @Builder

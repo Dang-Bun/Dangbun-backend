@@ -1,23 +1,20 @@
 package com.dangbun.domain.cleaning.entity;
 
 import com.dangbun.domain.duty.entity.Duty;
-import com.dangbun.domain.member.entity.Member;
-import com.dangbun.domain.membercleaning.entity.MemberCleaning;
 import com.dangbun.domain.place.entity.Place;
+import com.dangbun.global.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import java.time.DayOfWeek;
-import java.util.ArrayList;
-import java.util.List;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Cleaning {
+public class Cleaning extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "cleaning_id")
@@ -42,11 +39,8 @@ public class Cleaning {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "place_id", nullable = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Place place;
-
-    @OneToMany(mappedBy = "cleaning", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<MemberCleaning> memberCleanings = new ArrayList<>();
-
 
     @Builder
     public Cleaning(String name, CleaningRepeatType repeatType, String repeatDays, Duty duty, Boolean needPhoto, Place place) {
@@ -64,17 +58,6 @@ public class Cleaning {
         this.repeatType = repeatType;
         this.repeatDays = repeatDays;
         this.duty = duty;
-    }
-
-    public void updateMembers(List<Member> newMembers) {
-        this.memberCleanings.removeIf(mc -> true);
-        for (Member member : newMembers) {
-            MemberCleaning mc = MemberCleaning.builder()
-                    .cleaning(this)
-                    .member(member)
-                    .build();
-            this.memberCleanings.add(mc);
-        }
     }
 
     public void assignToDuty(Duty duty) {

@@ -13,6 +13,7 @@ import com.dangbun.domain.cleaning.dto.response.PostCleaningResponse;
 import com.dangbun.domain.cleaning.entity.Cleaning;
 import com.dangbun.domain.cleaning.exception.custom.*;
 import com.dangbun.domain.cleaning.repository.CleaningRepository;
+import com.dangbun.domain.cleaningImage.repository.CleaningImageRepository;
 import com.dangbun.domain.cleaningdate.entity.CleaningDate;
 import com.dangbun.domain.cleaningdate.repository.CleaningDateRepository;
 import com.dangbun.domain.duty.entity.Duty;
@@ -24,6 +25,7 @@ import com.dangbun.domain.membercleaning.repository.MemberCleaningRepository;
 import com.dangbun.domain.place.entity.Place;
 import com.dangbun.global.context.DutyContext;
 import com.dangbun.global.context.MemberContext;
+import com.dangbun.global.s3.S3Service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -38,6 +40,7 @@ import static com.dangbun.domain.cleaning.response.status.CleaningExceptionRespo
 
 @RequiredArgsConstructor
 @Service
+@Transactional
 public class CleaningService {
 
     private final MemberCleaningRepository memberCleaningRepository;
@@ -45,11 +48,12 @@ public class CleaningService {
     private final CleaningRepository cleaningRepository;
     private final MemberRepository memberRepository;
     private final CleaningDateRepository cleaningDateRepository;
-    private final ChecklistService checkListService;
-    private final ChecklistRepository checkListRepository;
     private final CreateChecklistService createChecklistService;
+    private final ChecklistRepository checklistRepository;
+    private final CleaningImageRepository cleaningImageRepository;
+    private final S3Service s3Service;
 
-
+    @Transactional(readOnly = true)
     public List<GetCleaningListResponse> getCleaningList(List<Long> memberIds) {
         List<Duty> duties = (memberIds == null || memberIds.isEmpty())
                 ? dutyRepository.findAll()
@@ -71,9 +75,8 @@ public class CleaningService {
 
         return cleanings.stream()
                 .map(cleaning -> {
-                    List<String> names = cleaning.getMemberCleanings().stream()
-                            .map(mc -> mc.getMember().getName())
-                            .toList();
+                    List<String> names = memberCleaningRepository.findMembersByCleaningId(cleaning.getCleaningId())
+                            .stream().map(Member::getName).toList();
 
                     List<String> displayed = names.stream().limit(2).toList();
                     return GetCleaningDetailListResponse.of(cleaning.getName(), displayed, names.size());
@@ -108,19 +111,16 @@ public class CleaningService {
                 .place(place)
                 .build();
 
+        cleaningRepository.save(cleaning);
 
         if (request.members() != null && !request.members().isEmpty()) {
             List<Member> members = memberRepository.findAllByNameIn((request.members()));
-            for (Member member : members) {
-                MemberCleaning mc = MemberCleaning.builder()
-                        .member(member)
-                        .cleaning(cleaning)
-                        .build();
-                cleaning.getMemberCleanings().add(mc);
-            }
+            List<MemberCleaning> memberCleanings = members.stream()
+                    .map(m -> MemberCleaning.builder().member(m).cleaning(cleaning).build())
+                    .toList();
+            memberCleaningRepository.saveAll(memberCleanings);
         }
 
-        cleaningRepository.save(cleaning);
 
         List<LocalDate> parsedDates = request.detailDates().stream()
                 .map(dateStr -> {
@@ -169,9 +169,16 @@ public class CleaningService {
                         : null,
                 duty
         );
-        cleaning.updateMembers(memberRepository.findAllByNameIn(request.members()));
+
         cleaningRepository.save(cleaning);
 
+        memberCleaningRepository.deleteAllByCleaning_CleaningId(cleaningId);
+
+        List<Member> newMembers = memberRepository.findAllByNameIn(request.members());
+        List<MemberCleaning> newMemberCleanings = newMembers.stream()
+                .map(m -> MemberCleaning.builder().member(m).cleaning(cleaning).build())
+                .toList();
+        memberCleaningRepository.saveAll(newMemberCleanings);
 
         cleaningDateRepository.deleteAllByCleaning_CleaningId(cleaningId);
 
@@ -201,11 +208,10 @@ public class CleaningService {
         Cleaning cleaning = cleaningRepository.findById(cleaningId)
                 .orElseThrow(() -> new CleaningNotFoundException(CLEANING_NOT_FOUND));
 
-        cleaningDateRepository.deleteAllByCleaning_CleaningId(cleaningId);
-
-        List<Checklist> checkLists = checkListRepository.findByCleaning_CleaningId(cleaningId);
-        for (Checklist checkList : checkLists) {
-            checkListService.deleteChecklist(checkList.getChecklistId());
+        List<Checklist> checklists = checklistRepository.findByCleaning_CleaningId(cleaning.getCleaningId());
+        for (Checklist checklist : checklists) {
+            cleaningImageRepository.findByChecklist_ChecklistId(checklist.getChecklistId())
+                    .ifPresent(img -> s3Service.deleteFile(img.getS3Key()));
         }
 
         cleaningRepository.delete(cleaning);

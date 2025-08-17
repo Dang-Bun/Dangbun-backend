@@ -6,6 +6,8 @@ import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 @Entity
 @NoArgsConstructor
@@ -17,12 +19,14 @@ public class CleaningImage extends BaseEntity {
     Long id;
 
     @Getter
+    @Column(name = "s3_key")
     String s3Key;
 
     String uploader;
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "checklist_id")
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Checklist checklist;
 
     @Builder

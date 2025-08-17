@@ -9,6 +9,7 @@ import com.dangbun.domain.checklist.repository.ChecklistRepository;
 import com.dangbun.domain.checklist.service.ChecklistService;
 import com.dangbun.domain.cleaning.entity.Cleaning;
 import com.dangbun.domain.cleaning.entity.CleaningRepeatType;
+import com.dangbun.domain.cleaningImage.repository.CleaningImageRepository;
 import com.dangbun.domain.cleaningImage.service.CleaningImageService;
 import com.dangbun.domain.cleaningdate.entity.CleaningDate;
 import com.dangbun.domain.cleaningdate.repository.CleaningDateRepository;
@@ -19,6 +20,7 @@ import com.dangbun.domain.member.repository.MemberRepository;
 import com.dangbun.domain.membercleaning.entity.MemberCleaning;
 import com.dangbun.domain.membercleaning.repository.MemberCleaningRepository;
 import com.dangbun.global.context.MemberContext;
+import com.dangbun.global.s3.S3Service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -40,8 +42,10 @@ public class CalenderService {
     private final MemberCleaningRepository memberCleaningRepository;
     private final MemberRepository memberRepository;
     private final CleaningImageService cleaningImageService;
+    private final CleaningImageRepository cleaningImageRepository;
     private final CleaningDateRepository cleaningDateRepository;
-    private final ChecklistService checklistService;
+    private final S3Service s3Service;
+
 
     @Transactional(readOnly = true)
     public GetChecklistsResponse getChecklists(LocalDate date) {
@@ -180,6 +184,9 @@ public class CalenderService {
     public void deleteChecklist(Long checklistId) {
         Member me = MemberContext.get();
 
-        checklistService.deleteChecklist(checklistId);
+        cleaningImageRepository.findByChecklist_ChecklistId(checklistId)
+                .ifPresent(img -> s3Service.deleteFile(img.getS3Key()));
+
+        checklistRepository.deleteById(checklistId);
     }
 }
