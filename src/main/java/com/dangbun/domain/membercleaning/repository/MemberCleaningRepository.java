@@ -22,11 +22,8 @@ public interface MemberCleaningRepository extends JpaRepository<MemberCleaning, 
 
     List<MemberCleaning> findAllByMember(Member member);
 
-    void deleteAllByMember(Member member);
-
-    @Query("select mc.cleaning from MemberCleaning mc where mc.id.memberId = :memberId")
-    List<Cleaning> findCleaningsByMemberId(Long memberId);
-
     @Query("select mc.member from MemberCleaning mc where mc.id.cleaningId = :cleaningId")
     List<Member> findMembersByCleaningId(Long cleaningId);
+
+    void deleteAllByCleaning_CleaningId(Long cleaningId);
 }
