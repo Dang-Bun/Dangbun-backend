@@ -1,7 +1,6 @@
 package com.dangbun.domain.member.entity;
 
-import com.dangbun.domain.membercleaning.entity.MemberCleaning;
-import com.dangbun.domain.memberduty.entity.MemberDuty;
+
 import com.dangbun.domain.place.entity.Place;
 import com.dangbun.domain.user.entity.User;
 import com.dangbun.global.entity.BaseEntity;
@@ -14,8 +13,6 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 @Entity

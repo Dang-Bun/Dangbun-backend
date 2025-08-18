@@ -19,7 +19,7 @@ public class MapToJsonConverter implements AttributeConverter<Map<String,String>
     @Override
     public String convertToDatabaseColumn(Map<String, String> attribute) {
         try {
-            return objectMapper.writeValueAsString(attribute);
+            return attribute == null ? "{}" : objectMapper.writeValueAsString(attribute);
         } catch (JsonProcessingException e) {
             throw new IllegalArgumentException("Map -> JSON 변환 실패", e);
         }
