@@ -1,4 +1,4 @@
-package com.dangbun.domain.calender.response.status;
+package com.dangbun.domain.calendar.response.status;
 
 import com.dangbun.global.response.status.ResponseStatus;
 import lombok.RequiredArgsConstructor;
