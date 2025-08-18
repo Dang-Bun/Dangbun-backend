@@ -43,4 +43,9 @@ public class NotificationReceiver extends BaseEntity {
         this.isRead = isRead;
         this.id = new NotificationReceiverId(receiver.getMemberId(), notification.getNotificationId());
     }
+
+
+    public void markAsRead() {
+        this.isRead=true;
+    }
 }

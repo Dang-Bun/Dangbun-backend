@@ -11,6 +11,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface NotificationReceiverRepository extends JpaRepository<NotificationReceiver, NotificationReceiverId> {
     Page<NotificationReceiver> findByReceiver_MemberId(Long receiverId, Pageable pageable);
@@ -25,4 +26,6 @@ public interface NotificationReceiverRepository extends JpaRepository<Notificati
                 and nr.isRead = false
             """)
     int countUnreadByMemberId(@Param("memberId") Long memberId);
+
+    Optional<NotificationReceiver> findByNotification_NotificationIdAndReceiver_MemberId(Long notificationId, Long memberId);
 }
