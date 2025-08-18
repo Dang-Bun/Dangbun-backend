@@ -1,12 +1,11 @@
-package com.dangbun.domain.calender.service;
+package com.dangbun.domain.calendar.service;
 
-import com.dangbun.domain.calender.dto.*;
-import com.dangbun.domain.calender.exception.custom.InvalidDateException;
+import com.dangbun.domain.calendar.dto.*;
+import com.dangbun.domain.calendar.exception.custom.InvalidDateException;
 
-import com.dangbun.domain.calender.exception.custom.NoPhotoException;
+import com.dangbun.domain.calendar.exception.custom.NoPhotoException;
 import com.dangbun.domain.checklist.entity.Checklist;
 import com.dangbun.domain.checklist.repository.ChecklistRepository;
-import com.dangbun.domain.checklist.service.ChecklistService;
 import com.dangbun.domain.cleaning.entity.Cleaning;
 import com.dangbun.domain.cleaning.entity.CleaningRepeatType;
 import com.dangbun.domain.cleaningImage.repository.CleaningImageRepository;
@@ -29,13 +28,13 @@ import java.time.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.dangbun.domain.calender.dto.GetChecklistsResponse.*;
-import static com.dangbun.domain.calender.response.status.CalenderExceptionResponse.*;
+import static com.dangbun.domain.calendar.dto.GetChecklistsResponse.*;
+import static com.dangbun.domain.calendar.response.status.CalendarExceptionResponse.*;
 
 @RequiredArgsConstructor
 @Service
 @Transactional
-public class CalenderService {
+public class CalendarService {
 
 
     private final ChecklistRepository checklistRepository;

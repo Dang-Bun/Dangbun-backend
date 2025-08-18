@@ -1,4 +1,4 @@
-package com.dangbun.domain.calender.exception.custom;
+package com.dangbun.domain.calendar.exception.custom;
 
 import com.dangbun.global.response.status.ResponseStatus;
 import lombok.Getter;
