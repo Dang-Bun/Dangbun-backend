@@ -10,6 +10,8 @@ spring:
 
 # ?? DB
 spring:
+  jackson:
+    time-zone: Asia/Seoul
   config:
     activate:
       on-profile: db-local
