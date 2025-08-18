@@ -2,6 +2,7 @@ package com.dangbun.domain.user.controller;
 
 import com.dangbun.domain.user.dto.request.*;
 import com.dangbun.domain.user.dto.response.PostUserLoginResponse;
+import com.dangbun.domain.user.entity.CustomUserDetails;
 import com.dangbun.domain.user.entity.User;
 import com.dangbun.domain.user.response.status.UserExceptionResponse;
 import com.dangbun.domain.user.service.UserCommandService;
@@ -109,9 +110,9 @@ public class UserController {
             includes = { "INVALID_EMAIL"}
     )
     @DeleteMapping("/me")
-    public ResponseEntity<BaseResponse<?>> deleteCurrentUser(@AuthenticationPrincipal(expression = "user") User user,
+    public ResponseEntity<BaseResponse<?>> deleteCurrentUser(@AuthenticationPrincipal CustomUserDetails userDetails,
                                                              @RequestBody DeleteUserAccountRequest request) {
-        userCommandService.deleteCurrentUser(user, request);
+        userCommandService.deleteCurrentUser(userDetails.getUser(), request);
         return ResponseEntity.ok(BaseResponse.ok(null));
     }
 
@@ -122,10 +123,10 @@ public class UserController {
     )
     @GetMapping("/me")
     public ResponseEntity<BaseResponse<?>> getMyInfo(
-            @AuthenticationPrincipal(expression = "user") User user
+            @AuthenticationPrincipal CustomUserDetails userDetails
     ) {
 
-        return ResponseEntity.ok(BaseResponse.ok(userQueryService.getMyInfo(user)));
+        return ResponseEntity.ok(BaseResponse.ok(userQueryService.getMyInfo(userDetails.getUser())));
     }
 
 }

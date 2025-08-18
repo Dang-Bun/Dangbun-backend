@@ -5,6 +5,7 @@ import com.dangbun.domain.place.dto.request.*;
 import com.dangbun.domain.place.dto.response.*;
 import com.dangbun.domain.place.response.status.PlaceExceptionResponse;
 import com.dangbun.domain.place.service.PlaceService;
+import com.dangbun.domain.user.entity.CustomUserDetails;
 import com.dangbun.domain.user.entity.User;
 import com.dangbun.domain.user.response.status.UserExceptionResponse;
 import com.dangbun.global.aop.CheckManagerAuthority;
@@ -36,8 +37,8 @@ public class PlaceController {
             includes = {""}
     )
     @GetMapping()
-    public ResponseEntity<BaseResponse<GetPlaceListResponse>> getPlaces(@AuthenticationPrincipal(expression = "user") User user) {
-        return ResponseEntity.ok(BaseResponse.ok(placeService.getPlaces(user.getUserId())));
+    public ResponseEntity<BaseResponse<GetPlaceListResponse>> getPlaces(@AuthenticationPrincipal CustomUserDetails userDetails) {
+        return ResponseEntity.ok(BaseResponse.ok(placeService.getPlaces(userDetails.getUser().getUserId())));
     }
 
     @Operation(summary = "플레이스 생성", description = "플레이스를 생성합니다. 플레이스를 생성한 user는 매니저가 됩니다.")
@@ -46,11 +47,11 @@ public class PlaceController {
             includes = {"NO_SUCH_USER"}
     )
     @PostMapping
-    public ResponseEntity<BaseResponse<PostCreatePlaceResponse>> createPlace(@AuthenticationPrincipal(expression = "user") User user,
+    public ResponseEntity<BaseResponse<PostCreatePlaceResponse>> createPlace(@AuthenticationPrincipal CustomUserDetails userDetails,
                                                        @RequestBody PostCreatePlaceRequest request) {
 
 
-        return ResponseEntity.ok(BaseResponse.ok(placeService.createPlaceWithManager(user.getUserId(), request)));
+        return ResponseEntity.ok(BaseResponse.ok(placeService.createPlaceWithManager(userDetails.getUser().getUserId(), request)));
     }
 
     @Operation(summary = "참여코드 생성", description = "플레이스의 참여코드를 생성합니다.(매니저)")
@@ -72,10 +73,10 @@ public class PlaceController {
             includes = {"ALREADY_INVITED", "INVALID_INVITE_CODE"}
     )
     @PostMapping("/invite-code")
-    public ResponseEntity<BaseResponse<PostCheckInviteCodeResponse>> checkInviteCode(@AuthenticationPrincipal(expression = "user") User user,
+    public ResponseEntity<BaseResponse<PostCheckInviteCodeResponse>> checkInviteCode(@AuthenticationPrincipal CustomUserDetails userDetails,
                                                                                      @RequestBody PostCheckInviteCodeRequest request) {
 
-        PostCheckInviteCodeResponse response = placeService.checkInviteCode(user, request);
+        PostCheckInviteCodeResponse response = placeService.checkInviteCode(userDetails.getUser(), request);
         return ResponseEntity.ok(BaseResponse.ok(response));
 
     }
@@ -86,10 +87,10 @@ public class PlaceController {
             includes = {"INVALID_INVITE_CODE", "INVALID_INFORMATION"}
     )
     @PostMapping("/join-requests")
-    public ResponseEntity<BaseResponse<PostRegisterPlaceResponse>> registerPlace(@AuthenticationPrincipal(expression = "user") User user,
+    public ResponseEntity<BaseResponse<PostRegisterPlaceResponse>> registerPlace(@AuthenticationPrincipal CustomUserDetails userDetails,
                                                                                  @RequestBody PostRegisterPlaceRequest request) {
 
-        return ResponseEntity.ok(BaseResponse.ok(placeService.joinRequest(user, request)));
+        return ResponseEntity.ok(BaseResponse.ok(placeService.joinRequest(userDetails.getUser(), request)));
     }
 
     @Operation(summary = "참여 취소",description = "대기중인 플레이스의 참여 신청을 철회합니다")
