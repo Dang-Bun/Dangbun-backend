@@ -1,5 +1,6 @@
 package com.dangbun.domain.notificationreceiver.service;
 
+import com.dangbun.domain.notificationreceiver.exception.custom.NotificationReceiverNotFoundException;
 import com.dangbun.global.context.MemberContext;
 import com.dangbun.domain.notificationreceiver.dto.response.*;
 import com.dangbun.domain.notificationreceiver.entity.NotificationReceiver;
@@ -9,8 +10,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import static com.dangbun.domain.notificationreceiver.response.status.NotificationReceiverExceptionResponse.*;
 
 @Service
 @RequiredArgsConstructor
@@ -28,5 +31,16 @@ public class NotificationReceiverService {
 
         return new GetNotificationReceivedListResponse(notifications, resultPage.hasNext());
 
+    }
+
+    @Transactional
+    public void markAsRead(Long notificationId) {
+        Long memberId = MemberContext.get().getMemberId();
+
+        NotificationReceiver receiver = notificationReceiverRepository
+                .findByNotification_NotificationIdAndReceiver_MemberId(notificationId, memberId)
+                .orElseThrow(() -> new NotificationReceiverNotFoundException(NOTIFICATION_RECEIVER_NOT_FOUND));
+
+        receiver.markAsRead();
     }
 }
