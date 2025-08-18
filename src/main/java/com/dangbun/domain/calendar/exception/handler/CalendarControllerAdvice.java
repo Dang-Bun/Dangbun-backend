@@ -1,8 +1,8 @@
-package com.dangbun.domain.calender.exception.handler;
+package com.dangbun.domain.calendar.exception.handler;
 
-import com.dangbun.domain.calender.exception.custom.InvalidDateException;
-import com.dangbun.domain.calender.exception.custom.InvalidRoleException;
-import com.dangbun.domain.calender.exception.custom.NoPhotoException;
+import com.dangbun.domain.calendar.exception.custom.InvalidDateException;
+import com.dangbun.domain.calendar.exception.custom.InvalidRoleException;
+import com.dangbun.domain.calendar.exception.custom.NoPhotoException;
 import com.dangbun.global.response.BaseErrorResponse;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @Order(Ordered.HIGHEST_PRECEDENCE)
 @RestControllerAdvice
-public class CalenderControllerAdvice {
+public class CalendarControllerAdvice {
 
     @ExceptionHandler(InvalidDateException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)

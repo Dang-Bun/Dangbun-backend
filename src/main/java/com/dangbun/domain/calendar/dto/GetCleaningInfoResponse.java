@@ -1,4 +1,4 @@
-package com.dangbun.domain.calender.dto;
+package com.dangbun.domain.calendar.dto;
 
 import com.dangbun.domain.cleaning.entity.CleaningRepeatType;
 import io.swagger.v3.oas.annotations.media.Schema;

@@ -1,6 +1,6 @@
 package com.dangbun.domain.place.dto.response;
 
-import com.dangbun.domain.calender.dto.GetChecklistsResponse;
+import com.dangbun.domain.calendar.dto.GetChecklistsResponse;
 import com.dangbun.domain.checklist.entity.Checklist;
 import com.dangbun.domain.cleaning.entity.Cleaning;
 import com.dangbun.domain.member.entity.Member;
