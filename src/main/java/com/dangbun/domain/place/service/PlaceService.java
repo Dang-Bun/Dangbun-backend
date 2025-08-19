@@ -116,6 +116,7 @@ public class PlaceService {
                 .categoryName(categoryName)
                 .build();
 
+        place.createCode(generateCode());
 
         Place savedPlace = placeRepository.save(place);
 
