@@ -8,7 +8,7 @@ public record PostAddCleaningsResponse(
         @Schema(description = "추가된 청소 ID 목록")
         List<Long> addedCleaningId
 ) {
-    public static PostAddCleaningsResponse of(List<Long> addedMemberId) {
-        return new PostAddCleaningsResponse(addedMemberId);
+    public static PostAddCleaningsResponse of(List<Long> addedCleaningId) {
+        return new PostAddCleaningsResponse(addedCleaningId);
     }
 }
