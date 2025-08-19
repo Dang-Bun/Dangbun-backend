@@ -41,7 +41,7 @@ public class Place extends BaseEntity {
     private LocalTime startTime = LocalTime.MIDNIGHT;
 
     @Column(name = "end_time")
-    private LocalTime endTime = LocalTime.MAX;
+    private LocalTime endTime = LocalTime.of(23,59);
 
     @Column(name = "is_today")
     private Boolean isToday = true;
