@@ -36,12 +36,12 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.dangbun.domain.place.dto.response.GetPlaceListResponse.PlaceDto;
+import static com.dangbun.domain.place.dto.response.GetPlaceResponse.*;
 import static com.dangbun.domain.place.response.status.PlaceExceptionResponse.*;
 import static com.dangbun.domain.user.response.status.UserExceptionResponse.NO_SUCH_USER;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
 public class PlaceService {
 
 
@@ -53,12 +53,11 @@ public class PlaceService {
     private static final String CHARACTERS = "abcdefghijklmnopqrstuvwxyz0123456789";
     private static final int CODE_LENGTH = 6;
     private static final SecureRandom RANDOM = new SecureRandom();
+
     private final MemberDutyRepository memberDutyRepository;
     private final MemberCleaningRepository memberCleaningRepository;
     private final ChecklistRepository checkListRepository;
     private final DutyRepository dutyRepository;
-    private final DutyService dutyService;
-    private final MemberService memberService;
     private final NotificationReceiverRepository notificationReceiverRepository;
 
     @Transactional(readOnly = true)
@@ -97,6 +96,7 @@ public class PlaceService {
         return GetPlaceListResponse.of(placeDtos);
     }
 
+    @Transactional
     public PostCreatePlaceResponse createPlaceWithManager(Long userId, PostCreatePlaceRequest request) {
 
 
@@ -133,6 +133,7 @@ public class PlaceService {
         return PostCreatePlaceResponse.of(savedPlace.getPlaceId());
     }
 
+    @Transactional
     public PostCreateInviteCodeResponse createInviteCode() {
         Place place = MemberContext.get().getPlace();
         String code = place.createCode(generateCode());
@@ -159,15 +160,8 @@ public class PlaceService {
         return PostCheckInviteCodeResponse.of(place.getPlaceId(), iList);
     }
 
-    public static String generateCode() {
-        StringBuilder sb = new StringBuilder(CODE_LENGTH);
-        for (int i = 0; i < CODE_LENGTH; i++) {
-            int index = RANDOM.nextInt(CHARACTERS.length());
-            sb.append(CHARACTERS.charAt(index));
-        }
-        return sb.toString();
-    }
 
+    @Transactional
     public PostRegisterPlaceResponse joinRequest(User user, PostRegisterPlaceRequest request) {
 
 
@@ -201,7 +195,7 @@ public class PlaceService {
         Long placeId = place.getPlaceId();
 
         if (!member.getStatus()) {
-            return new GetPlaceResponse(member.getMemberId(), placeId, place.getName(), place.getCategory(),place.getCategoryName(),null, null);
+            return new GetPlaceResponse(member.getMemberId(), placeId, place.getName(), place.getCategory(),place.getCategoryName(),null,null);
         }
 
         List<MemberDuty> memberDuties = memberDutyRepository.findAllWithMemberAndPlaceByPlaceId(placeId);
@@ -217,10 +211,13 @@ public class PlaceService {
                         md -> checkListRepository.findWithCleaningByDutyId(md.getDuty().getDutyId())
                 ));
 
+        List<DutyDto> dutyDtos = createDutyDtos(cleaningMap, memberCleanings);
 
-        return GetPlaceResponse.of(member, place, cleaningMap, memberCleanings);
+        return of(member.getMemberId(), placeId,place.getName(),place.getCategory(), place.getCategoryName(),place.getEndTime(), dutyDtos);
     }
 
+
+    @Transactional
     public void deletePlace(DeletePlaceRequest request) {
         Member runner = MemberContext.get();
 
@@ -233,13 +230,14 @@ public class PlaceService {
 
     }
 
+    @Transactional
     public void cancelRegister() {
         Member member = MemberContext.get();
 
         memberRepository.delete(member);
     }
 
-
+    @Transactional
     public PatchUpdateTimeResponse updateTime(PatchUpdateTimeRequest request) {
         Place place = MemberContext.get().getPlace();
 
@@ -252,6 +250,7 @@ public class PlaceService {
         return PatchUpdateTimeResponse.of(place, place.getIsToday());
     }
 
+    @Transactional(readOnly = true)
     public GetDutiesProgressResponse getDutiesProgress() {
         Long placeId = MemberContext.get().getPlace().getPlaceId();
 
@@ -280,5 +279,39 @@ public class PlaceService {
             throw new InviteCodeNotExistsException(INVITE_CODE_NOT_EXISTS);
         }
         return GetPlaceInvitedCodeResponse.of(code);
+    }
+///
+/// without transaction
+
+    private String generateCode() {
+        StringBuilder sb = new StringBuilder(CODE_LENGTH);
+        for (int i = 0; i < CODE_LENGTH; i++) {
+            int index = RANDOM.nextInt(CHARACTERS.length());
+            sb.append(CHARACTERS.charAt(index));
+        }
+        return sb.toString();
+    }
+
+    private List<DutyDto> createDutyDtos(Map<MemberDuty, List<Checklist>> cleaningMap, List<MemberCleaning> memberCleanings) {
+        List<DutyDto> duties = new ArrayList<>();
+        for (Map.Entry<MemberDuty, List<Checklist>> mdc : cleaningMap.entrySet()) {
+            MemberDuty md = mdc.getKey();
+            List<CheckListDto> checkListDtos = new ArrayList<>();
+            for (Checklist checkList : mdc.getValue()) {
+
+                Cleaning cleaning = checkList.getCleaning();
+
+                List<Member> members = new ArrayList<>();
+                for (MemberCleaning mc : memberCleanings) {
+                    if (mc.getCleaning().equals(cleaning)) {
+                        members.add(mc.getMember());
+                    }
+                }
+                checkListDtos.add(CheckListDto.of(checkList, members));
+            }
+
+             duties.add(DutyDto.of(md.getDuty().getName(), checkListDtos));
+        }
+        return duties;
     }
 }

@@ -41,42 +41,9 @@ public record GetPlaceResponse(
         @Schema(description = "당번 리스트")
         List<DutyDto> duties
 ) {
-
-    public static GetPlaceResponse of(Member member, Place place, Map<MemberDuty, List<Checklist>> cleaningMap, List<MemberCleaning> memberCleanings) {
-
-        Long placeId = place.getPlaceId();
-        String placeName = place.getName();
-        LocalTime endTime = place.getEndTime();
-
-        List<DutyDto> duties = new ArrayList<>();
-        for (Map.Entry<MemberDuty, List<Checklist>> mdc : cleaningMap.entrySet()) {
-            MemberDuty md = mdc.getKey();
-            List<CheckListDto> checkListDtos = new ArrayList<>();
-            for (Checklist checkList : mdc.getValue()) {
-
-                Cleaning cleaning = checkList.getCleaning();
-
-                List<Member> members = new ArrayList<>();
-                for (MemberCleaning mc : memberCleanings) {
-                    if (mc.getCleaning().equals(cleaning)) {
-                        members.add(mc.getMember());
-                    }
-                }
-                checkListDtos.add(CheckListDto.of(checkList, members));
-            }
-
-            duties.add(DutyDto.of(md.getDuty().getName(), checkListDtos));
-        }
-
-        return new GetPlaceResponse(member.getMemberId(),
-                placeId,
-                placeName,
-                place.getCategory(),
-                place.getCategoryName(),
-                endTime,
-                duties);
+    public static GetPlaceResponse of(Long memberId, Long placeId, String placeName, PlaceCategory placeCategory, String categoryName, LocalTime endTime, List<DutyDto> dutyDtos) {
+        return new GetPlaceResponse(memberId, placeId, placeName, placeCategory, categoryName, endTime, dutyDtos);
     }
-
 
     @Schema(name = "GetPlaceResponse.DutyDto", description = "당번 DTO")
     public record DutyDto(
@@ -101,7 +68,7 @@ public record GetPlaceResponse(
                     endCleaning++;
                 }
             }
-            return new DutyDto(dutyName, checkLists.size(),endCleaning, checkLists);
+            return new DutyDto(dutyName, checkLists.size(), endCleaning, checkLists);
         }
     }
 
