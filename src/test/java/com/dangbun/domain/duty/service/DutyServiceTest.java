@@ -34,8 +34,8 @@ import static com.dangbun.domain.place.entity.PlaceCategory.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.*;
+import static org.mockito.BDDMockito.*;
+
 
 @ExtendWith(MockitoExtension.class)
 class DutyServiceTest {
@@ -88,7 +88,7 @@ class DutyServiceTest {
 
         // then
         assertThat(response.dutyId()).isEqualTo(1L);
-        verify(dutyRepository).save(any(Duty.class));
+        then(dutyRepository).should().save(any(Duty.class));
     }
 
     @Test
@@ -206,7 +206,7 @@ class DutyServiceTest {
         dutyService.deleteDuty();
 
         // then
-        verify(dutyRepository).delete(duty);
+        then(dutyRepository).should().delete(duty);
     }
 
     @Test
@@ -237,8 +237,8 @@ class DutyServiceTest {
 
         // then
         assertThat(response.addedMemberIds()).containsExactlyInAnyOrder(100L, 200L);
-        verify(memberDutyRepository).deleteAllByDuty(duty);
-        verify(memberDutyRepository, times(2)).save(any(MemberDuty.class));
+        then(memberDutyRepository).should().deleteAllByDuty(duty);
+        then(memberDutyRepository).should(times(2)).save(any(MemberDuty.class));
     }
 
     @Test
@@ -290,8 +290,8 @@ class DutyServiceTest {
         dutyService.assignMember(request);
 
         // then
-        verify(memberCleaningRepository).deleteAllByCleaning_CleaningId(10L);
-        verify(memberCleaningRepository).saveAll(anyList());
+        then(memberCleaningRepository).should().deleteAllByCleaning_CleaningId(10L);
+        then(memberCleaningRepository).should().saveAll(anyList());
     }
 
     @Test
@@ -341,8 +341,8 @@ class DutyServiceTest {
         dutyService.assignMember(request);
 
         // then
-        verify(memberCleaningRepository, times(2)).deleteAllByCleaning_CleaningId(anyLong());
-        verify(memberCleaningRepository, times(2)).saveAll(anyList());
+        then(memberCleaningRepository).should(times(2)).deleteAllByCleaning_CleaningId(anyLong());
+        then(memberCleaningRepository).should(times(2)).saveAll(anyList());
     }
 
     @Test
@@ -393,8 +393,8 @@ class DutyServiceTest {
         dutyService.assignMember(request);
 
         // then
-        verify(memberCleaningRepository).deleteAllByCleaning_CleaningId(10L);
-        verify(memberCleaningRepository).saveAll(anyList());
+        then(memberCleaningRepository).should().deleteAllByCleaning_CleaningId(10L);
+        then(memberCleaningRepository).should().saveAll(anyList());
     }
 
 
@@ -463,7 +463,7 @@ class DutyServiceTest {
         assertThat(response.addedCleaningId()).containsExactlyInAnyOrder(100L, 200L);
         assertThat(cleaning1.getDuty()).isEqualTo(duty);
         assertThat(cleaning2.getDuty()).isEqualTo(duty);
-        verify(cleaningRepository).saveAll(anyList());
+        then(cleaningRepository).should().saveAll(anyList());
     }
 
     @Test
