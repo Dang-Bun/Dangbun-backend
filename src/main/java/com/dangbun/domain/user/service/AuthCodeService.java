@@ -30,6 +30,7 @@ public class AuthCodeService {
     public void sendAuthCode(String toEmail){
         String title = "당번 이메일 인증 번호";
         String authCode = createAuthCode();
+        authRedisService.checkDuration(AUTH_CODE_PREFIX+toEmail, Duration.ofMillis(this.authCodeExpirationMillis));
         emailService.sendEmail(toEmail, title, authCode);
         authRedisService.saveAuthCode(AUTH_CODE_PREFIX + toEmail, authCode, Duration.ofMillis(this.authCodeExpirationMillis));
     }
