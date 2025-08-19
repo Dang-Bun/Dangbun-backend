@@ -177,7 +177,7 @@ public class PlaceService {
 
         Member member = Member.builder()
                 .user(user)
-                .role(MemberRole.MEMBER)
+                .role(MemberRole.WAITING)
                 .status(false)
                 .place(place)
                 .name(request.name())

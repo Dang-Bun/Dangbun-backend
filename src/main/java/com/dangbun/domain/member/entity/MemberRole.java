@@ -7,7 +7,8 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public enum MemberRole {
     MANAGER("매니저"),
-    MEMBER("멤버")
+    MEMBER("멤버"),
+    WAITING("대기중")
     ;
 
     private final String displayName;
