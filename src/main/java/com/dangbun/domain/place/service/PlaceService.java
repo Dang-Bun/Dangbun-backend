@@ -25,6 +25,7 @@ import com.dangbun.domain.user.exception.custom.NoSuchUserException;
 import com.dangbun.domain.user.repository.UserRepository;
 import com.dangbun.global.context.MemberContext;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -40,6 +41,7 @@ import static com.dangbun.domain.place.dto.response.GetPlaceResponse.*;
 import static com.dangbun.domain.place.response.status.PlaceExceptionResponse.*;
 import static com.dangbun.domain.user.response.status.UserExceptionResponse.NO_SUCH_USER;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class PlaceService {
@@ -183,7 +185,7 @@ public class PlaceService {
                 .name(request.name())
                 .information(request.information())
                 .build();
-
+        log.info(member.getRole().toString());
         memberRepository.save(member);
 
         return PostRegisterPlaceResponse.of(place.getPlaceId());
