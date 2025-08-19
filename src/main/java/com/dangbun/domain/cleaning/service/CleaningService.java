@@ -94,7 +94,7 @@ public class CleaningService {
                     .orElseThrow(() -> new DutyNotFoundException(DUTY_NOT_FOUND));
         }
 
-        if (cleaningRepository.existsByNameAndDuty(request.cleaningName(), duty)) {
+        if (cleaningRepository.existsByNameAndDutyAndPlace(request.cleaningName(), duty, place)) {
             throw new CleaningAlreadyExistsException(CLEANING_ALREADY_EXISTS);
         }
 
@@ -146,6 +146,8 @@ public class CleaningService {
 
 
     public void updateCleaning(Long cleaningId, PutCleaningUpdateRequest request) {
+        Place place = MemberContext.get().getPlace();
+
         Cleaning cleaning = cleaningRepository.findWithDutyNullableById(cleaningId)
                 .orElseThrow(() -> new CleaningNotFoundException(CLEANING_NOT_FOUND));
 
@@ -155,7 +157,7 @@ public class CleaningService {
                     .orElseThrow(() -> new DutyNotFoundException(DUTY_NOT_FOUND));
         }
 
-        if (cleaningRepository.existsByNameAndDutyAndCleaningIdNot(request.cleaningName(), duty, cleaningId)) {
+        if (cleaningRepository.existsByNameAndDutyAndCleaningIdNotAndPlace(request.cleaningName(), duty, cleaningId, place)) {
             throw new CleaningAlreadyExistsException(CLEANING_ALREADY_EXISTS);
         }
 

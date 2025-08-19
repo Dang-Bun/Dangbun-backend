@@ -54,10 +54,10 @@ public class Cleaning extends BaseEntity {
 
     public void updateInfo(String name, Boolean needPhoto, CleaningRepeatType repeatType, String repeatDays, Duty duty) {
         this.name = name;
-        this.needPhoto = needPhoto;
         this.repeatType = repeatType;
         this.repeatDays = repeatDays;
         this.duty = duty;
+        this.needPhoto = needPhoto;
     }
 
     public void assignToDuty(Duty duty) {
