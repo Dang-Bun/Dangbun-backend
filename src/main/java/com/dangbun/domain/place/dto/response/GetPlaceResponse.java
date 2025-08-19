@@ -91,11 +91,16 @@ public record GetPlaceResponse(
             Boolean needPhoto
 
     ) {
-        public static CheckListDto of(Checklist checkList, List<Member> members) {
+        public static CheckListDto of(Checklist checklist, List<Member> members) {
 
             List<MemberDto> memberDtos = members.stream()
                     .map(MemberDto::of).toList();
-            return new CheckListDto(checkList.getChecklistId(), memberDtos, checkList.getCleaning().getName(), checkList.getCompleteTime().toLocalTime(), checkList.getCleaning().getNeedPhoto());
+
+            LocalTime time = checklist.getCompleteTime() != null
+                    ? checklist.getCompleteTime().toLocalTime()
+                    : null;
+
+            return new CheckListDto(checklist.getChecklistId(), memberDtos, checklist.getCleaning().getName(), time, checklist.getCleaning().getNeedPhoto());
         }
     }
 
