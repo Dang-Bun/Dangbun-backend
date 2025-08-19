@@ -36,20 +36,32 @@ public class MemberControllerAdvice {
 
     @ExceptionHandler(NameNotMatchedException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public BaseErrorResponse handleNameNotMatched(NameNotMatchedException e) {
+    public BaseErrorResponse handleNameNotMatchedException(NameNotMatchedException e) {
         return new BaseErrorResponse(NAME_NOT_MATCHED);
     }
 
     @ExceptionHandler(PlaceNameNotMatchedException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public BaseErrorResponse handleNameNotMatched(PlaceNameNotMatchedException e) {
+    public BaseErrorResponse handlePlaceNameNotMatchedException(PlaceNameNotMatchedException e) {
         return new BaseErrorResponse(PLACE_NAME_NOT_MATCHED);
     }
 
     @ExceptionHandler(MembershipUnauthorizedException.class)
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
-    public BaseErrorResponse handleNameNotMatched(MembershipUnauthorizedException e) {
+    public BaseErrorResponse handleMembershipUnauthorizedException(MembershipUnauthorizedException e) {
         return new BaseErrorResponse(MEMBERSHIP_UNAUTHORIZED);
+    }
+
+    @ExceptionHandler(DutyNotInPlaceException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public BaseErrorResponse handleDutyNotInPlaceException(DutyNotInPlaceException e) {
+        return new BaseErrorResponse(DUTY_NOT_IN_PLACE);
+    }
+
+    @ExceptionHandler(MemberDutyAlreadyAssignedException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public BaseErrorResponse handleMemberDutyAlreadyAssignedException(MemberDutyAlreadyAssignedException e) {
+        return new BaseErrorResponse(MEMBER_DUTY_ALREADY_ASSIGNED);
     }
 
 }
