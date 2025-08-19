@@ -2,6 +2,7 @@ package com.dangbun.domain.cleaning.repository;
 
 import com.dangbun.domain.cleaning.entity.Cleaning;
 import com.dangbun.domain.duty.entity.Duty;
+import com.dangbun.domain.place.entity.Place;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -12,9 +13,9 @@ public interface CleaningRepository extends JpaRepository<Cleaning, Long> {
     List<Cleaning> findAllByDuty(Duty duty);
 
 
-    boolean existsByNameAndDuty(String name, Duty duty);
+    boolean existsByNameAndDutyAndPlace(String name, Duty duty, Place place);
 
-    boolean existsByNameAndDutyAndCleaningIdNot(String name, Duty duty, Long cleaningId);
+    boolean existsByNameAndDutyAndCleaningIdNotAndPlace(String name, Duty duty, Long cleaningId, Place place);
 
     @Query("""
             SELECT c FROM Cleaning c
@@ -37,5 +38,4 @@ public interface CleaningRepository extends JpaRepository<Cleaning, Long> {
     """)
     List<Cleaning> findUnassignedCleaningsByPlaceId(Long placeId);
 
-    List<Cleaning> findByDuty_DutyId(Long dutyId);
 }

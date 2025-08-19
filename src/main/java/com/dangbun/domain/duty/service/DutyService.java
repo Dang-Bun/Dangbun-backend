@@ -1,10 +1,7 @@
 package com.dangbun.domain.duty.service;
 
 import com.dangbun.domain.cleaning.entity.Cleaning;
-import com.dangbun.domain.cleaning.exception.custom.DutyNotFoundException;
 import com.dangbun.domain.cleaning.repository.CleaningRepository;
-import com.dangbun.domain.cleaning.service.CleaningService;
-import com.dangbun.domain.cleaningdate.repository.CleaningDateRepository;
 import com.dangbun.domain.duty.dto.request.*;
 import com.dangbun.domain.duty.dto.response.*;
 import com.dangbun.domain.duty.entity.Duty;
@@ -25,7 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
-import java.util.stream.Collectors;
+
 
 import static com.dangbun.domain.duty.response.status.DutyExceptionResponse.*;
 
@@ -38,10 +35,7 @@ public class DutyService {
     private final MemberDutyRepository memberDutyRepository;
     private final CleaningRepository cleaningRepository;
     private final MemberRepository memberRepository;
-    private final CleaningDateRepository cleaningDateRepository;
     private final MemberCleaningRepository memberCleaningRepository;
-    private final CleaningService cleaningService;
-
 
     public PostDutyCreateResponse createDuty(PostDutyCreateRequest request) {
 
@@ -125,15 +119,12 @@ public class DutyService {
 
         List<Long> addedMemberIds = new ArrayList<>();
         for (Member member : members) {
-            boolean exists = memberDutyRepository.existsByDutyAndMember(duty, member);
-            if (!exists) {
-                MemberDuty md = MemberDuty.builder()
-                        .duty(duty)
-                        .member(member)
-                        .build();
-                memberDutyRepository.save(md);
-                addedMemberIds.add(member.getMemberId());
-            }
+            MemberDuty md = MemberDuty.builder()
+                    .duty(duty)
+                    .member(member)
+                    .build();
+            memberDutyRepository.save(md);
+            addedMemberIds.add(member.getMemberId());
         }
 
         return PutAddMembersResponse.of(addedMemberIds);
