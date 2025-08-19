@@ -3,7 +3,6 @@ package com.dangbun.domain.place.service;
 import com.dangbun.domain.checklist.entity.Checklist;
 import com.dangbun.domain.checklist.repository.ChecklistRepository;
 import com.dangbun.domain.cleaning.entity.Cleaning;
-import com.dangbun.domain.duty.entity.Duty;
 import com.dangbun.domain.duty.repository.DutyRepository;
 import com.dangbun.domain.duty.service.DutyService;
 import com.dangbun.domain.member.entity.Member;
@@ -172,7 +171,7 @@ public class PlaceService {
     public PostRegisterPlaceResponse joinRequest(User user, PostRegisterPlaceRequest request) {
 
 
-        Member tempMember = memberRepository.findFirstWithPlaceByInviteCode(request.inviteCode())
+        Member tempMember = memberRepository.findWithPlaceByInviteCode(request.inviteCode()).stream().findAny()
                 .orElseThrow(() -> new InvalidInviteCodeException(INVALID_INVITE_CODE));
 
         Place place = tempMember.getPlace();
