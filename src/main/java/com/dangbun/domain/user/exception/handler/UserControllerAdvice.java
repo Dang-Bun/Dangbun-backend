@@ -51,6 +51,12 @@ public class UserControllerAdvice {
         return new BaseErrorResponse(DELETE_MEMBER);
     }
 
+    @ExceptionHandler(AuthCodeAlreadySentException.class)
+    public BaseErrorResponse handleAuthCodeAlreadySent(AuthCodeAlreadySentException e){
+        log.error("[AuthCodeAlreadySentException]",e);
+        return new BaseErrorResponse(AUTH_CODE_SENT);
+    }
+
 
 
 }

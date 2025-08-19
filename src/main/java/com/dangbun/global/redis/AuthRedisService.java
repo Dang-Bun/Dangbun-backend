@@ -1,7 +1,8 @@
 package com.dangbun.global.redis;
 
+import com.dangbun.domain.user.exception.custom.AuthCodeAlreadySentException;
+import com.dangbun.domain.user.response.status.UserExceptionResponse;
 import com.dangbun.global.security.JwtUtil;
-import com.dangbun.global.security.TokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
@@ -9,6 +10,8 @@ import org.springframework.stereotype.Service;
 import java.time.Duration;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
+
+import static com.dangbun.domain.user.response.status.UserExceptionResponse.*;
 
 @RequiredArgsConstructor
 @Service
@@ -42,12 +45,22 @@ public class AuthRedisService {
     }
 
     public void saveAuthCode(String toEmail, String authCode, Duration duration){
+
+
         redisTemplate.opsForValue()
                 .set(toEmail, authCode, duration);
     }
 
     public String getAuthCode(String email) {
         return redisTemplate.opsForValue().get(email);
+    }
+
+    public void checkDuration(String toEmail, Duration duration) {
+        long remaining = redisTemplate.getExpire(toEmail, TimeUnit.SECONDS);
+
+        if(remaining > 0 && remaining > duration.getSeconds() - 60){
+            throw new AuthCodeAlreadySentException(AUTH_CODE_SENT);
+        }
     }
 }
 

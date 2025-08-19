@@ -35,7 +35,7 @@ public class UserController {
     @Operation(summary = "인증번호 생성(비밀번호 재설정용)",description = "이메일 인증번호를 생성합니다.(비밀번호 재설정 용)")
     @DocumentedApiErrors(
             value = {UserExceptionResponse.class},
-            includes = {"INVALID_EMAIL"}
+            includes = {"INVALID_EMAIL","AUTH_CODE_SENT"}
     )
     @PostMapping("/email-code")
     public ResponseEntity<BaseResponse<?>> generatePasswordAuthCode(@RequestBody PostUserAuthCodeRequest request) {
@@ -47,7 +47,7 @@ public class UserController {
     @Operation(summary = "인증번호 생성(회원가입 용)",description = "이메일 인증번호를 생성합니다.(회원가입 용)")
     @DocumentedApiErrors(
             value = {UserExceptionResponse.class},
-            includes = {"EXIST_EMAIL"}
+            includes = {"EXIST_EMAIL","AUTH_CODE_SENT"}
     )
     @PostMapping("/signup/email-code")
     public ResponseEntity<BaseResponse<?>> generateSignupAuthCode(@RequestBody PostUserAuthCodeRequest request) {
