@@ -2,7 +2,6 @@ package com.dangbun.domain.cleaning.service;
 
 import com.dangbun.domain.checklist.entity.Checklist;
 import com.dangbun.domain.checklist.repository.ChecklistRepository;
-import com.dangbun.domain.checklist.service.ChecklistService;
 import com.dangbun.domain.checklist.service.CreateChecklistService;
 import com.dangbun.domain.cleaning.dto.request.PostCleaningCreateRequest;
 import com.dangbun.domain.cleaning.dto.request.PutCleaningUpdateRequest;
@@ -90,7 +89,7 @@ public class CleaningService {
 
         Duty duty = null;
         if (request.dutyName() != null) {
-            duty = dutyRepository.findByName(request.dutyName())
+            duty = dutyRepository.findById(request.dutyId())
                     .orElseThrow(() -> new DutyNotFoundException(DUTY_NOT_FOUND));
         }
 
