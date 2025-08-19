@@ -59,6 +59,7 @@ public class Member extends BaseEntity {
     }
 
     public void activate(){
+        this.role = MemberRole.MEMBER;
         this.status = true;
     }
 
