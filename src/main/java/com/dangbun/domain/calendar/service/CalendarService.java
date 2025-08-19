@@ -68,7 +68,12 @@ public class CalendarService {
             Long checklistId = checklist.getChecklistId();
             String dutyName = checklist.getCleaning().getDuty().getName();
             Boolean isComplete = checklist.getIsComplete();
-            String memberName = memberRepository.findById(checklist.getCompleteMemberId()).get().getName();
+
+            String memberName = null;
+            if(checklist.getCompleteMemberId()!=null){
+                memberName = memberRepository.findById(checklist.getCompleteMemberId()).map(Member::getName).orElse(null);
+            }
+
             LocalTime localTime = checklist.getCompleteTime().toLocalTime();
             Boolean needPhoto = checklist.getCleaning().getNeedPhoto();
 

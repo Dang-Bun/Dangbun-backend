@@ -35,7 +35,7 @@ public class CalendarController {
     @GetMapping("/checklists")
     public ResponseEntity<BaseResponse<GetChecklistsResponse>> getChecklistsByDate(@PathVariable Long placeId,
                                                                                    @RequestParam LocalDate date) {
-        return ResponseEntity.ok(BaseResponse.ok(calendarService.getChecklists( date)));
+        return ResponseEntity.ok(BaseResponse.ok(calendarService.getChecklists(date)));
     }
 
     @Operation(summary = "프로그래스바 조회(이전 달, 다음 달 포함)")
