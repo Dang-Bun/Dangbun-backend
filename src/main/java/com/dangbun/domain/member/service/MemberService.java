@@ -1,6 +1,9 @@
 package com.dangbun.domain.member.service;
 
+import com.dangbun.domain.cleaning.exception.custom.DutyNotFoundException;
 import com.dangbun.domain.duty.entity.Duty;
+import com.dangbun.domain.duty.repository.DutyRepository;
+import com.dangbun.domain.place.entity.Place;
 import com.dangbun.global.context.MemberContext;
 import com.dangbun.domain.member.dto.request.*;
 import com.dangbun.domain.member.dto.response.*;
@@ -27,6 +30,7 @@ public class MemberService {
 
     private final MemberRepository memberRepository;
     private final MemberDutyRepository memberDutyRepository;
+    private final DutyRepository dutyRepository;
 
     @Transactional(readOnly = true)
     public GetMembersResponse getMembers() {
@@ -144,20 +148,35 @@ public class MemberService {
 
     @Transactional(readOnly = true)
     public GetMemberSearchResponse searchByNameInPlace(Long placeId, String name) {
-        Member me = MemberContext.get();
-
         return memberRepository.findByPlace_PlaceIdAndName(placeId, name)
                 .map(GetMemberSearchResponse::of)
                 .orElse(new GetMemberSearchResponse(null, null));
     }
 
-    /**
-     * 해당 함수는 연관된 클래스에서 Member 클래스를 삭제하기 위해 호출하는 함수임
-     * 탈퇴 및 추방 등 Member 도메인에서 직접 호출하는 로직 같은 경우는 removeX 메서드를 사용
-     */
-
     private Member getMemberByMemberIdAndPlaceId(Long memberId, Long placeId) {
         return memberRepository.findByMemberIdAndPlace_PlaceId(memberId, placeId)
                 .orElseThrow(() -> new MemberNotFoundException(MEMBER_NOT_FOUND));
+    }
+
+
+    public void assignDutyToMember(Long memberId, Long dutyId) {
+        Long placeId = MemberContext.get().getPlace().getPlaceId();
+
+        Member targetMember = memberRepository.findByMemberIdAndPlace_PlaceId(memberId, placeId)
+                .orElseThrow(() -> new MemberNotFoundException(MEMBER_NOT_FOUND));
+
+        Duty duty = dutyRepository.findByDutyIdAndPlace_PlaceId(dutyId, placeId)
+                .orElseThrow(() -> new DutyNotInPlaceException(DUTY_NOT_IN_PLACE));
+
+        if (memberDutyRepository.existsByDutyAndMember(duty, targetMember)) {
+            throw new MemberDutyAlreadyAssignedException(MEMBER_DUTY_ALREADY_ASSIGNED);
+        }
+
+        MemberDuty memberDuty = MemberDuty.builder()
+                .member(targetMember)
+                .duty(duty)
+                .build();
+
+        memberDutyRepository.save(memberDuty);
     }
 }

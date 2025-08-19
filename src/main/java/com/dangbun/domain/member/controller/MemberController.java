@@ -57,7 +57,7 @@ public class MemberController {
     )
     @PostMapping("/{memberId}/accept")
     @CheckManagerAuthority
-    public ResponseEntity<?> registerMember(@PathVariable("placeId") Long placeId,
+    public ResponseEntity<BaseResponse<Void>> registerMember(@PathVariable("placeId") Long placeId,
                                             @PathVariable("memberId") Long memberId) {
         memberService.registerMember(memberId);
 
@@ -71,7 +71,7 @@ public class MemberController {
     )
     @DeleteMapping("/waiting/{memberId}")
     @CheckManagerAuthority
-    public ResponseEntity<?> removeWaitingMember(@PathVariable("placeId") Long placeId,
+    public ResponseEntity<BaseResponse<Void>> removeWaitingMember(@PathVariable("placeId") Long placeId,
                                                  @PathVariable("memberId") Long memberId) {
 
         memberService.removeWaitingMember(memberId);
@@ -96,7 +96,7 @@ public class MemberController {
             includes = {"PLACE_ACCESS_DENIED","PLACE_NAME_NOT_MATCHED", "INVALID_ROLE"}
     )
     @DeleteMapping("/me")
-    public ResponseEntity<?> removeSelfFromPlace(@PathVariable("placeId") Long placeId,
+    public ResponseEntity<BaseResponse<Void>> removeSelfFromPlace(@PathVariable("placeId") Long placeId,
                                                  @RequestBody DeleteSelfFromPlaceRequest request) {
         memberService.exitPlace(request);
         return ResponseEntity.ok(BaseResponse.ok(null));
@@ -109,14 +109,14 @@ public class MemberController {
     )
     @DeleteMapping("/{memberId}")
     @CheckManagerAuthority
-    public ResponseEntity<?> removeMember(@PathVariable("placeId") Long placeId,
+    public ResponseEntity<BaseResponse<Void>> removeMember(@PathVariable("placeId") Long placeId,
                                           @PathVariable("memberId") Long memberId,
                                           @RequestBody DeleteMemberRequest request) {
         memberService.removeMember(memberId, request);
         return ResponseEntity.ok(BaseResponse.ok(null));
     }
 
-    @Operation(summary = "당번에 멤버 추가 - 플레이스에 속한 멤버 검색", description = "해당 플레이스에서 이름이 정확히 일치하는 멤버를 검색합니다. (매니저용)")
+    @Operation(summary = "플레이스에 속한 멤버 검색", description = "해당 플레이스에서 이름이 정확히 일치하는 멤버를 검색합니다. (매니저용)")
     @DocumentedApiErrors(
             value = MemberExceptionResponse.class,
             includes = {"PLACE_ACCESS_DENIED","INVALID_ROLE", "MEMBERSHIP_UNAUTHORIZED"}
@@ -137,6 +137,21 @@ public class MemberController {
     @GetMapping("/me")
     public ResponseEntity<BaseResponse<GetMyInformationResponse>> getMyInformation(@PathVariable("placeId") Long placeId){
         return ResponseEntity.ok(BaseResponse.ok(memberService.getMyInformation()));
+    }
+
+    @Operation(summary = "멤버 관리 - 당번 설정")
+    @DocumentedApiErrors(
+            value = MemberExceptionResponse.class,
+            includes = {"PLACE_ACCESS_DENIED"}
+    )
+    @PostMapping("/{memberId}/duties/{dutyId}")
+    @CheckManagerAuthority
+    public ResponseEntity<BaseResponse<Void>> assignDutyToMember(
+            @PathVariable Long memberId,
+            @PathVariable Long dutyId
+    ) {
+        memberService.assignDutyToMember(memberId, dutyId);
+        return ResponseEntity.ok(BaseResponse.ok(null));
     }
 
 }
