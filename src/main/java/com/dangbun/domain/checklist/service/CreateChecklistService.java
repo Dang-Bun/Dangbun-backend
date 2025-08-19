@@ -16,15 +16,14 @@ import java.time.LocalTime;
 import java.time.YearMonth;
 import java.util.List;
 
-@Transactional
 @Service
 @RequiredArgsConstructor
 public class CreateChecklistService {
 
 
-    private final ChecklistService checklistService;
     private final ChecklistRepository checklistRepository;
 
+    @Transactional
     public void createChecklistByDateAndTime(Cleaning cleaning, List<CleaningDate> cleaningDates, Place place) {
 
 
