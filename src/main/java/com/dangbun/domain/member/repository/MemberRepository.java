@@ -31,7 +31,7 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
 
     List<Member> findByPlace_PlaceId(Long placeId);
 
-    List<Member> findByPlace_PlaceIdAndStatusIsFalse(Long placeId);
+    List<Member> findByPlace_PlaceIdAndStatusIsFalseOrderByNameAsc(Long placeId);
 
     Optional<Member> findByMemberIdAndPlace_PlaceId(Long memberId, Long placeId);
 

@@ -167,7 +167,7 @@ class DutyServiceTest {
         List<GetDutyMemberNameListResponse> result = dutyService.getDutyMemberNameList();
 
         assertThat(result).hasSize(2);
-        assertThat(result).extracting("name").containsExactlyInAnyOrder("철수", "영희");
+        assertThat(result).extracting("name").containsExactly("영희", "철수");
     }
 
     @Test
