@@ -70,31 +70,39 @@ public class PlaceService {
         List<Member> members = memberRepository.findWithPlaceByUserId(userId);
 
         List<PlaceDto> placeDtos = new ArrayList<>();
+
+
         for (Member member : members) {
-            if (!member.getStatus()) {
-                Place place = member.getPlace();
-                placeDtos.add(PlaceDto.of(place.getPlaceId(), place.getName(), place.getCategory(), place.getCategoryName(), null, null, null, null));
-            } else {
-                Place place = member.getPlace();
+                if (!member.getStatus() || member.getRole().equals(MemberRole.WAITING)) {
+                    Place place = member.getPlace();
+                    placeDtos.add(PlaceDto.of(place.getPlaceId(), place.getName(), place.getCategory(), place.getCategoryName(), null, null, null, null));
+                } else {
+                    Place place = member.getPlace();
 
-                List<MemberCleaning> memberCleanings = memberCleaningRepository.findAllByMember(member);
-                Integer totalCleaning = memberCleanings.size();
-                Integer endCleaning = 0;
-                for (MemberCleaning memberCleaning : memberCleanings) {
-                    Cleaning cleaning = memberCleaning.getCleaning();
-                    LocalDate now = LocalDate.now();
-                    LocalDateTime start = now.atStartOfDay();
-                    LocalDateTime end = now.plusDays(1).atStartOfDay();
-                    if (checkListRepository.existsCompletedChecklistByDateAndCleaning(start, end, cleaning)) {
-                        endCleaning++;
+                    List<MemberCleaning> memberCleanings = memberCleaningRepository.findAllByMember(member);
+                    Integer totalCleaning = null;
+                    if(member.getRole().equals(MemberRole.MANAGER)){
+                        totalCleaning = cleaningRepository.findByPlace(place).size();
                     }
+                    if(member.getRole().equals(MemberRole.MEMBER)) {
+                        totalCleaning = memberCleanings.size();
+                    }
+                    Integer endCleaning = 0;
+                    for (MemberCleaning memberCleaning : memberCleanings) {
+                        Cleaning cleaning = memberCleaning.getCleaning();
+                        LocalDate now = LocalDate.now();
+                        LocalDateTime start = now.atStartOfDay();
+                        LocalDateTime end = now.plusDays(1).atStartOfDay();
+                        if (checkListRepository.existsCompletedChecklistByDateAndCleaning(start, end, cleaning)) {
+                            endCleaning++;
+                        }
+                    }
+
+                    Integer notifyNumber = notificationReceiverRepository.countUnreadByMemberId(member.getMemberId());
+
+
+                    placeDtos.add(PlaceDto.of(place.getPlaceId(), place.getName(), place.getCategory(), place.getCategoryName(), totalCleaning, endCleaning, member.getRole().getDisplayName(), notifyNumber));
                 }
-
-                Integer notifyNumber = notificationReceiverRepository.countUnreadByMemberId(member.getMemberId());
-
-
-                placeDtos.add(PlaceDto.of(place.getPlaceId(), place.getName(), place.getCategory(), place.getCategoryName(), totalCleaning, endCleaning, member.getRole().getDisplayName(), notifyNumber));
-            }
         }
 
         return GetPlaceListResponse.of(placeDtos);
@@ -245,8 +253,6 @@ public class PlaceService {
     }
 
 
-
-
     @Transactional
     public void deletePlace(DeletePlaceRequest request) {
         Member runner = MemberContext.get();
@@ -381,7 +387,7 @@ public class PlaceService {
             }
 
             if (!checkListDtos.isEmpty()) {
-                duties.add(DutyDto.of(duty.getDutyId(),duty.getName(), checkListDtos));
+                duties.add(DutyDto.of(duty.getDutyId(), duty.getName(), checkListDtos));
             }
         }
 
