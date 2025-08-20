@@ -202,6 +202,7 @@ public class DutyService {
                     List<MemberCleaning> mappings = memberCleaningRepository.findAllByCleaning(cleaning);
                     List<Member> members = mappings.stream()
                             .map(MemberCleaning::getMember)
+                            .distinct()
                             .toList();
 
                     List<String> displayednames = members.stream()

@@ -150,7 +150,7 @@ class DutyServiceTest {
     }
 
     @Test
-    @DisplayName("getDutyMemberNameList - 성공")
+    @DisplayName("당번 멤버 이름 목록 조회 - 성공")
     void getDutyMemberNameList_success() {
         Duty duty = Duty.builder().name("탕비실").build();
         ReflectionTestUtils.setField(duty, "dutyId", 1L);
@@ -171,7 +171,7 @@ class DutyServiceTest {
     }
 
     @Test
-    @DisplayName("getDutyCleaningNameList - 성공")
+    @DisplayName("당번 멤버 이름 목록 조회 - 성공")
     void getDutyCleaningNameList_success() {
         Duty duty = Duty.builder().name("탕비실").build();
         ReflectionTestUtils.setField(duty, "dutyId", 1L);
@@ -346,7 +346,7 @@ class DutyServiceTest {
     }
 
     @Test
-    @DisplayName("assignMember - COMMON 실패 (당번에 멤버 없음)")
+    @DisplayName("당번 역할 분담 - COMMON 실패 (당번에 멤버 없음)")
     void assignMember_common_noMembers() {
         // given
         Duty duty = Duty.builder().name("탕비실").build();

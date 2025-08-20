@@ -206,11 +206,10 @@ public class PlaceService {
 
         List<MemberDuty> memberDuties = memberDutyRepository.findAllWithMemberAndPlaceByPlaceId(placeId);
 
-        List<MemberCleaning> memberCleanings = new ArrayList<>();
-
-        for (MemberDuty memberDuty : memberDuties) {
-            memberCleanings.addAll(memberCleaningRepository.findAllByMember(memberDuty.getMember()));
-        }
+        List<MemberCleaning> memberCleanings = memberDuties.stream()
+                .flatMap(md -> memberCleaningRepository.findAllByMember(md.getMember()).stream())
+                .distinct()
+                .toList();
 
         if (me.getRole() == MemberRole.MANAGER) {
             List<Duty> duties = dutyRepository.findByPlace_PlaceId(placeId);
