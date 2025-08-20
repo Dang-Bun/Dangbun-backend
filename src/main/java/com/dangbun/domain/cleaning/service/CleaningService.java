@@ -88,7 +88,7 @@ public class CleaningService {
         Place place = MemberContext.get().getPlace();
 
         Duty duty = null;
-        if (request.dutyName() != null) {
+        if (request.dutyId() != null) {
             duty = dutyRepository.findById(request.dutyId())
                     .orElseThrow(() -> new DutyNotFoundException(DUTY_NOT_FOUND));
         }
@@ -110,12 +110,12 @@ public class CleaningService {
                 .place(place)
                 .build();
 
-        cleaningRepository.save(cleaning);
+        Cleaning savedCleaning = cleaningRepository.save(cleaning);
 
         if (request.members() != null && !request.members().isEmpty()) {
             List<Member> members = memberRepository.findAllByNameIn((request.members()));
             List<MemberCleaning> memberCleanings = members.stream()
-                    .map(m -> MemberCleaning.builder().member(m).cleaning(cleaning).build())
+                    .map(m -> MemberCleaning.builder().member(m).cleaning(savedCleaning).build())
                     .toList();
             memberCleaningRepository.saveAll(memberCleanings);
         }
@@ -134,13 +134,13 @@ public class CleaningService {
         List<CleaningDate> cleaningDates = parsedDates.stream()
                 .map(date -> CleaningDate.builder()
                         .date(date)
-                        .cleaning(cleaning)
+                        .cleaning(savedCleaning)
                         .build())
                 .toList();
-        createChecklistService.createChecklistByDateAndTime(cleaning, cleaningDates, place);
+        createChecklistService.createChecklistByDateAndTime(savedCleaning, cleaningDates, place);
         cleaningDateRepository.saveAll(cleaningDates);
 
-        return PostCleaningResponse.of(cleaning.getCleaningId());
+        return PostCleaningResponse.of(savedCleaning.getCleaningId());
     }
 
 
@@ -151,8 +151,8 @@ public class CleaningService {
                 .orElseThrow(() -> new CleaningNotFoundException(CLEANING_NOT_FOUND));
 
         Duty duty = null;
-        if (request.dutyName() != null) {
-            duty = dutyRepository.findByName(request.dutyName())
+        if (request.dutyId() != null) {
+            duty = dutyRepository.findById(request.dutyId())
                     .orElseThrow(() -> new DutyNotFoundException(DUTY_NOT_FOUND));
         }
 
