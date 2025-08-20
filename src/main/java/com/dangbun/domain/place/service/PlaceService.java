@@ -80,23 +80,32 @@ public class PlaceService {
                     Place place = member.getPlace();
 
                     List<MemberCleaning> memberCleanings = memberCleaningRepository.findAllByMember(member);
-                    Integer totalCleaning = null;
+                    Integer totalCleaning = 0;
+                    Integer endCleaning = 0;
+                    LocalDate now = LocalDate.now();
+                    LocalDateTime start = now.atStartOfDay();
+                    LocalDateTime end = now.plusDays(1).atStartOfDay();
+
                     if(member.getRole().equals(MemberRole.MANAGER)){
-                        totalCleaning = cleaningRepository.findByPlace(place).size();
+                        List<Cleaning> cleanings = cleaningRepository.findByPlace(place);
+                        totalCleaning = cleanings.size();
+                        for(Cleaning cleaning : cleanings){
+                            if(checkListRepository.existsCompletedChecklistByDateAndCleaning(start, end, cleaning)){
+                                endCleaning++;
+                            }
+                        }
                     }
                     if(member.getRole().equals(MemberRole.MEMBER)) {
                         totalCleaning = memberCleanings.size();
-                    }
-                    Integer endCleaning = 0;
-                    for (MemberCleaning memberCleaning : memberCleanings) {
-                        Cleaning cleaning = memberCleaning.getCleaning();
-                        LocalDate now = LocalDate.now();
-                        LocalDateTime start = now.atStartOfDay();
-                        LocalDateTime end = now.plusDays(1).atStartOfDay();
-                        if (checkListRepository.existsCompletedChecklistByDateAndCleaning(start, end, cleaning)) {
-                            endCleaning++;
+                        for (MemberCleaning memberCleaning : memberCleanings) {
+                            Cleaning cleaning = memberCleaning.getCleaning();
+
+                            if (checkListRepository.existsCompletedChecklistByDateAndCleaning(start, end, cleaning)) {
+                                endCleaning++;
+                            }
                         }
                     }
+
 
                     Integer notifyNumber = notificationReceiverRepository.countUnreadByMemberId(member.getMemberId());
 
