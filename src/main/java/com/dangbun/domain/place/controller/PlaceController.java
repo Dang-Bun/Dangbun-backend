@@ -6,7 +6,6 @@ import com.dangbun.domain.place.dto.response.*;
 import com.dangbun.domain.place.response.status.PlaceExceptionResponse;
 import com.dangbun.domain.place.service.PlaceService;
 import com.dangbun.domain.user.entity.CustomUserDetails;
-import com.dangbun.domain.user.entity.User;
 import com.dangbun.domain.user.response.status.UserExceptionResponse;
 import com.dangbun.global.aop.CheckManagerAuthority;
 import com.dangbun.global.aop.CheckPlaceMembership;
