@@ -88,7 +88,7 @@ public class CleaningService {
         Place place = MemberContext.get().getPlace();
 
         Duty duty = null;
-        if (request.dutyName() != null) {
+        if (request.dutyId() != null) {
             duty = dutyRepository.findById(request.dutyId())
                     .orElseThrow(() -> new DutyNotFoundException(DUTY_NOT_FOUND));
         }
@@ -151,8 +151,8 @@ public class CleaningService {
                 .orElseThrow(() -> new CleaningNotFoundException(CLEANING_NOT_FOUND));
 
         Duty duty = null;
-        if (request.dutyName() != null) {
-            duty = dutyRepository.findByName(request.dutyName())
+        if (request.dutyId() != null) {
+            duty = dutyRepository.findById(request.dutyId())
                     .orElseThrow(() -> new DutyNotFoundException(DUTY_NOT_FOUND));
         }
 

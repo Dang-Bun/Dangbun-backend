@@ -216,7 +216,6 @@ class CleaningServiceTest {
         PostCleaningCreateRequest request = new PostCleaningCreateRequest(
                 "거실 청소",
                 null,
-                null,
                 List.of("철수", "영희"),
                 false,
                 DAILY,
@@ -260,7 +259,6 @@ class CleaningServiceTest {
                 "거실 청소",
                 null,
                 null,
-                null,
                 false,
                 DAILY,
                 null,
@@ -282,7 +280,6 @@ class CleaningServiceTest {
         PostCleaningCreateRequest request = new PostCleaningCreateRequest(
                 "주방 청소",
                 999L,
-                "없는당번",
                 List.of("지윤"),
                 true,
                 WEEKLY,
@@ -302,14 +299,14 @@ class CleaningServiceTest {
     void updateCleaning_success() {
         //given
         PutCleaningUpdateRequest request = new PutCleaningUpdateRequest(
-                "바닥 쓸기", "사무실 청소 당번", List.of("철수"), false, null, null, List.of("2025-08-21")
+                "바닥 쓸기", 100L, List.of("철수"), false, null, null, List.of("2025-08-21")
         );
 
         Cleaning cleaning = Cleaning.builder().name("기존 청소").place(mockPlace).build();
         ReflectionTestUtils.setField(cleaning, "cleaningId", 200L);
 
         given(cleaningRepository.findWithDutyNullableById(200L)).willReturn(Optional.of(cleaning));
-        given(dutyRepository.findByName("사무실 청소 당번"))
+        given(dutyRepository.findById(100L))
                 .willReturn(Optional.of(mockDuty));
         given(cleaningRepository.existsByNameAndDutyAndCleaningIdNotAndPlace(
                 "바닥 쓸기", mockDuty, 200L, mockPlace))
@@ -323,7 +320,7 @@ class CleaningServiceTest {
         //then
         assertThat(cleaning.getName()).isEqualTo("바닥 쓸기");
         then(cleaningRepository).should().findWithDutyNullableById(200L);
-        then(dutyRepository).should().findByName("사무실 청소 당번");
+        then(dutyRepository).should().findById(100L);
         then(cleaningRepository).should().existsByNameAndDutyAndCleaningIdNotAndPlace(
                 "바닥 쓸기", mockDuty, 200L, mockPlace);
         then(memberCleaningRepository).should().deleteAllByCleaning_CleaningId(200L);
@@ -357,14 +354,14 @@ class CleaningServiceTest {
     void updateCleaning_dutyNotFound() {
         // given
         PutCleaningUpdateRequest request = new PutCleaningUpdateRequest(
-                "바닥 쓸기", "없는 당번", null, false, null, null, List.of("2025-08-21")
+                "바닥 쓸기", 999L, null, false, null, null, List.of("2025-08-21")
         );
 
         Cleaning cleaning = Cleaning.builder().name("기존 청소").place(mockPlace).build();
         ReflectionTestUtils.setField(cleaning, "cleaningId", 200L);
 
         given(cleaningRepository.findWithDutyNullableById(200L)).willReturn(Optional.of(cleaning));
-        given(dutyRepository.findByName("없는 당번")).willReturn(Optional.empty());
+        given(dutyRepository.findById(999L)).willReturn(Optional.empty());
 
         // when // then
         assertThatThrownBy(() -> cleaningService.updateCleaning(200L, request))
