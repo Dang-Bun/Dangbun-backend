@@ -34,6 +34,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static com.dangbun.domain.place.dto.response.GetPlaceListResponse.PlaceDto;
@@ -216,25 +217,25 @@ public class PlaceService {
 
             Map<Duty, List<Checklist>> checklistMap = duties.stream()
                     .collect(Collectors.toMap(
-                            d -> d,
-                            d -> {
-                                List<Checklist> rslt = filterChecklist(d, place);
-                                return rslt;
-                            }
+                            Function.identity(),
+                            d -> filterChecklist(d, place),
+                            (existing, replacement) -> existing,
+                            LinkedHashMap::new
                     ));
 
-            dutyDtos = createManagerDutyDtos(placeId, checklistMap, memberCleanings );
+            dutyDtos = createManagerDutyDtos(placeId, checklistMap, memberCleanings);
+            return of(me.getMemberId(), placeId, place.getName(), place.getCategory(), place.getCategoryName(), place.getEndTime(), dutyDtos);
         }
 
         List<Duty> duties = memberDuties.stream().map(MemberDuty::getDuty).distinct().toList();
 
         Map<Duty, List<Checklist>> checklistMap = duties.stream()
                 .collect(Collectors.toMap(
-                        d -> d,
-                        d -> {
-                            List<Checklist> rslt = filterChecklist(d, place);
-                            return rslt;
-                        }
+                        Function.identity(),
+                        d -> filterChecklist(d, place),
+                        (existing, replacement) -> existing,
+                        LinkedHashMap::new
+
                 ));
 
         if (me.getRole() == MemberRole.MEMBER) {
