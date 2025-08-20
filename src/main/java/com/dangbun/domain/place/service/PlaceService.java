@@ -222,7 +222,7 @@ public class PlaceService {
                             LinkedHashMap::new
                     ));
 
-            dutyDtos = createManagerDutyDtos(placeId, checklistMap, memberCleanings);
+            dutyDtos = createManagerDutyDtos(checklistMap, memberCleanings);
             return of(me.getMemberId(), placeId, place.getName(), place.getCategory(), place.getCategoryName(), place.getEndTime(), dutyDtos);
         }
 
@@ -351,14 +351,14 @@ public class PlaceService {
             }
 
             if (!checkListDtos.isEmpty()) {
-                duties.add(DutyDto.of(duty.getName(), checkListDtos));
+                duties.add(DutyDto.of(duty.getDutyId(), duty.getName(), checkListDtos));
             }
         }
         return duties;
     }
 
 
-    private List<DutyDto> createManagerDutyDtos(Long placeId, Map<Duty, List<Checklist>> checklistMap, List<MemberCleaning> memberCleanings) {
+    private List<DutyDto> createManagerDutyDtos(Map<Duty, List<Checklist>> checklistMap, List<MemberCleaning> memberCleanings) {
         List<DutyDto> duties = new ArrayList<>();
         for (Map.Entry<Duty, List<Checklist>> dc : checklistMap.entrySet()) {
             Duty duty = dc.getKey();
@@ -381,7 +381,7 @@ public class PlaceService {
             }
 
             if (!checkListDtos.isEmpty()) {
-                duties.add(DutyDto.of(duty.getName(), checkListDtos));
+                duties.add(DutyDto.of(duty.getDutyId(),duty.getName(), checkListDtos));
             }
         }
 

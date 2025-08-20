@@ -47,9 +47,12 @@ public record GetPlaceResponse(
 
     @Schema(name = "GetPlaceResponse.DutyDto", description = "당번 DTO")
     public record DutyDto(
+
+            @Schema(description = "당번 Id", example = "1")
+            Long dutyId,
+
             @Schema(description = "당번 이름", example = "로비 청소")
             String dutyName,
-
 
             @Schema(description = "해당 날의 청소 수", example = "10")
             Integer totalCleaning,
@@ -61,14 +64,14 @@ public record GetPlaceResponse(
             List<CheckListDto> checkLists
 
     ) {
-        public static DutyDto of(String dutyName, List<CheckListDto> checkLists) {
+        public static DutyDto of(Long dutyId, String dutyName, List<CheckListDto> checkLists) {
             Integer endCleaning = 0;
             for (CheckListDto checkListDto : checkLists) {
                 if (checkListDto.completeTime != null) {
                     endCleaning++;
                 }
             }
-            return new DutyDto(dutyName, checkLists.size(), endCleaning, checkLists);
+            return new DutyDto(dutyId, dutyName, checkLists.size(), endCleaning, checkLists);
         }
     }
 
