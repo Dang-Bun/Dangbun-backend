@@ -3,12 +3,11 @@ package com.dangbun.domain.place.service;
 import com.dangbun.domain.checklist.entity.Checklist;
 import com.dangbun.domain.checklist.repository.ChecklistRepository;
 import com.dangbun.domain.cleaning.entity.Cleaning;
+import com.dangbun.domain.duty.entity.Duty;
 import com.dangbun.domain.duty.repository.DutyRepository;
-import com.dangbun.domain.duty.service.DutyService;
 import com.dangbun.domain.member.entity.Member;
 import com.dangbun.domain.member.entity.MemberRole;
 import com.dangbun.domain.member.repository.MemberRepository;
-import com.dangbun.domain.member.service.MemberService;
 import com.dangbun.domain.membercleaning.entity.MemberCleaning;
 import com.dangbun.domain.membercleaning.repository.MemberCleaningRepository;
 import com.dangbun.domain.memberduty.entity.MemberDuty;
@@ -71,7 +70,7 @@ public class PlaceService {
         for (Member member : members) {
             if (!member.getStatus()) {
                 Place place = member.getPlace();
-                placeDtos.add(PlaceDto.of(place.getPlaceId(), place.getName(), place.getCategory(), place.getCategoryName(),null,null, null, null));
+                placeDtos.add(PlaceDto.of(place.getPlaceId(), place.getName(), place.getCategory(), place.getCategoryName(), null, null, null, null));
             } else {
                 Place place = member.getPlace();
 
@@ -83,7 +82,7 @@ public class PlaceService {
                     LocalDate now = LocalDate.now();
                     LocalDateTime start = now.atStartOfDay();
                     LocalDateTime end = now.plusDays(1).atStartOfDay();
-                    if(checkListRepository.existsCompletedChecklistByDateAndCleaning(start, end, cleaning)){
+                    if (checkListRepository.existsCompletedChecklistByDateAndCleaning(start, end, cleaning)) {
                         endCleaning++;
                     }
                 }
@@ -91,7 +90,7 @@ public class PlaceService {
                 Integer notifyNumber = notificationReceiverRepository.countUnreadByMemberId(member.getMemberId());
 
 
-                placeDtos.add(PlaceDto.of(place.getPlaceId(), place.getName(),place.getCategory(),place.getCategoryName(), totalCleaning, endCleaning, member.getRole().getDisplayName(), notifyNumber));
+                placeDtos.add(PlaceDto.of(place.getPlaceId(), place.getName(), place.getCategory(), place.getCategoryName(), totalCleaning, endCleaning, member.getRole().getDisplayName(), notifyNumber));
             }
         }
 
@@ -108,7 +107,7 @@ public class PlaceService {
 
         String categoryName = request.categoryName() == null ? null : request.categoryName();
 
-        if(category!=PlaceCategory.ETC) categoryName = category.getDisplayName();
+        if (category != PlaceCategory.ETC) categoryName = category.getDisplayName();
 
         Map<String, String> info = request.information();
 
@@ -143,8 +142,6 @@ public class PlaceService {
 
         return new PostCreateInviteCodeResponse(code);
     }
-
-
 
 
     @Transactional(readOnly = true)
@@ -193,30 +190,46 @@ public class PlaceService {
 
     @Transactional(readOnly = true)
     public GetPlaceResponse getPlace() {
-        Member member = MemberContext.get();
-        Place place = member.getPlace();
+        Member me = MemberContext.get();
+        Place place = me.getPlace();
         Long placeId = place.getPlaceId();
 
-        if (!member.getStatus()) {
-            return new GetPlaceResponse(member.getMemberId(), placeId, place.getName(), place.getCategory(),place.getCategoryName(),null,null);
+        List<DutyDto> dutyDtos = null;
+
+
+        if (!me.getStatus() || me.getRole() == MemberRole.WAITING) {
+            return new GetPlaceResponse(me.getMemberId(), placeId, place.getName(), place.getCategory(), place.getCategoryName(), null, null);
         }
 
         List<MemberDuty> memberDuties = memberDutyRepository.findAllWithMemberAndPlaceByPlaceId(placeId);
 
         List<MemberCleaning> memberCleanings = new ArrayList<>();
+
         for (MemberDuty memberDuty : memberDuties) {
             memberCleanings.addAll(memberCleaningRepository.findAllByMember(memberDuty.getMember()));
         }
 
-        Map<MemberDuty, List<Checklist>> cleaningMap = memberDuties.stream()
+        List<Duty> duties = memberDuties.stream().map(MemberDuty::getDuty).distinct().toList();
+
+        Map<Duty, List<Checklist>> cleaningMap = duties.stream()
                 .collect(Collectors.toMap(
-                        md -> md,
-                        md -> checkListRepository.findWithCleaningByDutyId(md.getDuty().getDutyId())
+                        d -> d,
+                        d -> checkListRepository.findWithCleaningByDutyId(d.getDutyId())
                 ));
 
-        List<DutyDto> dutyDtos = createDutyDtos(cleaningMap, memberCleanings);
+// Todo MANAGER, MEMBER 분리
 
-        return of(member.getMemberId(), placeId,place.getName(),place.getCategory(), place.getCategoryName(),place.getEndTime(), dutyDtos);
+//        if(me.getRole() == MemberRole.MANAGER ){
+//            dutyDtos = createManagerDutyDtos(placeId, memberCleanings);
+//        }
+
+//        if(me.getRole() == MemberRole.MEMBER) {
+//            dutyDtos = createDutyDtos(cleaningMap, memberCleanings);
+//        }
+
+        dutyDtos = createDutyDtos(cleaningMap, memberCleanings);
+
+        return of(me.getMemberId(), placeId, place.getName(), place.getCategory(), place.getCategoryName(), place.getEndTime(), dutyDtos);
     }
 
 
@@ -225,7 +238,7 @@ public class PlaceService {
         Member runner = MemberContext.get();
 
         Place place = runner.getPlace();
-        if(!place.getName().equals(request.placeName())){
+        if (!place.getName().equals(request.placeName())) {
             throw new InvalidPlaceNameException(INVALID_NAME);
         }
 
@@ -244,7 +257,7 @@ public class PlaceService {
     public PatchUpdateTimeResponse updateTime(PatchUpdateTimeRequest request) {
         Place place = MemberContext.get().getPlace();
 
-        if(request.isToday()&&request.startTime().isAfter(request.endTime())){
+        if (request.isToday() && request.startTime().isAfter(request.endTime())) {
             throw new InvalidTimeException(INVALID_TIME);
         }
 
@@ -278,13 +291,13 @@ public class PlaceService {
         Place place = MemberContext.get().getPlace();
         String code = place.getInviteCode();
 
-        if (code==null || code.isBlank()) {
+        if (code == null || code.isBlank()) {
             throw new InviteCodeNotExistsException(INVITE_CODE_NOT_EXISTS);
         }
         return GetPlaceInvitedCodeResponse.of(code);
     }
-///
-/// without transaction
+
+    /// without transaction
 
     private String generateCode() {
         StringBuilder sb = new StringBuilder(CODE_LENGTH);
@@ -295,12 +308,12 @@ public class PlaceService {
         return sb.toString();
     }
 
-    private List<DutyDto> createDutyDtos(Map<MemberDuty, List<Checklist>> cleaningMap, List<MemberCleaning> memberCleanings) {
+    private List<DutyDto> createDutyDtos(Map<Duty, List<Checklist>> cleaningMap, List<MemberCleaning> memberCleanings) {
         List<DutyDto> duties = new ArrayList<>();
-        for (Map.Entry<MemberDuty, List<Checklist>> mdc : cleaningMap.entrySet()) {
-            MemberDuty md = mdc.getKey();
+        for (Map.Entry<Duty, List<Checklist>> dc : cleaningMap.entrySet()) {
+            Duty duty = dc.getKey();
             List<CheckListDto> checkListDtos = new ArrayList<>();
-            for (Checklist checkList : mdc.getValue()) {
+            for (Checklist checkList : dc.getValue()) {
 
                 Cleaning cleaning = checkList.getCleaning();
 
@@ -313,7 +326,7 @@ public class PlaceService {
                 checkListDtos.add(CheckListDto.of(checkList, members));
             }
 
-             duties.add(DutyDto.of(md.getDuty().getName(), checkListDtos));
+            duties.add(DutyDto.of(duty.getName(), checkListDtos));
         }
         return duties;
     }
