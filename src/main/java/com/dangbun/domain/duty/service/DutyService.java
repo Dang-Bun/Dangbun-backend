@@ -8,6 +8,7 @@ import com.dangbun.domain.duty.entity.Duty;
 import com.dangbun.domain.duty.exception.custom.*;
 import com.dangbun.domain.duty.repository.DutyRepository;
 import com.dangbun.domain.member.entity.Member;
+import com.dangbun.domain.member.entity.MemberRole;
 import com.dangbun.domain.member.repository.MemberRepository;
 import com.dangbun.domain.membercleaning.entity.MemberCleaning;
 import com.dangbun.domain.membercleaning.repository.MemberCleaningRepository;
@@ -88,7 +89,13 @@ public class DutyService {
         List<MemberDuty> members = memberDutyRepository.findAllByDuty(duty);
 
         return members.stream()
-                .map(md -> GetDutyMemberNameListResponse.of(md.getMember()))
+                .map(MemberDuty::getMember)
+                .sorted(
+                        Comparator
+                                .comparing((Member m) -> m.getRole() != MemberRole.MANAGER) // 매니저 먼저
+                                .thenComparing(Member::getName, Comparator.nullsLast(String::compareTo)) // 이름 가나다순
+                )
+                .map(GetDutyMemberNameListResponse::of)
                 .toList();
     }
 
