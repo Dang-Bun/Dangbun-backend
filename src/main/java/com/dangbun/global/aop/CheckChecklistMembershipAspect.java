@@ -1,5 +1,6 @@
 package com.dangbun.global.aop;
 
+import com.dangbun.domain.member.entity.MemberRole;
 import com.dangbun.global.aop.support.AnnotationResolver;
 import com.dangbun.global.aop.support.RequestParamResolver;
 import com.dangbun.global.aop.support.SecuritySupport;
@@ -16,7 +17,6 @@ import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
-
 
 
 import static com.dangbun.domain.checklist.response.status.ChecklistExceptionResponse.CHECKLIST_ACCESS_DENIED;
@@ -48,9 +48,15 @@ public class CheckChecklistMembershipAspect {
 
         Member me = MemberContext.get();
 
-        Checklist checklist = checklistRepository
-                .findByChecklistAndMemberId(checklistId, me.getMemberId())
-                .orElseThrow(() -> new ChecklistAccessDeniedException(CHECKLIST_ACCESS_DENIED));
+        Checklist checklist;
+        if (me.getRole() == MemberRole.MANAGER) {
+            checklist = checklistRepository.findById(checklistId)
+                    .orElseThrow(() -> new ChecklistAccessDeniedException(CHECKLIST_ACCESS_DENIED));
+        } else {
+            checklist = checklistRepository
+                    .findByChecklistAndMemberId(checklistId, me.getMemberId())
+                    .orElseThrow(() -> new ChecklistAccessDeniedException(CHECKLIST_ACCESS_DENIED));
+        }
 
         try {
             ChecklistContext.set(checklist);
