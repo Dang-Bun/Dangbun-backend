@@ -152,6 +152,9 @@ public class DutyService {
 
                 memberCleaningRepository.deleteAllByCleaning_CleaningId(cleaning.getCleaningId());
                 List<Member> selectedMembers = memberRepository.findAllById(request.memberIds());
+                if(selectedMembers.isEmpty()){
+                    return;
+                }
                 List<MemberCleaning> mappings = selectedMembers.stream()
                         .map(m -> MemberCleaning.builder().member(m).cleaning(cleaning).build())
                         .toList();
