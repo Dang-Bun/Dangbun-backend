@@ -38,7 +38,7 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class NotificationServiceTest {
+class NotificationServiceTest {
     @InjectMocks
     private NotificationService notificationService;
 
@@ -53,7 +53,6 @@ public class NotificationServiceTest {
 
     private Member mockMember;
     private Member mockReceiverMember;
-    private Place mockPlace;
     private final Long MOCK_PLACE_ID = 1L;
     private final Long MOCK_MEMBER_ID = 10L;
     private final Long MOCK_RECEIVER_ID = 20L;
@@ -61,7 +60,7 @@ public class NotificationServiceTest {
 
     @BeforeEach
     void setUp() {
-        mockPlace = Place.builder().name("테스트 장소").category(CAFE).build();
+        Place mockPlace = Place.builder().name("테스트 장소").category(CAFE).build();
         ReflectionTestUtils.setField(mockPlace, "placeId", MOCK_PLACE_ID);
 
         mockMember = Member.builder().name("철수").build();
