@@ -47,7 +47,7 @@ public class CalendarController {
     public ResponseEntity<BaseResponse<GetProgressBarsResponse>> getProgressBars(@PathVariable Long placeId,
                                                                                  @RequestParam int year,
                                                                                  @RequestParam int month) {
-        return ResponseEntity.ok(BaseResponse.ok(calendarService.getProgressBars( year, month)));
+        return ResponseEntity.ok(BaseResponse.ok(calendarService.getProgressBars(year, month)));
     }
 
     @Operation(summary = "체크리스트 완료(매니저)")

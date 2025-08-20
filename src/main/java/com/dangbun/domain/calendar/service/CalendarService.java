@@ -120,11 +120,12 @@ public class CalendarService {
 
     private void filterMyChecklists(Member me, List<Checklist> checklists) {
         if (me.getRole().equals(MemberRole.MEMBER)) {
-            List<MemberCleaning> memberCleanings = memberCleaningRepository.findAllByMember(me);
+            List<Cleaning> myCleanings = memberCleaningRepository.findAllByMember(me)
+                    .stream()
+                    .map(MemberCleaning::getCleaning)
+                    .toList();
 
-            for (MemberCleaning memberCleaning : memberCleanings) {
-                checklists.removeIf(checklist -> !memberCleaning.getCleaning().equals(checklist.getCleaning()));
-            }
+            checklists.removeIf(checklist -> !myCleanings.contains(checklist.getCleaning()));
         }
     }
 
