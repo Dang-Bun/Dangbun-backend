@@ -35,9 +35,13 @@ public class MemberService {
         Member me = MemberContext.get();
         Long placeId = me.getPlace().getPlaceId();
 
-        Map<Member, List<String>> memberMap = new HashMap<>();
-
+        Map<Member, List<String>> memberMap = new LinkedHashMap<>();
         List<Member> members = memberRepository.findByPlace_PlaceId(placeId);
+
+
+        members.sort(Comparator
+                .comparing((Member m) -> m.getRole() != MemberRole.MANAGER) // MANAGER 먼저
+                .thenComparing(Member::getName, Comparator.nullsLast(String::compareTo))); // 이름 가나다순
 
         Integer waitingMemberNumber = 0;
 
@@ -83,7 +87,7 @@ public class MemberService {
         Member me = MemberContext.get();
         Long placeId = me.getPlace().getPlaceId();
 
-        List<Member> members = memberRepository.findByPlace_PlaceIdAndStatusIsFalse(placeId);
+        List<Member> members = memberRepository.findByPlace_PlaceIdAndStatusIsFalseOrderByNameAsc(placeId);
 
         return GetWaitingMembersResponse.of(members);
 
