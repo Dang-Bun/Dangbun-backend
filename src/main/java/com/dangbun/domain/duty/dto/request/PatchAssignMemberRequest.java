@@ -23,11 +23,11 @@ public record PatchAssignMemberRequest(
         @Schema(description = "청소당 랜덤으로 배정할 멤버 수 (RANDOM 타입일 경우에만)", example = "2")
         Integer assignCount // RANDOM
 ) {
-    @AssertTrue()
+    @AssertTrue(message = "cleaningId는 null이 아니어야 합니다.")
     @Schema(hidden = true)
     public boolean isCustomFieldsValid() {
         if (assignType == CUSTOM) {
-            return cleaningId != null && memberIds != null && !memberIds.isEmpty();
+            return cleaningId != null;
         }
         return true;
     }
