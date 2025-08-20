@@ -75,6 +75,11 @@ public class NotificationService {
         Long placeId = me.getPlace().getPlaceId();
 
         List<Member> receiverMembers = memberRepository.findAllById(request.receiverMemberIds());
+
+        if (receiverMembers.size() != request.receiverMemberIds().size()) {
+            throw new MemberNotFoundException(MEMBER_NOT_FOUND);
+        }
+
         boolean allBelongToPlace = receiverMembers.stream()
                 .allMatch(m -> m.getPlace().getPlaceId().equals(placeId));
 
@@ -148,7 +153,10 @@ public class NotificationService {
 
         boolean isSender = notification.getSender().getMemberId().equals(member.getMemberId());
 
-        boolean isReceiver = notificationReceiverRepository.existsByNotificationAndReceiver(notification, member);
+        boolean isReceiver = false;
+        if (!isSender) {
+            isReceiver = notificationReceiverRepository.existsByNotificationAndReceiver(notification, member);
+        }
 
         if (!isSender && !isReceiver) {
             throw new NotificationAccessForbiddenException(NOTIFICATION_ACCESS_FORBIDDEN);
