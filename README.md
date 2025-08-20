@@ -3,7 +3,8 @@
 
 
 ### 📌 ERD
-[![ERD Cloud]([https://img.shields.io/badge/ERD%20Cloud-6C63FF?style=for-the-badge&labelColor=6C63FF)](https://www.erdcloud.com/d/QJDK3dYT29CjqWHAW)
+[![ERD Cloud](https://img.shields.io/badge/ERD%20Cloud-6C63FF?style=for-the-badge&labelColor=6C63FF)](https://www.erdcloud.com/d/QJDK3dYT29CjqWHAW)
+
 <br>
 
 ### 📌 API Specification
