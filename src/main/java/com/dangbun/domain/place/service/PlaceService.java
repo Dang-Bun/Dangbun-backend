@@ -3,6 +3,7 @@ package com.dangbun.domain.place.service;
 import com.dangbun.domain.checklist.entity.Checklist;
 import com.dangbun.domain.checklist.repository.ChecklistRepository;
 import com.dangbun.domain.cleaning.entity.Cleaning;
+import com.dangbun.domain.cleaning.repository.CleaningRepository;
 import com.dangbun.domain.duty.entity.Duty;
 import com.dangbun.domain.duty.repository.DutyRepository;
 import com.dangbun.domain.member.entity.Member;
@@ -60,6 +61,7 @@ public class PlaceService {
     private final ChecklistRepository checkListRepository;
     private final DutyRepository dutyRepository;
     private final NotificationReceiverRepository notificationReceiverRepository;
+    private final CleaningRepository cleaningRepository;
 
     @Transactional(readOnly = true)
     public GetPlaceListResponse getPlaces(Long userId) {
@@ -209,28 +211,40 @@ public class PlaceService {
             memberCleanings.addAll(memberCleaningRepository.findAllByMember(memberDuty.getMember()));
         }
 
+        if (me.getRole() == MemberRole.MANAGER) {
+            List<Duty> duties = dutyRepository.findByPlace_PlaceId(placeId);
+
+            Map<Duty, List<Checklist>> checklistMap = duties.stream()
+                    .collect(Collectors.toMap(
+                            d -> d,
+                            d -> {
+                                List<Checklist> rslt = filterChecklist(d, place);
+                                return rslt;
+                            }
+                    ));
+
+            dutyDtos = createManagerDutyDtos(placeId, checklistMap, memberCleanings );
+        }
+
         List<Duty> duties = memberDuties.stream().map(MemberDuty::getDuty).distinct().toList();
 
-        Map<Duty, List<Checklist>> cleaningMap = duties.stream()
+        Map<Duty, List<Checklist>> checklistMap = duties.stream()
                 .collect(Collectors.toMap(
                         d -> d,
-                        d -> checkListRepository.findWithCleaningByDutyId(d.getDutyId())
+                        d -> {
+                            List<Checklist> rslt = filterChecklist(d, place);
+                            return rslt;
+                        }
                 ));
 
-// Todo MANAGER, MEMBER 분리
-
-//        if(me.getRole() == MemberRole.MANAGER ){
-//            dutyDtos = createManagerDutyDtos(placeId, memberCleanings);
-//        }
-
-//        if(me.getRole() == MemberRole.MEMBER) {
-//            dutyDtos = createDutyDtos(cleaningMap, memberCleanings);
-//        }
-
-        dutyDtos = createDutyDtos(cleaningMap, memberCleanings);
+        if (me.getRole() == MemberRole.MEMBER) {
+            dutyDtos = createDutyDtos(me, checklistMap, memberCleanings);
+        }
 
         return of(me.getMemberId(), placeId, place.getName(), place.getCategory(), place.getCategoryName(), place.getEndTime(), dutyDtos);
     }
+
+
 
 
     @Transactional
@@ -308,26 +322,96 @@ public class PlaceService {
         return sb.toString();
     }
 
-    private List<DutyDto> createDutyDtos(Map<Duty, List<Checklist>> cleaningMap, List<MemberCleaning> memberCleanings) {
+    private List<DutyDto> createDutyDtos(Member me, Map<Duty, List<Checklist>> checklistMap, List<MemberCleaning> memberCleanings) {
         List<DutyDto> duties = new ArrayList<>();
-        for (Map.Entry<Duty, List<Checklist>> dc : cleaningMap.entrySet()) {
+
+        for (Map.Entry<Duty, List<Checklist>> dc : checklistMap.entrySet()) {
             Duty duty = dc.getKey();
             List<CheckListDto> checkListDtos = new ArrayList<>();
-            for (Checklist checkList : dc.getValue()) {
 
+            for (Checklist checkList : dc.getValue()) {
                 Cleaning cleaning = checkList.getCleaning();
 
                 List<Member> members = new ArrayList<>();
+                boolean containsMe = false;
+
                 for (MemberCleaning mc : memberCleanings) {
                     if (mc.getCleaning().equals(cleaning)) {
-                        members.add(mc.getMember());
+                        Member m = mc.getMember();
+                        members.add(m);
+                        if (m.equals(me)) {
+                            containsMe = true;
+                        }
                     }
                 }
-                checkListDtos.add(CheckListDto.of(checkList, members));
+
+                if (containsMe) {
+                    checkListDtos.add(CheckListDto.of(checkList, members));
+                }
             }
 
-            duties.add(DutyDto.of(duty.getName(), checkListDtos));
+            if (!checkListDtos.isEmpty()) {
+                duties.add(DutyDto.of(duty.getName(), checkListDtos));
+            }
         }
         return duties;
+    }
+
+
+    private List<DutyDto> createManagerDutyDtos(Long placeId, Map<Duty, List<Checklist>> checklistMap, List<MemberCleaning> memberCleanings) {
+        List<DutyDto> duties = new ArrayList<>();
+        for (Map.Entry<Duty, List<Checklist>> dc : checklistMap.entrySet()) {
+            Duty duty = dc.getKey();
+
+            List<CheckListDto> checkListDtos = new ArrayList<>();
+            for (Checklist checkList : dc.getValue()) {
+                Cleaning cleaning = checkList.getCleaning();
+
+                List<Member> members = new ArrayList<>();
+
+                for (MemberCleaning mc : memberCleanings) {
+                    if (mc.getCleaning().equals(cleaning)) {
+                        Member m = mc.getMember();
+                        members.add(m);
+                    }
+                }
+
+                checkListDtos.add(CheckListDto.of(checkList, members));
+
+            }
+
+            if (!checkListDtos.isEmpty()) {
+                duties.add(DutyDto.of(duty.getName(), checkListDtos));
+            }
+        }
+
+        return duties;
+    }
+
+    private List<Checklist> filterChecklist(Duty duty, Place place) {
+
+        List<Checklist> rslt = new ArrayList<>();
+
+        Boolean isToday = place.getIsToday();
+
+        LocalDateTime now = LocalDateTime.now();
+        LocalTime startTime = place.getStartTime();
+        LocalTime endTime = place.getEndTime();
+
+
+        List<Checklist> checklists = checkListRepository.findWithCleaningByDutyId(duty.getDutyId());
+        for (Checklist checklist : checklists) {
+            LocalDateTime createdAt = checklist.getCreatedAt();
+            if (isToday && (createdAt.toLocalTime().isAfter(startTime) && createdAt.toLocalTime().isBefore(endTime)) && now.toLocalDate().equals(createdAt.toLocalDate())) {
+                rslt.add(checklist);
+            }
+            if (!isToday && (
+                    (createdAt.toLocalTime().isAfter(startTime) && createdAt.toLocalTime().isBefore(LocalTime.MAX) && createdAt.toLocalDate().isEqual(now.minusDays(1).toLocalDate())) ||
+                            (createdAt.toLocalTime().isBefore(endTime) && createdAt.toLocalDate().isEqual(now.toLocalDate()))
+            )) {
+                rslt.add(checklist);
+            }
+        }
+        return rslt;
     }
 }
