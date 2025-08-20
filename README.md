@@ -9,6 +9,7 @@
 
 ### 📌 API Specification
 [![Swagger UI](https://img.shields.io/badge/Swagger%20UI-00C853?style=for-the-badge&labelColor=00C853)](https://dangbun.o-r.kr/swagger-ui/index.html#/)
+
 <br>
 
 ### 📌 Architecture Diagram
