@@ -66,18 +66,19 @@ public class CalendarService {
 
         for (Checklist checklist : checklists) {
             Long checklistId = checklist.getChecklistId();
+            String cleaningName = checklist.getCleaning().getName();
             String dutyName = checklist.getCleaning().getDuty().getName();
             Boolean isComplete = checklist.getIsComplete();
 
             String memberName = null;
             LocalTime localTime = null;
-            if(checklist.getCompleteMemberId()!=null){
+            if (checklist.getCompleteMemberId() != null) {
                 memberName = memberRepository.findById(checklist.getCompleteMemberId()).map(Member::getName).orElse(null);
                 localTime = checklist.getCompleteTime().toLocalTime();
             }
             Boolean needPhoto = checklist.getCleaning().getNeedPhoto();
 
-            checklistDtos.add(ChecklistDto.of(checklistId, dutyName, isComplete, memberName, localTime, needPhoto));
+            checklistDtos.add(ChecklistDto.of(checklistId, cleaningName, dutyName, isComplete, memberName, localTime, needPhoto));
         }
 
         return GetChecklistsResponse.of(checklistDtos);
@@ -149,7 +150,7 @@ public class CalendarService {
         return GetImageUrlResponse.of(imageUrl);
     }
 
-    public GetCleaningInfoResponse getCleaningInfo( Long checklistId) {
+    public GetCleaningInfoResponse getCleaningInfo(Long checklistId) {
         Checklist checklist = checklistRepository.findWithCleaningAndDutyById(checklistId).orElseThrow();
 
         Cleaning cleaning = checklist.getCleaning();

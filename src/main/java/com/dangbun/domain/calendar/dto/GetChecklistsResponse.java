@@ -6,11 +6,11 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalTime;
 import java.util.List;
 
-public record GetChecklistsResponse (
+public record GetChecklistsResponse(
         @Schema(description = "체크리스트")
         List<ChecklistDto> checklists
-){
-    public static GetChecklistsResponse of(List<ChecklistDto> checklistDtos){
+) {
+    public static GetChecklistsResponse of(List<ChecklistDto> checklistDtos) {
         return new GetChecklistsResponse(checklistDtos);
     }
 
@@ -18,6 +18,9 @@ public record GetChecklistsResponse (
     public record ChecklistDto(
             @Schema(description = "체크리스트 Id", example = "1")
             Long checklistId,
+
+            @Schema(description = "청소 이름", example = "바닥 쓸기")
+            String cleaningName,
 
             @Schema(description = "당번 이름", example = "당번 A")
             String dutyName,
@@ -35,9 +38,9 @@ public record GetChecklistsResponse (
             @Schema(description = "사진 요구", example = "true")
             Boolean needPhoto
 
-    ){
-        public static ChecklistDto of(Long checklistId, String dutyName, Boolean isComplete, String memberName, LocalTime endTime, Boolean needPhoto){
-            return new ChecklistDto(checklistId, dutyName, isComplete, memberName, endTime, needPhoto);
+    ) {
+        public static ChecklistDto of(Long checklistId, String cleaningName, String dutyName, Boolean isComplete, String memberName, LocalTime endTime, Boolean needPhoto) {
+            return new ChecklistDto(checklistId, cleaningName, dutyName, isComplete, memberName, endTime, needPhoto);
         }
     }
 }
