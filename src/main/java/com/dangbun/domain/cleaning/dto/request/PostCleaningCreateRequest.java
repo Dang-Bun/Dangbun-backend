@@ -16,9 +16,6 @@ public record PostCleaningCreateRequest(
         @Schema(description = "당번 Id", example = "1")
         Long dutyId,
 
-        @Schema(description = "당번 이름", example = "탕비실 청소 당번")
-        String dutyName,
-
         @Schema(description = "담당 멤버", example = "[\"박완\", \"박한나\"]")
         List<String> members,
 
