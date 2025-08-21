@@ -14,7 +14,9 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.YearMonth;
+import java.time.format.TextStyle;
 import java.util.List;
+import java.util.Locale;
 
 @Service
 @RequiredArgsConstructor
@@ -43,7 +45,7 @@ public class CreateChecklistService {
                 String repeatDays = cleaning.getRepeatDays();
                 String[] days = repeatDays.split(",");
                 for(String day:days){
-                    if(now.getDayOfWeek().name().equals(day)){
+                    if(now.getDayOfWeek().getDisplayName(TextStyle.SHORT, Locale.KOREAN).equals(day)){
                         createChecklist(cleaning);
                     }
                 }
