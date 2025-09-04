@@ -18,7 +18,6 @@ import com.dangbun.domain.place.dto.request.*;
 import com.dangbun.domain.place.dto.response.*;
 import com.dangbun.domain.place.dto.response.DutyProgressDto;
 import com.dangbun.domain.place.entity.Place;
-import com.dangbun.domain.place.entity.PlaceCategory;
 import com.dangbun.domain.place.exception.custom.*;
 import com.dangbun.domain.place.repository.PlaceRepository;
 import com.dangbun.domain.user.entity.User;
@@ -198,9 +197,9 @@ class PlaceServiceTest {
     void createPlaceWithManager_notETC() {
         // given
         PostCreatePlaceRequest request = new PostCreatePlaceRequest(
-                "새 카페", 
-                CAFE, 
-                null, 
+                "새 카페",
+                CAFE,
+                null,
                 "매니저",
                 Map.of("phone", "010-1111-1111")
         );
@@ -220,13 +219,13 @@ class PlaceServiceTest {
         assertThat(result.placeId()).isEqualTo(20L);
         then(placeRepository).should().save(argThat(place ->
                 place.getName().equals("새 카페") &&
-                place.getCategory() == CAFE &&
-                place.getCategoryName().equals("카페")
+                        place.getCategory() == CAFE &&
+                        place.getCategoryName().equals("카페")
         ));
         then(memberRepository).should().save(argThat(member ->
                 member.getName().equals("매니저") &&
-                member.getRole() == MemberRole.MANAGER &&
-                member.getStatus()
+                        member.getRole() == MemberRole.MANAGER &&
+                        member.getStatus()
         ));
     }
 
@@ -292,7 +291,7 @@ class PlaceServiceTest {
     void checkInviteCode_valid() {
         // given
         PostCheckInviteCodeRequest request = new PostCheckInviteCodeRequest("abc123");
-        
+
         given(placeRepository.findByInviteCode("abc123")).willReturn(mockPlace);
         given(memberRepository.findByPlaceAndUser(mockPlace, mockUser)).willReturn(Optional.empty());
         given(memberRepository.findFirstByPlace(mockPlace)).willReturn(mockMember);
@@ -322,7 +321,7 @@ class PlaceServiceTest {
     void checkInviteCode_alreadyInvited() {
         // given
         PostCheckInviteCodeRequest request = new PostCheckInviteCodeRequest("abc123");
-        
+
         given(placeRepository.findByInviteCode("abc123")).willReturn(mockPlace);
         given(memberRepository.findByPlaceAndUser(mockPlace, mockUser)).willReturn(Optional.of(mockMember));
 
@@ -351,8 +350,8 @@ class PlaceServiceTest {
         assertThat(result.placeId()).isEqualTo(10L);
         then(memberRepository).should().save(argThat(member ->
                 member.getName().equals("신규멤버") &&
-                member.getRole() == MemberRole.WAITING &&
-                !member.getStatus()
+                        member.getRole() == MemberRole.WAITING &&
+                        !member.getStatus()
         ));
     }
 
@@ -363,7 +362,7 @@ class PlaceServiceTest {
         PostRegisterPlaceRequest request = new PostRegisterPlaceRequest(
                 "wrong", "신규멤버", Map.of()
         );
-        
+
         given(memberRepository.findWithPlaceByInviteCode("wrong")).willReturn(List.of());
 
         // when & then
@@ -377,10 +376,10 @@ class PlaceServiceTest {
         // given
         PostRegisterPlaceRequest request = new PostRegisterPlaceRequest(
                 "abc123",
-                "신규멤버", 
+                "신규멤버",
                 Map.of("address", "서울시")  // 다른 키
         );
-        
+
         given(memberRepository.findWithPlaceByInviteCode("abc123")).willReturn(List.of(mockMember));
 
         // when & then
@@ -416,7 +415,7 @@ class PlaceServiceTest {
     void getPlace_activeMember() {
         // given
         MemberContext.set(mockMember);
-        
+
         MemberDuty memberDuty = MemberDuty.builder()
                 .member(mockMember)
                 .duty(mockDuty)
@@ -457,7 +456,7 @@ class PlaceServiceTest {
     void getPlace_manager() {
         // given
         MemberContext.set(mockManager);
-        
+
         MemberDuty memberDuty = MemberDuty.builder()
                 .member(mockMember)
                 .duty(mockDuty)
@@ -596,7 +595,7 @@ class PlaceServiceTest {
         DutyProgressDto dto = new DutyProgressDto(
                 1000L, "청소 당번", 5L, 3L
         );
-        
+
         given(dutyRepository.findDutyProgressByPlaceToday(10L)).willReturn(List.of(dto));
 
         // when
