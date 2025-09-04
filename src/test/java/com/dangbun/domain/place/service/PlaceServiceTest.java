@@ -426,12 +426,18 @@ class PlaceServiceTest {
                 .cleaning(mockCleaning)
                 .build();
 
+        // Set the place time first
+        mockPlace.setTime(LocalTime.of(9, 0), LocalTime.of(18, 0), true);
+        
+        // Create checklist with time within the range
         Checklist checklist = Checklist.builder()
                 .cleaning(mockCleaning)
                 .isComplete(false)
                 .build();
         ReflectionTestUtils.setField(checklist, "checklistId", 3000L);
-        ReflectionTestUtils.setField(checklist, "createdAt", LocalDateTime.now());
+        // Set created time to be within the time range (e.g., 12:00 today)
+        LocalDateTime createdAt = LocalDate.now().atTime(12, 0);
+        ReflectionTestUtils.setField(checklist, "createdAt", createdAt);
 
         given(memberDutyRepository.findAllWithMemberAndPlaceByPlaceId(10L))
                 .willReturn(List.of(memberDuty));
@@ -439,8 +445,6 @@ class PlaceServiceTest {
                 .willReturn(List.of(memberCleaning));
         given(checkListRepository.findWithCleaningByDutyId(1000L))
                 .willReturn(List.of(checklist));
-
-        mockPlace.setTime(LocalTime.of(9, 0), LocalTime.of(18, 0), true);
 
         // when
         GetPlaceResponse result = placeService.getPlace();
@@ -467,12 +471,18 @@ class PlaceServiceTest {
                 .cleaning(mockCleaning)
                 .build();
 
+        // Set the place time first
+        mockPlace.setTime(LocalTime.of(9, 0), LocalTime.of(18, 0), true);
+        
+        // Create checklist with time within the range
         Checklist checklist = Checklist.builder()
                 .cleaning(mockCleaning)
                 .isComplete(false)
                 .build();
         ReflectionTestUtils.setField(checklist, "checklistId", 4000L);
-        ReflectionTestUtils.setField(checklist, "createdAt", LocalDateTime.now());
+        // Set created time to be within the time range (e.g., 12:00 today)
+        LocalDateTime createdAt = LocalDate.now().atTime(12, 0);
+        ReflectionTestUtils.setField(checklist, "createdAt", createdAt);
 
         given(dutyRepository.findByPlace_PlaceId(10L)).willReturn(List.of(mockDuty));
         given(memberDutyRepository.findAllWithMemberAndPlaceByPlaceId(10L))
@@ -481,8 +491,6 @@ class PlaceServiceTest {
                 .willReturn(List.of(memberCleaning));
         given(checkListRepository.findWithCleaningByDutyId(1000L))
                 .willReturn(List.of(checklist));
-
-        mockPlace.setTime(LocalTime.of(9, 0), LocalTime.of(18, 0), true);
 
         // when
         GetPlaceResponse result = placeService.getPlace();
