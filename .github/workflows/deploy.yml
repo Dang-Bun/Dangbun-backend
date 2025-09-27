@@ -75,14 +75,14 @@ jobs:
             # 최신 이미지 풀
             aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | \
               docker login --username AWS --password-stdin ${{ secrets.ECR_REGISTRY }}
-            docker-compose pull
+            docker compose pull
 
             # 현재 Nginx가 바라보는 포트 확인 (8081 or 8082)
             ACTIVE_PORT=$(grep -o "127.0.0.1:[0-9]*" /etc/nginx/sites-enabled/default | cut -d: -f2)
 
             if [ "$ACTIVE_PORT" = "8081" ]; then
               echo ">>> BLUE 활성화중 → GREEN으로 전환"
-              docker-compose up -d app-green
+              docker compose up -d app-green
               sleep 10
               curl -f http://localhost:8082/actuator/health || (echo "Health check 실패!" && exit 1)
               sudo sed -i 's/8081/8082/' /etc/nginx/sites-enabled/default
@@ -90,7 +90,7 @@ jobs:
               docker stop app-blue
             else
               echo ">>> GREEN 활성화중 → BLUE로 전환"
-              docker-compose up -d app-blue
+              docker compose up -d app-blue
               sleep 10
               curl -f http://localhost:8081/actuator/health || (echo "Health check 실패!" && exit 1)
               sudo sed -i 's/8082/8081/' /etc/nginx/sites-enabled/default
