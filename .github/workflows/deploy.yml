@@ -97,13 +97,6 @@ jobs:
               sudo nginx -s reload
               docker stop app-green
             fi
-
-      - name: Health Check
-        uses: jtalk/url-health-check-action@v4
-        with:
-          url: https://dangbun.o-r.kr/actuator/health
-          max-attempts: 7
-          retry-delay: 10s
         
       - name: Health Check
         uses: jtalk/url-health-check-action@v4
