@@ -58,7 +58,7 @@ jobs:
           key: ${{ secrets.REMOTE_SSH_KEY }}
           port: ${{ secrets.REMOTE_SSH_PORT }}
           script: |
-            cd /home/ubuntu/dangbun
+            cd /home/ubuntu/dangbun-server
 
             # 환경변수 export (docker-compose.yml에서 사용)
             export ECR_REGISTRY=${{ secrets.ECR_REGISTRY }}
