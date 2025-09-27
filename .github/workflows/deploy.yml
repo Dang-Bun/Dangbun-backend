@@ -83,7 +83,13 @@ jobs:
             if [ "$ACTIVE_PORT" = "8081" ]; then
               echo ">>> BLUE 활성화중 → GREEN으로 전환"
               docker compose up -d app-green
-              sleep 10
+              for i in {1..30}; do
+                if curl -fs http://localhost:8082/actuator/health; then
+                  echo "GREEN 컨테이너 Health check 성공"
+                  break
+                fi
+                echo "GREEN 준비 대기중... ($i)"
+                sleep 5
               curl -f http://localhost:8082/actuator/health || (echo "Health check 실패!" && exit 1)
               sudo sed -i 's/8081/8082/' /etc/nginx/sites-enabled/default
               sudo nginx -s reload
@@ -91,7 +97,13 @@ jobs:
             else
               echo ">>> GREEN 활성화중 → BLUE로 전환"
               docker compose up -d app-blue
-              sleep 10
+              for i in {1..30}; do
+                if curl -fs http://localhost:8081/actuator/health; then
+                  echo "BLUE 컨테이너 Health check 성공"
+                  break
+                fi
+                echo "BLUE 준비 대기중... ($i)"
+                sleep 5
               curl -f http://localhost:8081/actuator/health || (echo "Health check 실패!" && exit 1)
               sudo sed -i 's/8082/8081/' /etc/nginx/sites-enabled/default
               sudo nginx -s reload
@@ -101,6 +113,6 @@ jobs:
       - name: Health Check
         uses: jtalk/url-health-check-action@v4
         with:
-          url: http://${{ secrets.REMOTE_IP }}:8080/actuator/health
+          url: https://dangbun.o-r.kr/actuator/health
           max-attempts: 7
           retry-delay: 10s
