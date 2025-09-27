@@ -90,6 +90,7 @@ jobs:
                 fi
                 echo "GREEN 준비 대기중... ($i)"
                 sleep 5
+              done
               curl -f http://localhost:8082/actuator/health || (echo "Health check 실패!" && exit 1)
               sudo sed -i 's/8081/8082/' /etc/nginx/sites-enabled/default
               sudo nginx -s reload
@@ -104,6 +105,7 @@ jobs:
                 fi
                 echo "BLUE 준비 대기중... ($i)"
                 sleep 5
+              done
               curl -f http://localhost:8081/actuator/health || (echo "Health check 실패!" && exit 1)
               sudo sed -i 's/8082/8081/' /etc/nginx/sites-enabled/default
               sudo nginx -s reload
