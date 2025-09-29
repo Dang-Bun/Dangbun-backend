@@ -14,11 +14,12 @@ import org.springframework.stereotype.Service;
 import java.security.Key;
 import java.util.Date;
 
+import static com.dangbun.global.security.jwt.TokenType.*;
+
 @RequiredArgsConstructor
 @Service
 public class JwtProvider {
 
-    private final StringRedisTemplate redisTemplate;
     @Value("${jwt.secret}")
     private String SECRET;
     private Key key;
@@ -33,13 +34,13 @@ public class JwtProvider {
         this.key = Keys.hmacShaKeyFor(SECRET.getBytes());
     }
 
-    public String createAccessToken(User user){
+    public String createAccessToken(String email){
 
-        return buildToken(user.getEmail(), issuer, "access");
+        return buildToken(email, issuer, ACCESS.getName());
     }
 
     public String createRefreshToken(User user){
-        return buildToken(user.getEmail(), issuer, "refresh");
+        return buildToken(user.getEmail(), issuer, REFRESH.getName());
     }
 
 
@@ -47,9 +48,9 @@ public class JwtProvider {
         Date now = new Date();
         Date expiryDate;
 
-        if ("access".equals(type)) {
+        if (ACCESS.getName().equals(type)) {
             expiryDate = new Date(now.getTime() + ACCESS_TOKEN_MS);
-        } else if ("refresh".equals(type)) {
+        } else if (REFRESH.getName().equals(type)) {
             expiryDate = new Date(now.getTime() + REFRESH_TOKEN_MS);
         } else {
             throw new IllegalArgumentException("Invalid token type: " + type);
