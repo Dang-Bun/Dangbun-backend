@@ -94,7 +94,7 @@ jobs:
               curl -f http://localhost:8082/actuator/health || (echo "Health check 실패!" && exit 1)
               sudo sed -i 's/8081/8082/' /etc/nginx/sites-enabled/default
               sudo nginx -s reload
-              docker stop app-blue
+              docker stop app-blue || true
             else
               echo ">>> GREEN 활성화중 → BLUE로 전환"
               docker compose up -d app-blue
@@ -109,7 +109,7 @@ jobs:
               curl -f http://localhost:8081/actuator/health || (echo "Health check 실패!" && exit 1)
               sudo sed -i 's/8082/8081/' /etc/nginx/sites-enabled/default
               sudo nginx -s reload
-              docker stop app-green
+              docker stop app-green || true
             fi
         
       - name: Health Check
