@@ -22,8 +22,8 @@ import java.util.Optional;
 
 import static com.dangbun.domain.user.response.status.UserExceptionResponse.*;
 import static com.dangbun.domain.user.response.status.UserExceptionResponse.INVALID_PASSWORD;
-import static com.dangbun.global.security.refactor.TokenName.ACCESS;
-import static com.dangbun.global.security.refactor.TokenName.REFRESH;
+import static com.dangbun.global.security.jwt.TokenPrefix.ACCESS;
+import static com.dangbun.global.security.jwt.TokenPrefix.REFRESH;
 
 @RequiredArgsConstructor
 @Service
