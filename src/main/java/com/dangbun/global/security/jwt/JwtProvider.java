@@ -35,15 +35,15 @@ public class JwtProvider {
 
     public String createAccessToken(User user){
 
-        return buildToken(user.getUserId(), issuer, "access");
+        return buildToken(user.getEmail(), issuer, "access");
     }
 
     public String createRefreshToken(User user){
-        return buildToken(user.getUserId(), issuer, "refresh");
+        return buildToken(user.getEmail(), issuer, "refresh");
     }
 
 
-    private String buildToken(Long userId, String issuer, String type){
+    private String buildToken(String email, String issuer, String type){
         Date now = new Date();
         Date expiryDate;
 
@@ -56,7 +56,7 @@ public class JwtProvider {
         }
 
         return Jwts.builder()
-                .setSubject(String.valueOf(userId))
+                .setSubject(email)
                 .setIssuer(issuer)
                 .setIssuedAt(now)
                 .setExpiration(expiryDate)
