@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.dangbun.global.security.refactor.TokenName.*;
+import static com.dangbun.global.security.jwt.TokenPrefix.*;
 
 @RequiredArgsConstructor
 @Service
