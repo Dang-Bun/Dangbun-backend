@@ -78,8 +78,7 @@ jobs:
             docker compose pull
 
             # 현재 Nginx가 바라보는 포트 확인 (8081 or 8082)
-            ACTIVE_PORT=$(grep -o "127.0.0.1:[0-9]*" /etc/nginx/sites-enabled/default | cut -d: -f2)
-
+            ACTIVE_PORT=$(grep -o "127.0.0.1:808[12]" /etc/nginx/sites-enabled/default | cut -d: -f2 | head -n1)
             if [ "$ACTIVE_PORT" = "8081" ]; then
               echo ">>> BLUE 활성화중 → GREEN으로 전환"
               docker compose up -d app-green
