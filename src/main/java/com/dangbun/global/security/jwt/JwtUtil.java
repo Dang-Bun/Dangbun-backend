@@ -16,13 +16,19 @@ import java.util.Date;
 import static com.dangbun.global.security.jwt.TokenPrefix.REFRESH;
 
 @Slf4j
+@Component
 public class JwtUtil {
 
-    @Value("${jwt.secret}")
     private static String SECRET;
-    private static final Key KEY = Keys.hmacShaKeyFor(SECRET.getBytes());
+    private static Key KEY;
 
     private JwtUtil() {}
+
+    @Value("${jwt.secret}")
+    private void setSECRETAndKEY(String secret){
+        SECRET = secret;
+        KEY = Keys.hmacShaKeyFor(secret.getBytes());
+    }
 
     public static String parseAccessToken(String authorizationHeader) {
         if (authorizationHeader == null || authorizationHeader.isBlank()) {
