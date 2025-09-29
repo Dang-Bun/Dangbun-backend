@@ -77,30 +77,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
     }
 
-//    private boolean authenticate(HttpServletRequest request, HttpServletResponse response, String accessToken) {
-//        try {
-//
-//            String userId = JwtUtil.getUserId(accessToken);
-//            log.info("Authenticated user ID : " + userId);
-//            AbstractAuthenticationToken authentication = createAuthenticationToken(request, userId);
-//
-//            SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
-//            securityContext.setAuthentication(authentication);
-//            SecurityContextHolder.setContext(securityContext);
-//            return true;
-//        } catch (ExpiredJwtException ex) {
-//
-//            log.warn("Expired JWT token: {}", ex.getMessage());
-//            Cookie expiredCookie = new Cookie("accessToken", null);
-//            expiredCookie.setPath("/");
-//            expiredCookie.setMaxAge(0);
-//            expiredCookie.setHttpOnly(true);
-//            response.addCookie(expiredCookie);
-//
-//            return refreshAuthentication(request, response);
-//        }
-//    }
-
     private boolean refreshAuthentication(HttpServletRequest request, HttpServletResponse response) {
         try {
             String refreshToken = JwtUtil.getRefreshToken(request);
@@ -126,35 +102,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             log.error("refreshAuthentication 실패: {}", e.getMessage());
 
             SecurityContextHolder.clearContext();
-//            createErrorResponse(response);
             return false;
         }
     }
-
-//    private boolean isValidRefreshToken(String refreshToken, Claims refreshClaims) {
-//        try {
-//            String tokenType = refreshClaims.get("token_type", String.class);
-//            if (!"refresh".equals(tokenType)) return false;
-//
-//            String userId = refreshClaims.getSubject();
-//            String saved = (String) redisTemplate.opsForValue().get("refreshToken:" + userId);
-//            return saved != null && saved.equals(refreshToken);
-//
-//        } catch (Exception e) {
-//            log.error("RefreshToken 유효성 검사 중 오류", e);
-//            return false;
-//        }
-//    }
-
-
-
-//    private static void createErrorResponse(HttpServletResponse response) {
-//        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-//        response.setContentType("application/json;charset=UTF-8");
-//        try {
-//            response.getWriter().write("{\"code\":"+INVALID_JWT.getCode()+",\"message\":\"토큰이 만료되었습니다. 다시 로그인해주세요.\"}");
-//        } catch (IOException ex) {
-//            log.error("Error writing response", ex);
-//        }
-//    }
 }

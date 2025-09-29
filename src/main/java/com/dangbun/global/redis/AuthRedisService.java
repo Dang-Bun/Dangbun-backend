@@ -17,20 +17,18 @@ import static com.dangbun.domain.user.response.status.UserExceptionResponse.*;
 public class AuthRedisService {
 
     private final StringRedisTemplate redisTemplate;
-    private final JwtUtil jwtUtil;
 
     public final static Long REFRESH_VALIDATION_MS = 1000L * 60 * 60 * 24 * 15;
 
 
     public void deleteAndSetBlacklist(String bearerToken){
-        String accessToken = jwtUtil.parseAccessToken(bearerToken);
-        String userId = jwtUtil.validateAndGetUserId(accessToken);
+        String accessToken = JwtUtil.parseAccessToken(bearerToken);
+        String email = JwtUtil.getSubject(accessToken);
 
 
+        redisTemplate.delete("refreshToken:" + email);
 
-        redisTemplate.delete("refreshToken:" + userId);
-
-        Date expiration = jwtUtil.getExpiration(accessToken);
+        Date expiration = JwtUtil.getExpiration(accessToken);
         Long now = System.currentTimeMillis();
         Long expirationMs = expiration.getTime() - now;
 

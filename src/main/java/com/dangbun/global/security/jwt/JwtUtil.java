@@ -80,7 +80,7 @@ public class JwtUtil {
 
     }
 
-    public Date getExpiration(String token) {
+    public static Date getExpiration(String token) {
         return parseToken(token).getExpiration();
     }
 
