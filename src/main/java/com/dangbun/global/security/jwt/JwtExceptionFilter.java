@@ -1,55 +1,73 @@
 package com.dangbun.global.security.jwt;
 
-import com.dangbun.global.exception.InvalidRefreshJWTException;
 import com.dangbun.global.response.BaseErrorResponse;
 import com.dangbun.global.response.status.BaseExceptionResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.Map;
 
-import static com.dangbun.global.response.status.BaseExceptionResponse.*;
 
-@Component
+@Slf4j
+@RequiredArgsConstructor
 public class JwtExceptionFilter extends OncePerRequestFilter {
+
+    private final ObjectMapper objectMapper;
+
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        try{
+    protected void doFilterInternal(
+            HttpServletRequest request,
+            HttpServletResponse response,
+            FilterChain filterChain
+    ) throws ServletException, IOException {
+        try {
             filterChain.doFilter(request, response);
-        }catch (ExpiredJwtException e){
-            // 토큰 유효기간 만료
-            logger.error(e);
-            setErrorResponse(AUTH_UNAUTHENTICATED, response, HttpStatus.UNAUTHORIZED);
-        }catch (InvalidRefreshJWTException e){
-            // 유효하지 않은 Refresh JWT
-            logger.error(e);
-            setErrorResponse(INVALID_REFRESH_TOKEN, response, HttpStatus.UNAUTHORIZED);
-        }
-        catch(JwtException | IllegalStateException e){
-            // 유효하지 않은 토큰
-            logger.error(e);
-            setErrorResponse(INVALID_JWT, response,HttpStatus.UNAUTHORIZED);
+        } catch (Exception ex) {
+            handleJwtException(request, response, ex);
         }
     }
 
-    private void setErrorResponse(BaseExceptionResponse exceptionResponse,
-                                  HttpServletResponse response,
-                                  HttpStatus status) throws IOException {
-        ObjectMapper objectMapper = new ObjectMapper();
-        response.setStatus(status.value());
-        response.setContentType("application/json; charset=UTF-8");
+    private void handleJwtException(
+            HttpServletRequest request,
+            HttpServletResponse response,
+            Exception ex
+    ) throws IOException {
+        if (response.isCommitted()) {
+            log.warn("Response already committed, cannot write jwt error. uri = {}, ex = {}", request.getRequestURI(), ex.toString());
+            return;
+        }
 
-        BaseErrorResponse errorResponse = new BaseErrorResponse(exceptionResponse);
-        response.getWriter().write(objectMapper.writeValueAsString(errorResponse));
+        int status = HttpServletResponse.SC_UNAUTHORIZED;
+        String code = "JWT_ERROR";
+        String message = ex.getMessage();
+
+        response.resetBuffer();
+        response.setStatus(status);
+        response.setCharacterEncoding(StandardCharsets.UTF_8.name());
+        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+
+        Map<String, Object> body = Map.of(
+                "success", false,
+                "code", code,
+                "message", message,
+                "path", request.getRequestURI()
+        );
+
+        String json = objectMapper.writeValueAsString(body);
+        response.getWriter().write(json);
+        response.getWriter().flush();
+        // close will be called by container
+
     }
-
-
 }
