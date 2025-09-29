@@ -16,7 +16,6 @@ import java.util.Date;
 import static com.dangbun.global.security.jwt.TokenPrefix.REFRESH;
 
 @Slf4j
-@Component
 public class JwtUtil {
 
     @Value("${jwt.secret}")
