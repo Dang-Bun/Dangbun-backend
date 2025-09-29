@@ -21,7 +21,7 @@ public class JwtService {
 
         Map<String , String> tokenMap = new HashMap<>();
 
-        final String accessToken = jwtProvider.createAccessToken(user);
+        final String accessToken = jwtProvider.createAccessToken(user.getEmail());
         tokenMap.put(ACCESS.getName(),accessToken);
 
         final String refreshToken = jwtProvider.createRefreshToken(user);
