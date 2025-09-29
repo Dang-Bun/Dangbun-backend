@@ -1,8 +1,7 @@
 package com.dangbun.global.redis;
 
 import com.dangbun.domain.user.exception.custom.AuthCodeAlreadySentException;
-import com.dangbun.domain.user.response.status.UserExceptionResponse;
-import com.dangbun.global.security.JwtUtil;
+import com.dangbun.global.security.jwt.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;

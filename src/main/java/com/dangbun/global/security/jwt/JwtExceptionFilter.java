@@ -1,9 +1,8 @@
-package com.dangbun.global.security;
+package com.dangbun.global.security.jwt;
 
 import com.dangbun.global.exception.InvalidRefreshJWTException;
 import com.dangbun.global.response.BaseErrorResponse;
 import com.dangbun.global.response.status.BaseExceptionResponse;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;

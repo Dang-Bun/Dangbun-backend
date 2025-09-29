@@ -1,4 +1,4 @@
-package com.dangbun.global.security;
+package com.dangbun.global.security.jwt;
 
 
 import io.jsonwebtoken.*;

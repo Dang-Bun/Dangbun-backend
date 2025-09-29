@@ -1,9 +1,8 @@
-package com.dangbun.global.security;
+package com.dangbun.global.security.jwt;
 
 import com.dangbun.domain.user.entity.CustomUserDetails;
 import com.dangbun.domain.user.entity.User;
 import com.dangbun.domain.user.repository.UserRepository;
-import com.dangbun.global.exception.InvalidRefreshJWTException;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
@@ -21,11 +20,13 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
+import org.springframework.util.PathMatcher;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.List;
 
 import static com.dangbun.global.response.status.BaseExceptionResponse.*;
 
@@ -35,10 +36,28 @@ import static com.dangbun.global.response.status.BaseExceptionResponse.*;
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-    private final TokenProvider tokenProvider;
+    private final JwtProvider jwtProvider;
     private final UserRepository userRepository;
     private final RedisTemplate<Object, Object> redisTemplate;
     private final JwtUtil jwtUtil;
+
+    private final PathMatcher pathMatcher;
+
+
+    private static final List<String> SKIP_URLS = List.of(
+            "/users/login",
+            "/users/signup",
+            "/actuator/health",
+            "/swagger-ui/**",
+            "/v3/api-docs/**",
+            "/docs/**"
+    );
+
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+        String path = request.getRequestURI();
+        return SKIP_URLS.stream().anyMatch(p -> pathMatcher.match(p, path));
+    }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
@@ -112,7 +131,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             securityContext.setAuthentication(authentication);
             SecurityContextHolder.setContext(securityContext);
 
-            String newAccessToken = tokenProvider.createAccessToken(user);
+            String newAccessToken = jwtProvider.createAccessToken(user);
             response.setHeader("Authorization", "Bearer " + newAccessToken);
             return true;
 

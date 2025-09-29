@@ -1,8 +1,8 @@
 package com.dangbun.global.config;
 
 
-import com.dangbun.global.security.JwtAuthenticationFilter;
-import com.dangbun.global.security.JwtExceptionFilter;
+import com.dangbun.global.security.jwt.JwtAuthenticationFilter;
+import com.dangbun.global.security.jwt.JwtExceptionFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

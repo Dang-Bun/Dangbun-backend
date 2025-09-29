@@ -1,4 +1,4 @@
-package com.dangbun.global.security;
+package com.dangbun.global.security.jwt;
 
 
 import com.dangbun.domain.user.entity.User;
@@ -16,7 +16,7 @@ import java.util.Date;
 
 @RequiredArgsConstructor
 @Service
-public class TokenProvider {
+public class JwtProvider {
 
     private final StringRedisTemplate redisTemplate;
     @Value("${jwt.secret}")
