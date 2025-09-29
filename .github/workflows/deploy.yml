@@ -50,7 +50,7 @@ jobs:
           docker build -t $IMAGE_URI .
           docker push $IMAGE_URI
 
-      - name: Deploy to EC2
+      - name: Deploy to EC2 (Blue-Green)
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.REMOTE_IP }}
@@ -58,27 +58,62 @@ jobs:
           key: ${{ secrets.REMOTE_SSH_KEY }}
           port: ${{ secrets.REMOTE_SSH_PORT }}
           script: |
-            aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login --username AWS --password-stdin ${{ secrets.ECR_REGISTRY }}
-            docker stop dangbun-server || true
-            docker rm dangbun-server || true
-            docker pull ${{ secrets.ECR_REGISTRY }}/${{ secrets.ECR_REPOSITORY }}:latest
-            docker run -d -p 8080:8080 \
-              --network=dangbun-network \
-              -e SPRING_PROFILES_ACTIVE=prod \
-              -e PROD_DB_URL=${{ secrets.PROD_DB_URL }} \
-              -e PROD_DB_USER=${{ secrets.PROD_DB_USER }} \
-              -e PROD_DB_PASSWORD=${{ secrets.PROD_DB_PASSWORD }} \
-              -e JWT_SECRET=${{ secrets.JWT_SECRET }} \
-              -e MAIL_PASSWORD=${{ secrets.MAIL_PASSWORD }} \
-              -e AWS_IAM_ACCESS_KEY=${{ secrets.AWS_IAM_ACCESS_KEY }} \
-              -e AWS_IAM_SECRET_KEY=${{ secrets.AWS_IAM_SECRET_KEY }} \
-              -e AWS_S3_BUCKET_NAME=${{ secrets.AWS_S3_BUCKET_NAME }} \
-              --name dangbun-server \
-              ${{ secrets.ECR_REGISTRY }}/${{ secrets.ECR_REPOSITORY }}:latest
+            cd /home/ubuntu/dangbun-server
+
+            # 환경변수 export (docker-compose.yml에서 사용)
+            export ECR_REGISTRY=${{ secrets.ECR_REGISTRY }}
+            export ECR_REPOSITORY=${{ secrets.ECR_REPOSITORY }}
+            export PROD_DB_URL=${{ secrets.PROD_DB_URL }}
+            export PROD_DB_USER=${{ secrets.PROD_DB_USER }}
+            export PROD_DB_PASSWORD=${{ secrets.PROD_DB_PASSWORD }}
+            export JWT_SECRET=${{ secrets.JWT_SECRET }}
+            export MAIL_PASSWORD=${{ secrets.MAIL_PASSWORD }}
+            export AWS_IAM_ACCESS_KEY=${{ secrets.AWS_IAM_ACCESS_KEY }}
+            export AWS_IAM_SECRET_KEY=${{ secrets.AWS_IAM_SECRET_KEY }}
+            export AWS_S3_BUCKET_NAME=${{ secrets.AWS_S3_BUCKET_NAME }}
+
+            # 최신 이미지 풀
+            aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | \
+              docker login --username AWS --password-stdin ${{ secrets.ECR_REGISTRY }}
+            docker compose pull
+
+            # 현재 Nginx가 바라보는 포트 확인 (8081 or 8082)
+            ACTIVE_PORT=$(grep -o "127.0.0.1:808[12]" /etc/nginx/sites-enabled/default | cut -d: -f2 | head -n1)
+            if [ "$ACTIVE_PORT" = "8081" ]; then
+              echo ">>> BLUE 활성화중 → GREEN으로 전환"
+              docker compose up -d app-green
+              for i in {1..10}; do
+                if curl -fs http://localhost:8082/actuator/health; then
+                  echo "GREEN 컨테이너 Health check 성공"
+                  break
+                fi
+                echo "GREEN 준비 대기중... ($i)"
+                sleep 5
+              done
+              curl -f http://localhost:8082/actuator/health || (echo "Health check 실패!" && exit 1)
+              sudo sed -i 's/8081/8082/' /etc/nginx/sites-enabled/default
+              sudo nginx -s reload
+              docker stop app-blue || true
+            else
+              echo ">>> GREEN 활성화중 → BLUE로 전환"
+              docker compose up -d app-blue
+              for i in {1..10}; do
+                if curl -fs http://localhost:8081/actuator/health; then
+                  echo "BLUE 컨테이너 Health check 성공"
+                  break
+                fi
+                echo "BLUE 준비 대기중... ($i)"
+                sleep 5
+              done
+              curl -f http://localhost:8081/actuator/health || (echo "Health check 실패!" && exit 1)
+              sudo sed -i 's/8082/8081/' /etc/nginx/sites-enabled/default
+              sudo nginx -s reload
+              docker stop app-green || true
+            fi
         
       - name: Health Check
         uses: jtalk/url-health-check-action@v4
         with:
-          url: http://${{ secrets.REMOTE_IP }}:8080/actuator/health
+          url: https://dangbun.o-r.kr/actuator/health
           max-attempts: 7
           retry-delay: 10s
