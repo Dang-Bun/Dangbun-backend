@@ -31,7 +31,6 @@ import static com.dangbun.global.security.jwt.TokenPrefix.*;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtProvider jwtProvider;
-    private final RedisTemplate<Object, Object> redisTemplate;
     private final PathMatcher pathMatcher;
     private final UserDetailsService userDetailsService;
 
@@ -55,7 +54,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
                                     FilterChain filterChain
-    ) throws ServletException, IOException {
+    ) throws ServletException, IOException, ExpiredJwtException {
         String token = JwtUtil.parseAccessToken(request.getHeader(HttpHeaders.AUTHORIZATION));
         try {
             if (token != null && JwtUtil.validateToken(token)) {
@@ -67,8 +66,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             }
             filterChain.doFilter(request, response);
         } catch (ExpiredJwtException e) {
-            //Todo RefreshToken 로직 처리
-            refreshAuthentication(request, response);
+            if(!refreshAuthentication(request, response, filterChain)){
+                throw e;
+            }
         } catch (Exception ex) {
             request.setAttribute("jwtException", ex);
             throw ex;
@@ -77,7 +77,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
     }
 
-    private boolean refreshAuthentication(HttpServletRequest request, HttpServletResponse response) {
+    private boolean refreshAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) {
         try {
             String refreshToken = JwtUtil.getRefreshToken(request);
             if(refreshToken!= null && JwtUtil.validateToken(refreshToken)){
@@ -95,12 +95,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
                 response.setHeader(HttpHeaders.AUTHORIZATION, BEARER.getName() + newAccessToken);
             }
-
+            filterChain.doFilter(request,response);
             return true;
-
         } catch (Exception e) {
             log.error("refreshAuthentication 실패: {}", e.getMessage());
-
             SecurityContextHolder.clearContext();
             return false;
         }

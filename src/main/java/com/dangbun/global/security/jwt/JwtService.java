@@ -1,7 +1,6 @@
-package com.dangbun.global.security.refactor;
+package com.dangbun.global.security.jwt;
 
 import com.dangbun.domain.user.entity.User;
-import com.dangbun.global.security.jwt.JwtProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

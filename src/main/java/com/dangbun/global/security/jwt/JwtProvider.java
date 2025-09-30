@@ -23,8 +23,6 @@ public class JwtProvider {
     private String SECRET;
     private Key key;
 
-    public final static Long ACCESS_TOKEN_MS = 1000L * 60 * 60 * 24 * 15;
-    public final static Long REFRESH_TOKEN_MS = 1000L * 60 * 60 * 24 * 15;
     public final static String issuer = "dangbun app";
 
 
@@ -48,9 +46,9 @@ public class JwtProvider {
         Date expiryDate;
 
         if (ACCESS.getName().equals(type)) {
-            expiryDate = new Date(now.getTime() + ACCESS_TOKEN_MS);
+            expiryDate = new Date(now.getTime() + TokenAge.ACCESS.getAge());
         } else if (REFRESH.getName().equals(type)) {
-            expiryDate = new Date(now.getTime() + REFRESH_TOKEN_MS);
+            expiryDate = new Date(now.getTime() + TokenAge.REFRESH.getAge());
         } else {
             throw new IllegalArgumentException("Invalid token type: " + type);
         }

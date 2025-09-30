@@ -9,15 +9,21 @@ import com.dangbun.domain.user.service.UserCommandService;
 import com.dangbun.domain.user.service.UserQueryService;
 import com.dangbun.global.docs.DocumentedApiErrors;
 import com.dangbun.global.response.BaseResponse;
+import com.dangbun.global.security.jwt.TokenAge;
+import com.dangbun.global.security.jwt.TokenType;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
+import static com.dangbun.global.security.jwt.TokenType.*;
 
 
 @Slf4j
@@ -75,7 +81,17 @@ public class UserController {
     )
     @PostMapping("/login")
     public ResponseEntity<BaseResponse<PostUserLoginResponse>> login(@RequestBody PostUserLoginRequest request) {
-        return ResponseEntity.ok(BaseResponse.ok(userQueryService.login(request)));
+        PostUserLoginResponse response = userQueryService.login(request);
+
+        ResponseCookie refreshCookie = ResponseCookie.from(REFRESH.getName(), response.refreshToken())
+                .httpOnly(true).secure(true).sameSite("None").path("/")
+                .maxAge(TokenAge.REFRESH.getAge()/1000)
+                .build();
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.SET_COOKIE, refreshCookie.toString())
+                .header(HttpHeaders.AUTHORIZATION, "Bearer "+response.accessToken())
+                .body(BaseResponse.ok(userQueryService.login(request)));
     }
 
 

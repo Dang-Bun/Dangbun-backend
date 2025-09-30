@@ -13,7 +13,8 @@ import java.security.Key;
 import java.util.Arrays;
 import java.util.Date;
 
-import static com.dangbun.global.security.jwt.TokenPrefix.REFRESH;
+import static com.dangbun.global.security.jwt.TokenType.*;
+
 
 @Slf4j
 @Component
@@ -74,7 +75,8 @@ public class JwtUtil {
             parseToken(token);
             return true;
         } catch (ExpiredJwtException e){
-            return false;
+//            return false;
+            throw e;
         } catch (UnsupportedJwtException | MalformedJwtException e){
             return false;
         } catch (io.jsonwebtoken.security.SecurityException e){
