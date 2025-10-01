@@ -23,10 +23,11 @@ public class JwtUtil {
     private static String SECRET;
     private static Key KEY;
 
-    private JwtUtil() {}
+    private JwtUtil() {
+    }
 
     @Value("${jwt.secret}")
-    private void setSECRETAndKEY(String secret){
+    private void setSECRETAndKEY(String secret) {
         SECRET = secret;
         KEY = Keys.hmacShaKeyFor(secret.getBytes());
     }
@@ -74,15 +75,14 @@ public class JwtUtil {
         try {
             parseToken(token);
             return true;
-        } catch (ExpiredJwtException e){
-//            return false;
+        } catch (ExpiredJwtException e) {
             throw e;
-        } catch (UnsupportedJwtException | MalformedJwtException e){
-            return false;
-        } catch (io.jsonwebtoken.security.SecurityException e){
-            return false;
-        } catch (IllegalArgumentException e){
-            return false;
+        } catch (UnsupportedJwtException | MalformedJwtException e) {
+            throw e;
+        } catch (io.jsonwebtoken.security.SecurityException e) {
+            throw e;
+        } catch (IllegalArgumentException e) {
+            throw e;
         }
 
     }

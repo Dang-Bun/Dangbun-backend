@@ -11,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -66,9 +67,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             }
             filterChain.doFilter(request, response);
         } catch (ExpiredJwtException e) {
-            if(!refreshAuthentication(request, response, filterChain)){
-                throw e;
-            }
+            log.info("check refreshAuthentication");
+             refreshAuthentication(request, response, filterChain);
         } catch (Exception ex) {
             request.setAttribute("jwtException", ex);
             throw ex;
@@ -77,10 +77,19 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
     }
 
-    private boolean refreshAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) {
+    private void refreshAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         try {
             String refreshToken = JwtUtil.getRefreshToken(request);
-            if(refreshToken!= null && JwtUtil.validateToken(refreshToken)){
+
+            if(refreshToken == null){
+                throw new BadCredentialsException("Refresh token absent");
+//                SecurityContextHolder.clearContext();
+//                log.warn("refresh token absent");
+//                response.sendError(HttpServletResponse.SC_UNAUTHORIZED,"Refresh token absent");
+            }
+
+            if (JwtUtil.validateToken(refreshToken)) {
+
                 Claims claims = JwtUtil.parseToken(refreshToken);
                 String email = claims.getSubject();
                 UserDetails userDetails = userDetailsService.loadUserByUsername(email);
@@ -95,12 +104,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
                 response.setHeader(HttpHeaders.AUTHORIZATION, BEARER.getName() + newAccessToken);
             }
-            filterChain.doFilter(request,response);
-            return true;
+            filterChain.doFilter(request, response);
+        } catch (ExpiredJwtException e) {
+            log.error("refresh token expired: {}",e.getMessage());
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED,"Refresh token expired");
         } catch (Exception e) {
             log.error("refreshAuthentication 실패: {}", e.getMessage());
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED,"refresh token failed");
             SecurityContextHolder.clearContext();
-            return false;
+            throw e;
         }
     }
 }
