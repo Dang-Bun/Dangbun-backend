@@ -10,7 +10,7 @@ import com.dangbun.domain.user.exception.custom.InvalidPasswordException;
 import com.dangbun.domain.user.exception.custom.NoSuchUserException;
 import com.dangbun.domain.user.repository.UserRepository;
 import com.dangbun.global.redis.AuthRedisService;
-import com.dangbun.global.security.refactor.JwtService;
+import com.dangbun.global.security.jwt.JwtService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -22,8 +22,8 @@ import java.util.Optional;
 
 import static com.dangbun.domain.user.response.status.UserExceptionResponse.*;
 import static com.dangbun.domain.user.response.status.UserExceptionResponse.INVALID_PASSWORD;
-import static com.dangbun.global.security.refactor.TokenName.ACCESS;
-import static com.dangbun.global.security.refactor.TokenName.REFRESH;
+import static com.dangbun.global.security.jwt.TokenPrefix.ACCESS;
+import static com.dangbun.global.security.jwt.TokenPrefix.REFRESH;
 
 @RequiredArgsConstructor
 @Service
