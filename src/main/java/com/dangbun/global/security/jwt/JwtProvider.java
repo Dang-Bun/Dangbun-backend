@@ -1,4 +1,4 @@
-package com.dangbun.global.security;
+package com.dangbun.global.security.jwt;
 
 
 import com.dangbun.domain.user.entity.User;
@@ -8,23 +8,21 @@ import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.security.Key;
 import java.util.Date;
 
+import static com.dangbun.global.security.jwt.TokenType.*;
+
 @RequiredArgsConstructor
 @Service
-public class TokenProvider {
+public class JwtProvider {
 
-    private final StringRedisTemplate redisTemplate;
     @Value("${jwt.secret}")
     private String SECRET;
     private Key key;
 
-    public final static Long ACCESS_TOKEN_MS = 1000L * 60 * 60 * 24 * 15;
-    public final static Long REFRESH_TOKEN_MS = 1000L * 60 * 60 * 24 * 15;
     public final static String issuer = "dangbun app";
 
 
@@ -33,30 +31,30 @@ public class TokenProvider {
         this.key = Keys.hmacShaKeyFor(SECRET.getBytes());
     }
 
-    public String createAccessToken(User user){
+    public String createAccessToken(String email){
 
-        return buildToken(user.getUserId(), issuer, "access");
+        return buildToken(email, issuer, ACCESS.getName());
     }
 
     public String createRefreshToken(User user){
-        return buildToken(user.getUserId(), issuer, "refresh");
+        return buildToken(user.getEmail(), issuer, REFRESH.getName());
     }
 
 
-    private String buildToken(Long userId, String issuer, String type){
+    private String buildToken(String email, String issuer, String type){
         Date now = new Date();
         Date expiryDate;
 
-        if ("access".equals(type)) {
-            expiryDate = new Date(now.getTime() + ACCESS_TOKEN_MS);
-        } else if ("refresh".equals(type)) {
-            expiryDate = new Date(now.getTime() + REFRESH_TOKEN_MS);
+        if (ACCESS.getName().equals(type)) {
+            expiryDate = new Date(now.getTime() + TokenAge.ACCESS.getAge());
+        } else if (REFRESH.getName().equals(type)) {
+            expiryDate = new Date(now.getTime() + TokenAge.REFRESH.getAge());
         } else {
             throw new IllegalArgumentException("Invalid token type: " + type);
         }
 
         return Jwts.builder()
-                .setSubject(String.valueOf(userId))
+                .setSubject(email)
                 .setIssuer(issuer)
                 .setIssuedAt(now)
                 .setExpiration(expiryDate)
