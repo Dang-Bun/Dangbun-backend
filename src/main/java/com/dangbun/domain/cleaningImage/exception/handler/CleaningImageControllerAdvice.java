@@ -1,5 +1,6 @@
 package com.dangbun.domain.cleaningImage.exception.handler;
 
+import com.dangbun.domain.cleaningImage.exception.custom.CleaningImageAlreadyExistsExcepetion;
 import com.dangbun.domain.cleaningImage.exception.custom.InvalidS3KeyException;
 import com.dangbun.domain.cleaningImage.exception.custom.NoSuchImageException;
 import com.dangbun.global.response.BaseErrorResponse;
@@ -22,6 +23,12 @@ public class CleaningImageControllerAdvice {
     @ExceptionHandler(InvalidS3KeyException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public BaseErrorResponse handleInvalidRoleException(InvalidS3KeyException e) {
+        return new BaseErrorResponse(e.getExceptionStatus());
+    }
+
+    @ExceptionHandler(CleaningImageAlreadyExistsExcepetion.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public BaseErrorResponse handleCleaningImageAlreadyExistsException(CleaningImageAlreadyExistsExcepetion e) {
         return new BaseErrorResponse(e.getExceptionStatus());
     }
 }
