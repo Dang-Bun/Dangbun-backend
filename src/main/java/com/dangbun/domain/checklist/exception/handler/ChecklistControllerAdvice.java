@@ -1,6 +1,7 @@
 package com.dangbun.domain.checklist.exception.handler;
 
 import com.dangbun.domain.checklist.exception.custom.ChecklistAccessDeniedException;
+import com.dangbun.domain.checklist.exception.custom.ChecklistRequireImageException;
 import com.dangbun.domain.checklist.exception.custom.ChecklistStatusConflictException;
 import com.dangbun.global.response.BaseErrorResponse;
 import org.springframework.core.Ordered;
@@ -25,4 +26,11 @@ public class ChecklistControllerAdvice {
     public BaseErrorResponse handleInvalidRoleException(ChecklistStatusConflictException e) {
         return new BaseErrorResponse(e.getExceptionStatus());
     }
+
+    @ExceptionHandler(ChecklistRequireImageException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public BaseErrorResponse handleRequireImageException(ChecklistRequireImageException e) {
+        return new BaseErrorResponse(e.getExceptionStatus());
+    }
+
 }
