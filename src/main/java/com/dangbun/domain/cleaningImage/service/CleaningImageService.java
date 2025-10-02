@@ -55,7 +55,7 @@ public class CleaningImageService {
         return accessUrl;
     }
 
-    public boolean isRequireImage(Long checklistId){
+    public boolean isImagePresent(Long checklistId) {
         return cleaningImageRepository.findByChecklist_ChecklistId(checklistId).isPresent();
     }
 }
