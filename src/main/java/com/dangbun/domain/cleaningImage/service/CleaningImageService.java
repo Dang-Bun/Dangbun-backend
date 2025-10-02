@@ -1,6 +1,7 @@
 package com.dangbun.domain.cleaningImage.service;
 
 import com.dangbun.domain.checklist.entity.Checklist;
+import com.dangbun.domain.checklist.repository.ChecklistRepository;
 import com.dangbun.domain.cleaningImage.entity.CleaningImage;
 import com.dangbun.domain.cleaningImage.repository.CleaningImageRepository;
 import com.dangbun.domain.user.entity.CustomUserDetails;
@@ -52,5 +53,9 @@ public class CleaningImageService {
         String accessUrl = s3Service.generateDownloadUrl(s3Key);
 
         return accessUrl;
+    }
+
+    public boolean isImagePresent(Long checklistId) {
+        return cleaningImageRepository.findByChecklist_ChecklistId(checklistId).isPresent();
     }
 }
