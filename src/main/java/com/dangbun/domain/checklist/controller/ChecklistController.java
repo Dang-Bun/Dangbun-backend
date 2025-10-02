@@ -34,12 +34,11 @@ public class ChecklistController {
     @Operation(summary = "체크리스트 완료")
     @DocumentedApiErrors(
             value = {MemberExceptionResponse.class, ChecklistExceptionResponse.class},
-            includes = {"PLACE_ACCESS_DENIED", "CHECKLIST_ACCESS_DENIED","ALREADY_CHECKED"}
+            includes = {"PLACE_ACCESS_DENIED", "CHECKLIST_ACCESS_DENIED", "ALREADY_CHECKED"}
     )
     @PostMapping("/actions/complete")
     public ResponseEntity<BaseResponse<PostCompleteChecklistResponse>> completeChecklist(@PathVariable("placeId") Long placeId,
                                                                                          @PathVariable("checklistId") Long checklistId) {
-
         return ResponseEntity.ok(BaseResponse.ok(checklistService.completeChecklist()));
     }
 

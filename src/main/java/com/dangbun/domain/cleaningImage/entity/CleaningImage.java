@@ -14,7 +14,7 @@ import org.hibernate.annotations.OnDeleteAction;
 public class CleaningImage extends BaseEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "cleaning_image_id")
     Long id;
 
