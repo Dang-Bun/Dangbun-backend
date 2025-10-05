@@ -6,7 +6,9 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public enum CleaningImageExceptionResponse implements ResponseStatus {
     NO_SUCH_IMAGE(140000,"요청한 이미지가 존재하지 않습니다."),
-    INVALID_S3_KEY(140000, "유효하지 않은 S3 Key 입니다");
+    INVALID_S3_KEY(140001, "유효하지 않은 S3 Key 입니다"),
+    CLEANING_IMAGE_ALREADY_EXISTS(140002,"이미 이미지가 존재합니다.")
+    ;
 
     private final int code;
     private final String message;

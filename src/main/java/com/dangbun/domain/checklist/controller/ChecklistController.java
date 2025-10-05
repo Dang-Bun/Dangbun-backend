@@ -57,7 +57,7 @@ public class ChecklistController {
     @PostMapping("/photos/upload-url")
     @DocumentedApiErrors(
             value = {MemberExceptionResponse.class, ChecklistExceptionResponse.class},
-            includes = {"PLACE_ACCESS_DENIED", "CHECKLIST_ACCESS_DENIED"}
+            includes = {"PLACE_ACCESS_DENIED", "CHECKLIST_ACCESS_DENIED", "CLEANING_IMAGE_ALREADY_EXISTS"}
     )
     public ResponseEntity<BaseResponse<PostGetPresignedUrlResponse>> getPresignedUrl(@PathVariable("placeId") Long placeId,
                                                                                      @PathVariable("checklistId") Long checklistId,

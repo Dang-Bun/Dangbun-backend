@@ -1,17 +1,18 @@
 package com.dangbun.domain.cleaningImage.service;
 
 import com.dangbun.domain.checklist.entity.Checklist;
-import com.dangbun.domain.checklist.repository.ChecklistRepository;
 import com.dangbun.domain.cleaningImage.entity.CleaningImage;
+import com.dangbun.domain.cleaningImage.exception.custom.CleaningImageAlreadyExistsExcepetion;
 import com.dangbun.domain.cleaningImage.repository.CleaningImageRepository;
 import com.dangbun.domain.user.entity.CustomUserDetails;
 import com.dangbun.global.s3.S3Service;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
+
+import static com.dangbun.domain.cleaningImage.response.status.CleaningImageExceptionResponse.*;
 
 @RequiredArgsConstructor
 @Service
@@ -21,6 +22,9 @@ public class CleaningImageService {
     private final CleaningImageRepository cleaningImageRepository;
 
     public Map<String, String> generateUrl(String filename, String contentType, Long checklistId) {
+        if (cleaningImageRepository.findByChecklist_ChecklistId(checklistId).isPresent()) {
+            throw new CleaningImageAlreadyExistsExcepetion(CLEANING_IMAGE_ALREADY_EXISTS);
+        }
 
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         CustomUserDetails userDetails = (CustomUserDetails) principal;
