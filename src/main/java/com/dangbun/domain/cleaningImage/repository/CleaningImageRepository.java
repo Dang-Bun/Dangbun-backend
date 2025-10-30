@@ -9,4 +9,6 @@ import java.util.Optional;
 public interface CleaningImageRepository extends JpaRepository<CleaningImage, Long> {
 
     Optional<CleaningImage> findByChecklist_ChecklistId(Long checklistId);
+
+    void deleteAllByChecklist_ChecklistId(Long checklistChecklistId);
 }
