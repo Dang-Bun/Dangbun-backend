@@ -1,13 +1,10 @@
 package com.dangbun.domain.checklist.controller;
 
+import com.dangbun.domain.checklist.dto.response.*;
 import com.dangbun.domain.member.response.status.MemberExceptionResponse;
 import com.dangbun.global.aop.CheckChecklistMembership;
 import com.dangbun.domain.checklist.dto.request.PostGetPresignedUrlRequest;
 import com.dangbun.domain.checklist.dto.request.PostSaveUploadResultRequest;
-import com.dangbun.domain.checklist.dto.response.GetImageUrlResponse;
-import com.dangbun.domain.checklist.dto.response.PostCompleteChecklistResponse;
-import com.dangbun.domain.checklist.dto.response.PostGetPresignedUrlResponse;
-import com.dangbun.domain.checklist.dto.response.PostIncompleteChecklistResponse;
 import com.dangbun.domain.checklist.response.status.ChecklistExceptionResponse;
 import com.dangbun.domain.checklist.service.ChecklistService;
 import com.dangbun.domain.cleaningImage.response.status.CleaningImageExceptionResponse;
@@ -44,8 +41,8 @@ public class ChecklistController {
 
     @Operation(summary = "체크리스트 해제")
     @DocumentedApiErrors(
-            value = {MemberExceptionResponse.class,ChecklistExceptionResponse.class},
-            includes = {"PLACE_ACCESS_DENIED", "CHECKLIST_ACCESS_DENIED","ALREADY_UNCHECKED"}
+            value = {MemberExceptionResponse.class, ChecklistExceptionResponse.class},
+            includes = {"PLACE_ACCESS_DENIED", "CHECKLIST_ACCESS_DENIED", "ALREADY_UNCHECKED"}
     )
     @PostMapping("/actions/incomplete")
     public ResponseEntity<BaseResponse<PostIncompleteChecklistResponse>> incompleteChecklist(@PathVariable("placeId") Long placeId,
@@ -91,5 +88,17 @@ public class ChecklistController {
         return ResponseEntity.ok(BaseResponse.ok(checklistService.getImageUrl(checklistId)));
     }
 
+    @Operation(summary = "이미지 삭제", description = "이미지 확인용 s3Key를 DB에서 삭제합니다.")
+    @DocumentedApiErrors(
+            value = {MemberExceptionResponse.class, ChecklistExceptionResponse.class},
+            includes = {"PLACE_ACCESS_DENIED", "CHECKLIST_ACCESS_DENIED"}
+    )
+    @DeleteMapping("/photos")
+    public ResponseEntity<?> deleteImage(@PathVariable("placeId") Long placeId,
+                                         @PathVariable("checklistId") Long checklistId)
+    {
+        checklistService.deleteS3Key(checklistId);
+        return ResponseEntity.ok(BaseResponse.ok(null));
+    }
 
 }

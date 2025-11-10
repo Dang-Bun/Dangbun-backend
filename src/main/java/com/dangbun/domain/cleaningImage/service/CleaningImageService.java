@@ -62,4 +62,8 @@ public class CleaningImageService {
     public boolean isImagePresent(Long checklistId) {
         return cleaningImageRepository.findByChecklist_ChecklistId(checklistId).isPresent();
     }
+
+    public void deleteByChecklistId(Long checklistId) {
+        cleaningImageRepository.deleteAllByChecklist_ChecklistId(checklistId);
+    }
 }

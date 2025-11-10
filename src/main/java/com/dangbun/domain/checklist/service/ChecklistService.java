@@ -1,13 +1,10 @@
 package com.dangbun.domain.checklist.service;
 
+import com.dangbun.domain.checklist.dto.response.*;
 import com.dangbun.domain.checklist.exception.custom.ChecklistRequireImageException;
 import com.dangbun.global.context.ChecklistContext;
 import com.dangbun.domain.checklist.dto.request.PostGetPresignedUrlRequest;
 import com.dangbun.domain.checklist.dto.request.PostSaveUploadResultRequest;
-import com.dangbun.domain.checklist.dto.response.GetImageUrlResponse;
-import com.dangbun.domain.checklist.dto.response.PostCompleteChecklistResponse;
-import com.dangbun.domain.checklist.dto.response.PostGetPresignedUrlResponse;
-import com.dangbun.domain.checklist.dto.response.PostIncompleteChecklistResponse;
 import com.dangbun.domain.checklist.entity.Checklist;
 import com.dangbun.domain.cleaning.entity.Cleaning;
 import com.dangbun.domain.cleaningImage.service.CleaningImageService;
@@ -77,6 +74,12 @@ public class ChecklistService {
     public GetImageUrlResponse getImageUrl(Long checklistId) {
         String accessUrl = cleaningImageService.getImageUrl(checklistId);
         return new GetImageUrlResponse(accessUrl);
+    }
+
+    public void deleteS3Key(Long checklistId) {
+        if(cleaningImageService.isImagePresent(checklistId)){
+            cleaningImageService.deleteByChecklistId(checklistId);
+        }
     }
 
     @Scheduled(cron = "0 0 0 * * *") // 매일 자정
