@@ -69,7 +69,7 @@ public class ChecklistController {
             includes = {"PLACE_ACCESS_DENIED", "CHECKLIST_ACCESS_DENIED", "INVALID_S3_KEY"}
     )
     @PostMapping("/photos/complete")
-    public ResponseEntity<?> saveUploadResult(@PathVariable("placeId") Long placeId,
+    public ResponseEntity<BaseResponse<?>> saveUploadResult(@PathVariable("placeId") Long placeId,
                                               @PathVariable("checklistId") Long checklistId,
                                               @RequestBody PostSaveUploadResultRequest request) {
         checklistService.saveUploadResult(request);
@@ -94,7 +94,7 @@ public class ChecklistController {
             includes = {"PLACE_ACCESS_DENIED", "CHECKLIST_ACCESS_DENIED"}
     )
     @DeleteMapping("/photos")
-    public ResponseEntity<?> deleteImage(@PathVariable("placeId") Long placeId,
+    public ResponseEntity<BaseResponse<?>> deleteImage(@PathVariable("placeId") Long placeId,
                                          @PathVariable("checklistId") Long checklistId)
     {
         checklistService.deleteS3Key(checklistId);
