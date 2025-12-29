@@ -37,6 +37,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
 
     private static final List<String> SKIP_URLS = List.of(
+            "/users/signup/email-code",
+            "/users/email-code",
             "/users/login",
             "/users/signup",
             "/actuator/health",
@@ -83,9 +85,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
             if(refreshToken == null){
                 throw new BadCredentialsException("Refresh token absent");
-//                SecurityContextHolder.clearContext();
-//                log.warn("refresh token absent");
-//                response.sendError(HttpServletResponse.SC_UNAUTHORIZED,"Refresh token absent");
             }
 
             if (JwtUtil.validateToken(refreshToken)) {
