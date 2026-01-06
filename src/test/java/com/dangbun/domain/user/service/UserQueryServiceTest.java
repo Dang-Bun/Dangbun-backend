@@ -1,8 +1,8 @@
 package com.dangbun.domain.user.service;
 
-import com.dangbun.domain.user.dto.request.PostUserLoginRequest;
+import com.dangbun.domain.user.dto.request.auth.PostUserLoginRequest;
 import com.dangbun.domain.user.dto.response.GetUserMyInfoResponse;
-import com.dangbun.domain.user.dto.response.PostUserLoginResponse;
+import com.dangbun.domain.user.dto.response.auth.PostUserLoginResponse;
 import com.dangbun.domain.user.entity.User;
 import com.dangbun.domain.user.exception.custom.DeleteMemberException;
 import com.dangbun.domain.user.exception.custom.InvalidEmailException;

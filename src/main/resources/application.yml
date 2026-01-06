@@ -137,3 +137,8 @@ management:
     health:
       show-details: always
 
+kakao:
+  client-id: ${CLIENT_ID}
+  redirect-uri: ${REDIRECT_URI}
+  client-secret:
+    kakao-login: ${KAKAO_LOGIN}

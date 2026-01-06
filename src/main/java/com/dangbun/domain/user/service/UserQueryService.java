@@ -1,8 +1,8 @@
 package com.dangbun.domain.user.service;
 
-import com.dangbun.domain.user.dto.request.PostUserLoginRequest;
+import com.dangbun.domain.user.dto.request.auth.PostUserLoginRequest;
 import com.dangbun.domain.user.dto.response.GetUserMyInfoResponse;
-import com.dangbun.domain.user.dto.response.PostUserLoginResponse;
+import com.dangbun.domain.user.dto.response.auth.PostUserLoginResponse;
 import com.dangbun.domain.user.entity.User;
 import com.dangbun.domain.user.exception.custom.DeleteMemberException;
 import com.dangbun.domain.user.exception.custom.InvalidEmailException;
@@ -31,9 +31,7 @@ public class UserQueryService {
 
     private final AuthCodeService authCodeService;
     private final UserRepository userRepository;
-    private final PasswordEncoder passwordEncoder;
     private final AuthRedisService authRedisService;
-    private final JwtService jwtService;
 
     @Transactional(readOnly = true)
     public void sendFindPasswordAuthCode(String toEmail) {
@@ -42,28 +40,6 @@ public class UserQueryService {
         } else{
             throw new InvalidEmailException(INVALID_EMAIL);
         }
-    }
-
-
-    @Transactional(readOnly = true)
-    public PostUserLoginResponse login(@Valid PostUserLoginRequest request) {
-
-
-        User user = userRepository.findByEmail(request.email())
-                .orElseThrow(() -> new NoSuchUserException(NO_SUCH_USER));
-
-        if (!user.getEnabled()) {
-            throw new DeleteMemberException(DELETE_MEMBER);
-        }
-
-        if (!passwordEncoder.matches(request.password(), user.getPassword())) {
-            throw new InvalidPasswordException(INVALID_PASSWORD);
-        }
-
-        Map<String, String> tokenMap = jwtService.generateToken(user);
-        authRedisService.saveRefreshToken(user.getUserId(), tokenMap.get(REFRESH.getName()));
-
-        return new PostUserLoginResponse(tokenMap.get(ACCESS.getName()), tokenMap.get(REFRESH.getName()));
     }
 
     public void logout(String bearerToken) {

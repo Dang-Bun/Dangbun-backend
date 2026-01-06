@@ -1,6 +1,7 @@
 package com.dangbun.domain.user.entity;
 
 
+import com.dangbun.domain.user.LoginType;
 import com.dangbun.global.entity.BaseEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -28,8 +29,13 @@ public class User extends BaseEntity {
     @Column(name = "user_email")
     private String email;
 
-    @NotNull
     private String password;
+
+    @NotNull
+    @Enumerated(EnumType.STRING)
+    private LoginType loginType;
+
+    private String socialId;
 
     private Boolean enabled = true;
 
@@ -46,10 +52,12 @@ public class User extends BaseEntity {
     }
 
     @Builder
-    public User(String name, String email, String password, Boolean enabled) {
+    public User(String name, String email, String password, LoginType loginType, String socialId, Boolean enabled){
         this.name = name;
         this.email = email;
-        this.password = password;
+        this.password = loginType == LoginType.EMAIL ? password : null;
+        this.loginType = loginType == null ? LoginType.EMAIL : loginType;
+        this.socialId = socialId;
         this.enabled = enabled;
     }
 

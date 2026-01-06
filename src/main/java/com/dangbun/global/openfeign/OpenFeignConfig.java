@@ -4,6 +4,6 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-@EnableFeignClients(basePackages = "com.dangbun.global.openfeign")
+@EnableFeignClients(basePackages = "com.dangbun.domain")
 public class OpenFeignConfig {
 }
