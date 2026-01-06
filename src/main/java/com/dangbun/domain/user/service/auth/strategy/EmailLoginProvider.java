@@ -51,8 +51,7 @@ public class EmailLoginProvider implements LoginProvider{
         }
 
         if(!user.getLoginType().equals(LoginType.EMAIL)){
-            //todo 예외처리 수정
-            throw new RuntimeException();
+            throw new NoSuchUserException(NO_SUCH_USER);
         }
 
         if (!passwordEncoder.matches(request.password(), user.getPassword())) {
