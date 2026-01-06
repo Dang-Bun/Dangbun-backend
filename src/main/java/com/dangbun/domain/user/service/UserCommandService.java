@@ -93,6 +93,10 @@ public class UserCommandService {
         User user = userRepository.findByEmail(request.email())
                 .orElseThrow(() -> new NoSuchUserException(NO_SUCH_USER));
 
+        if(!user.getLoginType().equals(LoginType.EMAIL)){
+            throw new NoSuchUserException(NO_SUCH_USER);
+        }
+
         authCodeService.checkAuthCode(request.email(), request.certCode());
 
         if (isValidPassword(request.password())) {
