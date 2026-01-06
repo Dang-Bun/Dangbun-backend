@@ -22,9 +22,6 @@ public interface KakaoApiClient {
     KakaoUserResponse getUserInfo(@RequestHeader(HttpHeaders.AUTHORIZATION) String bearerToken,
                                   @RequestParam("propertyKeys") String propertyKeys);
 
-    @GetMapping(value = "/v1/user/logout")
-    void logout(@RequestHeader(HttpHeaders.AUTHORIZATION) String bearerToken);
-
     @PostMapping(value = "/v1/user/unlink", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
     KakaoUnlinkResponse unlink(@RequestHeader(HttpHeaders.AUTHORIZATION) String adminKey,
                                @RequestParam("target_id_type") String targetIdType,

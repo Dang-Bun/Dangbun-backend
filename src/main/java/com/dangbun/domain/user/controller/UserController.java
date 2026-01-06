@@ -73,8 +73,9 @@ public class UserController {
             includes = {""}
     )
     @PostMapping("/logout")
-    public ResponseEntity<BaseResponse<?>> logout(@RequestHeader("Authorization") String bearerToken) {
-        userQueryService.logout(bearerToken);
+    public ResponseEntity<BaseResponse<?>> logout(@AuthenticationPrincipal CustomUserDetails userDetails,
+                                                  @RequestHeader("Authorization") String bearerToken) {
+        userQueryService.logout(userDetails.getUser(), bearerToken);
         return ResponseEntity.ok(BaseResponse.ok(null));
 
     }

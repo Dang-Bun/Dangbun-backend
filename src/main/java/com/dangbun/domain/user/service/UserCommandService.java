@@ -3,7 +3,6 @@ package com.dangbun.domain.user.service;
 import com.dangbun.domain.member.entity.Member;
 import com.dangbun.domain.member.repository.MemberRepository;
 import com.dangbun.domain.user.client.KakaoApiClient;
-import com.dangbun.domain.user.client.KakaoUnlinkResponse;
 import com.dangbun.domain.user.dto.request.DeleteUserAccountRequest;
 import com.dangbun.domain.user.dto.request.PostUserPasswordUpdateRequest;
 import com.dangbun.domain.user.dto.request.PostUserSignUpRequest;
