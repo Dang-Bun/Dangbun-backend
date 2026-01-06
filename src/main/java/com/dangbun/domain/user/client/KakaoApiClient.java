@@ -27,6 +27,11 @@ public interface KakaoApiClient {
 
     @PostMapping(value = "/v1/user/unlink", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
     KakaoUnlinkResponse unlink(@RequestHeader(HttpHeaders.AUTHORIZATION) String adminKey,
-                @RequestParam("target_id_type") String targetIdType,
-                @RequestParam("target_id") Long targetId);
+                               @RequestParam("target_id_type") String targetIdType,
+                               @RequestParam("target_id") Long targetId);
+
+    @PostMapping(value = "/v1/user/logout", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+    KakaoLogoutResponse logout(@RequestHeader(HttpHeaders.AUTHORIZATION) String adminKey,
+                               @RequestParam("target_id_type") String targetIdType,
+                               @RequestParam("target_id") Long targetId);
 }

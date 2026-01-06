@@ -43,6 +43,7 @@ public class UserQueryService {
     }
 
     public void logout(String bearerToken) {
+
         authRedisService.deleteAndSetBlacklist(bearerToken);
     }
 

@@ -107,25 +107,43 @@ public class UserCommandService {
 
     @Transactional
     public void deleteCurrentUser(User user, DeleteUserAccountRequest request) {
-        if (request.email() != null && user.getEmail().equals(request.email())) {
-            if (user.getLoginType().equals(LoginType.KAKAO)) {
-                System.out.println("admin key : " + "KakaoAK " + adminKey);
-                KakaoUnlinkResponse unlinkResponse = kakaoApiClient.unlink("KakaoAK " + adminKey,
-                        "user_id",
-                        Long.parseLong(user.getSocialId()));
-                if (unlinkResponse.id() != null) {
-                    userRepository.delete(user);
-                }
-            }
-            user.deactivate();
-            userRepository.save(user);
-
-            List<Member> members = memberRepository.findALLByUser(user);
-            memberRepository.deleteAll(members);
-
-            return;
+        validateDeleteRequest(user, request);
+        if (user.getLoginType().equals(LoginType.KAKAO)) {
+            unlinkKakaoAccount(user.getSocialId());
         }
-        throw new InvalidEmailException(INVALID_EMAIL);
+
+        /**
+         * soft delete
+         */
+//        user.deactivate();
+//        userRepository.save(user);
+
+        /**
+         * hard delete
+         */
+        userRepository.delete(user);
+
+        List<Member> members = memberRepository.findALLByUser(user);
+        memberRepository.deleteAll(members);
+
+        return;
+    }
+
+    private void unlinkKakaoAccount(String socialId) {
+        try {
+            kakaoApiClient.unlink("KakaoAK " + adminKey, "user_id", Long.parseLong(socialId));
+        } catch (feign.FeignException e) {
+            if (e.contentUTF8().contains("-101")) {
+                return;
+            }
+            throw e;
+        }
+    }
+
+    private void validateDeleteRequest(User user, DeleteUserAccountRequest request) {
+        if (request.email() == null || !user.getEmail().equals(request.email())) {
+            throw new InvalidEmailException(INVALID_EMAIL);
+        }
     }
 
     private Optional<User> getUserByEmail(String email) {
