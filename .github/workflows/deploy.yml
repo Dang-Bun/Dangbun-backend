@@ -71,6 +71,10 @@ jobs:
             export AWS_IAM_ACCESS_KEY=${{ secrets.AWS_IAM_ACCESS_KEY }}
             export AWS_IAM_SECRET_KEY=${{ secrets.AWS_IAM_SECRET_KEY }}
             export AWS_S3_BUCKET_NAME=${{ secrets.AWS_S3_BUCKET_NAME }}
+            export CLIENT_ID=${{ secrets.CLIENT_ID }}
+            export KAKAO_LOGIN=${{ secrets.KAKAO_LOGIN }}
+            export REDIRECT_URI=${{ secrets.REDIRECT_URI }}
+            export SERVICE_APP_ADMIN_KEY=${{ secrets.SERVICE_APP_ADMIN_KEY }}
 
             # 최신 이미지 풀
             aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | \
