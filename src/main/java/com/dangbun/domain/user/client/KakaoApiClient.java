@@ -1,9 +1,9 @@
-package com.dangbun.domain.user;
+package com.dangbun.domain.user.client;
 
+import com.dangbun.domain.user.dto.response.KakaoUserResponse;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -18,5 +18,8 @@ public interface KakaoApiClient {
      */
     @GetMapping(value = "/v2/user/me", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
     KakaoUserResponse getUserInfo(@RequestHeader(HttpHeaders.AUTHORIZATION) String bearerToken,
-                                  @RequestParam("property_keys") String propertyLeys);
+                                  @RequestParam("propertyKeys") String propertyKeys);
+
+    @GetMapping(value = "/v1/user/logout")
+    void logout(@RequestHeader(HttpHeaders.AUTHORIZATION) String bearerToken);
 }

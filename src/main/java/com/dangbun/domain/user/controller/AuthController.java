@@ -2,7 +2,7 @@ package com.dangbun.domain.user.controller;
 
 import com.dangbun.domain.user.dto.request.auth.LoginRequest;
 import com.dangbun.domain.user.dto.request.auth.PostKakaoLoginRequest;
-import com.dangbun.domain.user.LoginType;
+import com.dangbun.domain.user.entity.LoginType;
 import com.dangbun.domain.user.dto.request.auth.PostUserLoginRequest;
 import com.dangbun.domain.user.dto.response.auth.PostUserLoginResponse;
 import com.dangbun.domain.user.response.status.UserExceptionResponse;
@@ -11,7 +11,6 @@ import com.dangbun.global.docs.DocumentedApiErrors;
 import com.dangbun.global.response.BaseResponse;
 import com.dangbun.global.security.jwt.TokenAge;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

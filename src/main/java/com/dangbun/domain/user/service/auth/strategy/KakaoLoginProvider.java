@@ -1,7 +1,11 @@
 package com.dangbun.domain.user.service.auth.strategy;
 
 
-import com.dangbun.domain.user.*;
+import com.dangbun.domain.user.client.KakaoApiClient;
+import com.dangbun.domain.user.client.KakaoAuthClient;
+import com.dangbun.domain.user.dto.response.KakaoTokenResponse;
+import com.dangbun.domain.user.dto.response.KakaoUserResponse;
+import com.dangbun.domain.user.entity.LoginType;
 import com.dangbun.domain.user.dto.request.auth.LoginRequest;
 import com.dangbun.domain.user.dto.request.auth.PostKakaoLoginRequest;
 import com.dangbun.domain.user.dto.response.auth.PostUserLoginResponse;
@@ -23,7 +27,7 @@ import static com.dangbun.global.security.jwt.TokenPrefix.REFRESH;
 @RequiredArgsConstructor
 public class KakaoLoginProvider implements LoginProvider {
 
-    private final ExternalUserClient externalUserClient;
+    private final KakaoAuthClient kakaoAuthClient;
     private final KakaoApiClient kakaoApiClient;
     private final UserRepository userRepository;
     private final JwtService jwtService;
@@ -53,7 +57,7 @@ public class KakaoLoginProvider implements LoginProvider {
             throw new IllegalArgumentException("Invalid login request type");
         }
 
-        KakaoTokenResponse response = externalUserClient.fetchKakaoToken("authorization_code",
+        KakaoTokenResponse response = kakaoAuthClient.fetchKakaoToken("authorization_code",
                 clientId,
                 redirectUri,
                 request.code(),

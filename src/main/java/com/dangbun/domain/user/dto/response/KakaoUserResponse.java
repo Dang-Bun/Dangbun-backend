@@ -1,4 +1,4 @@
-package com.dangbun.domain.user;
+package com.dangbun.domain.user.dto.response;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;

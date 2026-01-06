@@ -1,4 +1,4 @@
-package com.dangbun.domain.user;
+package com.dangbun.domain.user.dto.request;
 
 public record KakaoTokenRequest(
         String grant_type,

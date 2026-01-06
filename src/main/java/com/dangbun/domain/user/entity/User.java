@@ -1,7 +1,6 @@
 package com.dangbun.domain.user.entity;
 
 
-import com.dangbun.domain.user.LoginType;
 import com.dangbun.global.entity.BaseEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;

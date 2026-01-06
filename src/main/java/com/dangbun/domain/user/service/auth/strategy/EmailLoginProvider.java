@@ -1,6 +1,6 @@
 package com.dangbun.domain.user.service.auth.strategy;
 
-import com.dangbun.domain.user.LoginType;
+import com.dangbun.domain.user.entity.LoginType;
 import com.dangbun.domain.user.dto.request.auth.LoginRequest;
 import com.dangbun.domain.user.dto.request.auth.PostUserLoginRequest;
 import com.dangbun.domain.user.dto.response.auth.PostUserLoginResponse;

@@ -1,6 +1,5 @@
-package com.dangbun.domain.user;
+package com.dangbun.domain.user.entity;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
