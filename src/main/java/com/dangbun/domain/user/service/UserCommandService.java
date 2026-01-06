@@ -2,9 +2,12 @@ package com.dangbun.domain.user.service;
 
 import com.dangbun.domain.member.entity.Member;
 import com.dangbun.domain.member.repository.MemberRepository;
+import com.dangbun.domain.user.client.KakaoApiClient;
+import com.dangbun.domain.user.client.KakaoUnlinkResponse;
 import com.dangbun.domain.user.dto.request.DeleteUserAccountRequest;
 import com.dangbun.domain.user.dto.request.PostUserPasswordUpdateRequest;
 import com.dangbun.domain.user.dto.request.PostUserSignUpRequest;
+import com.dangbun.domain.user.entity.LoginType;
 import com.dangbun.domain.user.entity.User;
 import com.dangbun.domain.user.exception.custom.ExistEmailException;
 import com.dangbun.domain.user.exception.custom.InvalidEmailException;
@@ -13,6 +16,7 @@ import com.dangbun.domain.user.exception.custom.NoSuchUserException;
 import com.dangbun.domain.user.repository.UserRepository;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,6 +36,10 @@ public class UserCommandService {
     private final MemberRepository memberRepository;
 
     private static final String PASSWORD_PATTERN = "^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d]{8,20}$";
+    private final KakaoApiClient kakaoApiClient;
+
+    @Value("${kakao.admin-key}")
+    private String adminKey;
 
     @Transactional
     public void sendSignupAuthCode(String toEmail) {
@@ -41,7 +49,7 @@ public class UserCommandService {
         }
 
         User user = getUserByEmail(toEmail).get();
-        if(!user.getEnabled()){
+        if (!user.getEnabled()) {
             userRepository.delete(user);
             authCodeService.sendAuthCode(toEmail);
             return;
@@ -100,6 +108,15 @@ public class UserCommandService {
     @Transactional
     public void deleteCurrentUser(User user, DeleteUserAccountRequest request) {
         if (request.email() != null && user.getEmail().equals(request.email())) {
+            if (user.getLoginType().equals(LoginType.KAKAO)) {
+                System.out.println("admin key : " + "KakaoAK " + adminKey);
+                KakaoUnlinkResponse unlinkResponse = kakaoApiClient.unlink("KakaoAK " + adminKey,
+                        "user_id",
+                        Long.parseLong(user.getSocialId()));
+                if (unlinkResponse.id() != null) {
+                    userRepository.delete(user);
+                }
+            }
             user.deactivate();
             userRepository.save(user);
 

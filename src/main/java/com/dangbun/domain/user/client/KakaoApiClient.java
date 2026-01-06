@@ -5,6 +5,7 @@ import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 
@@ -13,6 +14,7 @@ public interface KakaoApiClient {
 
     /**
      * 카카오 사용자 정보 가져오기
+     *
      * @param bearerToken "Bearer {access_token}" 형식의 헤더
      * @return KakaoUserResponse (사용자 프로필 및 계정 정보)
      */
@@ -22,4 +24,9 @@ public interface KakaoApiClient {
 
     @GetMapping(value = "/v1/user/logout")
     void logout(@RequestHeader(HttpHeaders.AUTHORIZATION) String bearerToken);
+
+    @PostMapping(value = "/v1/user/unlink", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+    KakaoUnlinkResponse unlink(@RequestHeader(HttpHeaders.AUTHORIZATION) String adminKey,
+                @RequestParam("target_id_type") String targetIdType,
+                @RequestParam("target_id") Long targetId);
 }

@@ -142,3 +142,4 @@ kakao:
   redirect-uri: ${REDIRECT_URI}
   client-secret:
     kakao-login: ${KAKAO_LOGIN}
+  admin-key: ${SERVICE_APP_ADMIN_KEY}
