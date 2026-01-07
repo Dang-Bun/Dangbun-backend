@@ -31,52 +31,44 @@ import static com.dangbun.global.security.jwt.TokenType.REFRESH;
 @Slf4j
 @Validated
 @RequestMapping("/users")
-@Tag(name = "User(Auth)", description = "AuthController - 로그인, 토큰재발급 관련 API")
 public class AuthController {
 
     private final LoginService loginService;
 
-
-    @Operation(summary = "일반 이메일 로그인")
-    @DocumentedApiErrors(
-            value = {UserExceptionResponse.class},
-            includes = {"NO_SUCH_USER", "INVALID_PASSWORD", "DELETE_MEMBER"}
-    )
     @PostMapping("/login")
     public ResponseEntity<BaseResponse<PostUserLoginResponse>> loginDefault(@RequestBody PostUserLoginRequest request) {
-        return processLogin(LoginType.EMAIL, request);
+        LoginResult result = handleLogin(LoginType.EMAIL, request);
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.SET_COOKIE, result.cookie().toString())
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + result.response().accessToken())
+                .body(BaseResponse.ok(result.response()));
     }
 
-    @Operation(summary = "카카오 로그인")
-    @DocumentedApiErrors(
-            value = {},
-            includes = {}
-    )
     @GetMapping("/login/kakao")
-    public ResponseEntity<BaseResponse<PostUserLoginResponse>> loginKakao(@RequestParam(defaultValue = "") String code,
-                                                                          @RequestParam(defaultValue = "") String error,
-                                                                          @RequestParam(defaultValue = "") String error_description,
-                                                                          @RequestParam(defaultValue = "") String state)
-    {
+    public ResponseEntity<Void> loginKakao(@RequestParam(defaultValue = "") String code) {
+        LoginResult result = handleLogin(LoginType.KAKAO, PostKakaoLoginRequest.of(code, "", "", ""));
 
-        return processLogin(LoginType.KAKAO, PostKakaoLoginRequest.of(code, error, error_description, state));
+        return ResponseEntity.status(org.springframework.http.HttpStatus.SEE_OTHER)
+                .header(HttpHeaders.SET_COOKIE, result.cookie().toString())
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + result.response().accessToken())
+                .location(java.net.URI.create("https://dangbun-frontend-virid.vercel.app/myPlace"))
+                .build();
     }
 
-
-
-    private ResponseEntity<BaseResponse<PostUserLoginResponse>> processLogin(@PathVariable LoginType type, @RequestBody LoginRequest request) {
+    private LoginResult handleLogin(LoginType type, LoginRequest request) {
         PostUserLoginResponse response = (PostUserLoginResponse) loginService.login(type, request);
 
         ResponseCookie refreshCookie = ResponseCookie.from(REFRESH.getName(), response.refreshToken())
-                .httpOnly(true).secure(true).sameSite("None").path("/")
+                .httpOnly(true)
+                .secure(true)
+                .sameSite("None")
+                .path("/")
                 .maxAge(TokenAge.REFRESH.getAge() / 1000)
                 .build();
 
-        return ResponseEntity.ok()
-                .header(HttpHeaders.SET_COOKIE, refreshCookie.toString())
-                .header(HttpHeaders.AUTHORIZATION, "Bearer " + response.accessToken())
-                .body(BaseResponse.ok(response));
+        return new LoginResult(response, refreshCookie);
     }
 
-
+    private record LoginResult(PostUserLoginResponse response, ResponseCookie cookie) {}
 }
