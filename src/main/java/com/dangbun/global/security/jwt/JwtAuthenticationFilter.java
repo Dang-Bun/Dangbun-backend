@@ -39,7 +39,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private static final List<String> SKIP_URLS = List.of(
             "/users/signup/email-code",
             "/users/email-code",
-            "/users/login",
+            "/users/login/**",
+            "/users/kakao/**",
             "/users/signup",
             "/actuator/health",
             "/swagger-ui/**",
