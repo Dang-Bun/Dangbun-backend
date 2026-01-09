@@ -5,9 +5,7 @@ import com.dangbun.domain.user.dto.request.auth.PostKakaoLoginRequest;
 import com.dangbun.domain.user.entity.LoginType;
 import com.dangbun.domain.user.dto.request.auth.PostUserLoginRequest;
 import com.dangbun.domain.user.dto.response.auth.PostUserLoginResponse;
-import com.dangbun.domain.user.response.status.UserExceptionResponse;
 import com.dangbun.domain.user.service.auth.LoginService;
-import com.dangbun.global.docs.DocumentedApiErrors;
 import com.dangbun.global.response.BaseResponse;
 import com.dangbun.global.security.jwt.TokenAge;
 import io.swagger.v3.oas.annotations.Operation;
@@ -26,6 +24,7 @@ import static com.dangbun.global.security.jwt.TokenType.REFRESH;
  * 로그인, 토큰 재발급
  */
 
+@Tag(name = "User", description = "AuthController - 로그인 및 토큰 발급 관련 API")
 @RequiredArgsConstructor
 @RestController
 @Slf4j
@@ -35,28 +34,20 @@ public class AuthController {
 
     private final LoginService loginService;
 
+    @Operation(summary = "일반 이메일 로그인",description = "이메일과 비밀번호로 요청하면 토큰을 발급함")
     @PostMapping("/login")
     public ResponseEntity<BaseResponse<PostUserLoginResponse>> loginDefault(@RequestBody PostUserLoginRequest request) {
-        LoginResult result = handleLogin(LoginType.EMAIL, request);
-
-        return ResponseEntity.ok()
-                .header(HttpHeaders.SET_COOKIE, result.cookie().toString())
-                .header(HttpHeaders.AUTHORIZATION, "Bearer " + result.response().accessToken())
-                .body(BaseResponse.ok(result.response()));
+        return handleLogin(LoginType.EMAIL, request);
     }
 
-    @GetMapping("/login/kakao")
-    public ResponseEntity<Void> loginKakao(@RequestParam(defaultValue = "") String code) {
-        LoginResult result = handleLogin(LoginType.KAKAO, PostKakaoLoginRequest.of(code, "", "", ""));
-
-        return ResponseEntity.status(org.springframework.http.HttpStatus.SEE_OTHER)
-                .header(HttpHeaders.SET_COOKIE, result.cookie().toString())
-                .header(HttpHeaders.AUTHORIZATION, "Bearer " + result.response().accessToken())
-                .location(java.net.URI.create("https://dangbun-frontend-virid.vercel.app/myPlace"))
-                .build();
+    @Operation(summary = "카카오 로그인",description = "인가코드로 요청하면 토큰을 발급함")
+    @PostMapping("/login/kakao")
+    public ResponseEntity<BaseResponse<PostUserLoginResponse>> loginKakao(@RequestBody PostKakaoLoginRequest request) {
+        return handleLogin(LoginType.KAKAO, request);
     }
 
-    private LoginResult handleLogin(LoginType type, LoginRequest request) {
+
+    private ResponseEntity<BaseResponse<PostUserLoginResponse>> handleLogin(LoginType type, LoginRequest request) {
         PostUserLoginResponse response = (PostUserLoginResponse) loginService.login(type, request);
 
         ResponseCookie refreshCookie = ResponseCookie.from(REFRESH.getName(), response.refreshToken())
@@ -67,8 +58,9 @@ public class AuthController {
                 .maxAge(TokenAge.REFRESH.getAge() / 1000)
                 .build();
 
-        return new LoginResult(response, refreshCookie);
+        return ResponseEntity.ok()
+                .header(HttpHeaders.SET_COOKIE, refreshCookie.toString())
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + response.accessToken())
+                .body(BaseResponse.ok(response));
     }
-
-    private record LoginResult(PostUserLoginResponse response, ResponseCookie cookie) {}
 }

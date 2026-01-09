@@ -11,8 +11,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 @FeignClient(name = "kakao-auth-api", url = "https://kauth.kakao.com/oauth")
 public interface KakaoAuthClient {
 
-    @GetMapping("/authorize")
-    KakaoAuthResponse fetchKakaoAuthCode(@RequestParam String code, @RequestParam String client_id, @RequestParam String redirect_uri);
 
     @PostMapping(value = "/token", consumes = "application/x-www-form-urlencoded;charset=utf-8")
     KakaoTokenResponse fetchKakaoToken(@RequestParam("grant_type") String grantType,
