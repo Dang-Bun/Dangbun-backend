@@ -82,6 +82,7 @@ public class UserCommandService {
                 .enabled(true)
                 .password(encodePassword)
                 .email(email)
+                .loginType(LoginType.EMAIL)
                 .build();
 
         userRepository.save(user);
@@ -118,13 +119,13 @@ public class UserCommandService {
         /**
          * soft delete
          */
-//        user.deactivate();
-//        userRepository.save(user);
+        user.deactivate();
+        userRepository.save(user);
 
         /**
          * hard delete
          */
-        userRepository.delete(user);
+//        userRepository.delete(user);
 
         List<Member> members = memberRepository.findALLByUser(user);
         memberRepository.deleteAll(members);
