@@ -53,3 +53,12 @@ spring:
 
 jwt:
   secret: test-secret-key-1234567890abcdefghij
+
+
+
+kakao:
+  client-id: test-client-id
+  redirect-uri: test-redirect-uri
+  client-secret:
+    kakao-login: test-kakao-login
+  admin-key: test-admin-key
