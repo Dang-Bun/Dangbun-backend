@@ -5,6 +5,7 @@ import com.dangbun.domain.member.repository.MemberRepository;
 import com.dangbun.domain.user.dto.request.DeleteUserAccountRequest;
 import com.dangbun.domain.user.dto.request.PostUserPasswordUpdateRequest;
 import com.dangbun.domain.user.dto.request.PostUserSignUpRequest;
+import com.dangbun.domain.user.entity.LoginType;
 import com.dangbun.domain.user.entity.User;
 import com.dangbun.domain.user.exception.custom.ExistEmailException;
 import com.dangbun.domain.user.exception.custom.InvalidEmailException;
@@ -120,7 +121,7 @@ class UserCommandServiceTest {
                 "새사용자",
                 "123456"
         );
-        
+
         given(userRepository.findByEmail("new@test.com")).willReturn(Optional.empty());
         given(passwordEncoder.encode("password123")).willReturn("encodedPassword123");
         willDoNothing().given(authCodeService).checkAuthCode("new@test.com", "123456");
@@ -132,9 +133,10 @@ class UserCommandServiceTest {
         then(authCodeService).should().checkAuthCode("new@test.com", "123456");
         then(userRepository).should().save(argThat(user ->
                 user.getName().equals("새사용자") &&
-                user.getEmail().equals("new@test.com") &&
-                user.getPassword().equals("encodedPassword123") &&
-                user.getEnabled()
+                        user.getEmail().equals("new@test.com") &&
+                        user.getPassword().equals("encodedPassword123") &&
+                        user.getLoginType().equals(LoginType.EMAIL) &&
+                        user.getEnabled()
         ));
     }
 
@@ -148,7 +150,7 @@ class UserCommandServiceTest {
                 "새사용자",
                 "123456"
         );
-        
+
         given(userRepository.findByEmail("test@test.com")).willReturn(Optional.of(mockUser));
 
         // when & then
@@ -166,7 +168,7 @@ class UserCommandServiceTest {
                 "새사용자",
                 "123456"
         );
-        
+
         given(userRepository.findByEmail("new@test.com")).willReturn(Optional.empty());
         willDoNothing().given(authCodeService).checkAuthCode("new@test.com", "123456");
 
@@ -184,14 +186,14 @@ class UserCommandServiceTest {
                 "654321",
                 "newPassword123"
         );
-        
+
         User testUser = User.builder()
                 .name("테스트유저")
                 .email("test@test.com")
                 .password("oldPassword")
                 .enabled(true)
                 .build();
-        
+
         given(userRepository.findByEmail("test@test.com")).willReturn(Optional.of(testUser));
         willDoNothing().given(authCodeService).checkAuthCode(anyString(), anyString());
         given(passwordEncoder.encode("newPassword123")).willReturn("encodedNewPassword");
@@ -216,7 +218,7 @@ class UserCommandServiceTest {
                 "654321",
                 "newPassword123"
         );
-        
+
         given(userRepository.findByEmail("notfound@test.com")).willReturn(Optional.empty());
 
         // when & then
@@ -233,7 +235,7 @@ class UserCommandServiceTest {
                 "654321",
                 "onlyletters"  // 숫자 없음
         );
-        
+
         given(userRepository.findByEmail("test@test.com")).willReturn(Optional.of(mockUser));
         willDoNothing().given(authCodeService).checkAuthCode("test@test.com", "654321");
 
@@ -250,10 +252,10 @@ class UserCommandServiceTest {
     void deleteCurrentUser_success() {
         // given
         DeleteUserAccountRequest request = new DeleteUserAccountRequest("test@test.com");
-        
+
         Member member1 = Member.builder().user(mockUser).build();
         Member member2 = Member.builder().user(mockUser).build();
-        
+
         given(memberRepository.findALLByUser(mockUser)).willReturn(List.of(member1, member2));
 
         // when
@@ -333,7 +335,7 @@ class UserCommandServiceTest {
             PostUserSignUpRequest request = new PostUserSignUpRequest(
                     "test@test.com", invalidPassword[0], "사용자", "123456"
             );
-            
+
             assertThatThrownBy(() -> userCommandService.signup(request))
                     .isInstanceOf(InvalidPasswordException.class)
                     .as("비밀번호 검증 실패: %s", invalidPassword[1]);
