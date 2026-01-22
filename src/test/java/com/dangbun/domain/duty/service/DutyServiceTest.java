@@ -13,7 +13,7 @@ import com.dangbun.domain.membercleaning.entity.MemberCleaning;
 import com.dangbun.domain.membercleaning.repository.MemberCleaningRepository;
 import com.dangbun.domain.memberduty.entity.MemberDuty;
 import com.dangbun.domain.memberduty.repository.MemberDutyRepository;
-import com.dangbun.domain.place.entity.Place;
+import com.dangbun.domain.place.original.entity.Place;
 import com.dangbun.global.context.DutyContext;
 import com.dangbun.global.context.MemberContext;
 import org.junit.jupiter.api.BeforeEach;
@@ -30,7 +30,6 @@ import java.util.Optional;
 
 import static com.dangbun.domain.duty.entity.DutyAssignType.*;
 import static com.dangbun.domain.duty.entity.DutyIcon.*;
-import static com.dangbun.domain.place.entity.PlaceCategory.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;

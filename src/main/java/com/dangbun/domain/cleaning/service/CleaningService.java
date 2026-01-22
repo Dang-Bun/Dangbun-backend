@@ -21,7 +21,7 @@ import com.dangbun.domain.member.entity.Member;
 import com.dangbun.domain.member.repository.MemberRepository;
 import com.dangbun.domain.membercleaning.entity.MemberCleaning;
 import com.dangbun.domain.membercleaning.repository.MemberCleaningRepository;
-import com.dangbun.domain.place.entity.Place;
+import com.dangbun.domain.place.original.entity.Place;
 import com.dangbun.global.context.DutyContext;
 import com.dangbun.global.context.MemberContext;
 import com.dangbun.global.s3.S3Service;

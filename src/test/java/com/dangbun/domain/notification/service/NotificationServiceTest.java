@@ -10,7 +10,7 @@ import com.dangbun.domain.notification.exception.custom.*;
 import com.dangbun.domain.notification.repository.NotificationRepository;
 import com.dangbun.domain.notificationreceiver.entity.NotificationReceiver;
 import com.dangbun.domain.notificationreceiver.repository.NotificationReceiverRepository;
-import com.dangbun.domain.place.entity.Place;
+import com.dangbun.domain.place.original.entity.Place;
 import com.dangbun.global.context.MemberContext;
 import com.dangbun.global.redis.RedisService;
 import org.junit.jupiter.api.BeforeEach;
@@ -27,7 +27,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import static com.dangbun.domain.notification.entity.NotificationTemplate.*;
-import static com.dangbun.domain.place.entity.PlaceCategory.*;
 import static org.assertj.core.api.Assertions.*;
 
 import java.time.LocalDateTime;

@@ -1,7 +1,7 @@
 package com.dangbun.domain.cleaning.entity;
 
 import com.dangbun.domain.duty.entity.Duty;
-import com.dangbun.domain.place.entity.Place;
+import com.dangbun.domain.place.original.entity.Place;
 import com.dangbun.global.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;

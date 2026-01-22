@@ -5,7 +5,7 @@ import com.dangbun.domain.checklist.repository.ChecklistRepository;
 import com.dangbun.domain.cleaning.entity.Cleaning;
 import com.dangbun.domain.cleaning.entity.CleaningRepeatType;
 import com.dangbun.domain.cleaningdate.entity.CleaningDate;
-import com.dangbun.domain.place.entity.Place;
+import com.dangbun.domain.place.original.entity.Place;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

@@ -2,7 +2,7 @@ package com.dangbun.domain.cleaning.repository;
 
 import com.dangbun.domain.cleaning.entity.Cleaning;
 import com.dangbun.domain.duty.entity.Duty;
-import com.dangbun.domain.place.entity.Place;
+import com.dangbun.domain.place.original.entity.Place;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 

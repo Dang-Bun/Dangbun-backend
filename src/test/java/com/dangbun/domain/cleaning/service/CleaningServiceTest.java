@@ -23,7 +23,7 @@ import com.dangbun.domain.duty.repository.DutyRepository;
 import com.dangbun.domain.member.entity.Member;
 import com.dangbun.domain.member.repository.MemberRepository;
 import com.dangbun.domain.membercleaning.repository.MemberCleaningRepository;
-import com.dangbun.domain.place.entity.Place;
+import com.dangbun.domain.place.original.entity.Place;
 import com.dangbun.global.context.DutyContext;
 import com.dangbun.global.context.MemberContext;
 import com.dangbun.global.s3.S3Service;
@@ -40,7 +40,6 @@ import java.util.List;
 import java.util.Optional;
 
 import static com.dangbun.domain.cleaning.entity.CleaningRepeatType.*;
-import static com.dangbun.domain.place.entity.PlaceCategory.*;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.*;

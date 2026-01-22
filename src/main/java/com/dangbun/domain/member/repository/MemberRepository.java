@@ -1,7 +1,7 @@
 package com.dangbun.domain.member.repository;
 
 import com.dangbun.domain.member.entity.Member;
-import com.dangbun.domain.place.entity.Place;
+import com.dangbun.domain.place.original.entity.Place;
 import com.dangbun.domain.user.entity.User;
 import io.lettuce.core.dynamic.annotation.Param;
 import org.springframework.data.domain.Page;

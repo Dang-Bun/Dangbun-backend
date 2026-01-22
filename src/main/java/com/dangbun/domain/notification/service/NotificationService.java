@@ -3,7 +3,6 @@ package com.dangbun.domain.notification.service;
 import com.dangbun.global.context.MemberContext;
 import com.dangbun.domain.member.entity.Member;
 import com.dangbun.domain.member.repository.MemberRepository;
-import com.dangbun.domain.member.service.MemberService;
 import com.dangbun.domain.notification.dto.request.*;
 import com.dangbun.domain.notification.dto.response.*;
 import com.dangbun.domain.notification.dto.response.GetNotificationListResponse.NotificationDto;
@@ -15,7 +14,6 @@ import com.dangbun.domain.notification.repository.NotificationRepository;
 
 import com.dangbun.domain.notificationreceiver.entity.NotificationReceiver;
 import com.dangbun.domain.notificationreceiver.repository.NotificationReceiverRepository;
-import com.dangbun.domain.place.repository.PlaceRepository;
 import com.dangbun.global.redis.RedisService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;

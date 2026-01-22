@@ -1,7 +1,7 @@
 package com.dangbun.domain.member.entity;
 
 
-import com.dangbun.domain.place.entity.Place;
+import com.dangbun.domain.place.original.entity.Place;
 import com.dangbun.domain.user.entity.User;
 import com.dangbun.global.entity.BaseEntity;
 import com.dangbun.global.converter.MapToJsonConverter;
