@@ -2,9 +2,7 @@ package com.dangbun.domain.membercleaning.entity;
 
 
 import com.dangbun.domain.cleaning.entity.Cleaning;
-import com.dangbun.domain.duty.entity.Duty;
-import com.dangbun.domain.member.entity.Member;
-import com.dangbun.domain.memberduty.entity.MemberDutyId;
+import com.dangbun.domain.member.entity.MemberJpaEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -25,7 +23,7 @@ public class MemberCleaning {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id", nullable = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
-    private Member member;
+    private MemberJpaEntity member;
 
     @MapsId("cleaningId")
     @ManyToOne(fetch = FetchType.LAZY)
@@ -34,7 +32,7 @@ public class MemberCleaning {
     private Cleaning cleaning;
 
     @Builder
-    public MemberCleaning(Member member, Cleaning cleaning) {
+    public MemberCleaning(MemberJpaEntity member, Cleaning cleaning) {
         this.member = member;
         this.cleaning = cleaning;
         this.id = new MemberCleaningId(member.getMemberId(), cleaning.getCleaningId());

@@ -6,7 +6,7 @@ import com.dangbun.domain.cleaning.entity.Cleaning;
 import com.dangbun.domain.cleaning.repository.CleaningRepository;
 import com.dangbun.domain.duty.entity.Duty;
 import com.dangbun.domain.duty.repository.DutyRepository;
-import com.dangbun.domain.member.entity.Member;
+import com.dangbun.domain.member.entity.MemberJpaEntity;
 import com.dangbun.domain.member.entity.MemberRole;
 import com.dangbun.domain.member.repository.MemberRepository;
 import com.dangbun.domain.membercleaning.entity.MemberCleaning;
@@ -39,6 +39,8 @@ import java.time.LocalTime;
 import java.util.*;
 
 import static com.dangbun.domain.place.original.dto.response.GetPlaceListResponse.PlaceDto;
+import static com.dangbun.domain.place.original.entity.PlaceCategory.CAFE;
+import static com.dangbun.domain.place.original.entity.PlaceCategory.ETC;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.*;
@@ -61,8 +63,8 @@ class PlaceServiceTest {
 
     private User mockUser;
     private Place mockPlace;
-    private Member mockMember;
-    private Member mockManager;
+    private MemberJpaEntity mockMember;
+    private MemberJpaEntity mockManager;
     private Duty mockDuty;
     private Cleaning mockCleaning;
 
@@ -84,7 +86,7 @@ class PlaceServiceTest {
         ReflectionTestUtils.setField(mockPlace, "placeId", 10L);
         mockPlace.createCode("abc123");
 
-        mockMember = Member.builder()
+        mockMember = MemberJpaEntity.builder()
                 .name("홍길동")
                 .place(mockPlace)
                 .role(MemberRole.MEMBER)
@@ -94,7 +96,7 @@ class PlaceServiceTest {
                 .build();
         ReflectionTestUtils.setField(mockMember, "memberId", 100L);
 
-        mockManager = Member.builder()
+        mockManager = MemberJpaEntity.builder()
                 .name("관리자")
                 .place(mockPlace)
                 .role(MemberRole.MANAGER)
@@ -121,7 +123,7 @@ class PlaceServiceTest {
     @DisplayName("사용자의 장소 목록 조회 - 대기 중인 멤버")
     void getPlaces_withWaitingMember() {
         // given
-        Member waitingMember = Member.builder()
+        MemberJpaEntity waitingMember = MemberJpaEntity.builder()
                 .name("대기자")
                 .place(mockPlace)
                 .role(MemberRole.WAITING)
@@ -209,7 +211,7 @@ class PlaceServiceTest {
             ReflectionTestUtils.setField(place, "placeId", 20L);
             return place;
         });
-        given(memberRepository.save(any(Member.class))).willAnswer(invocation -> invocation.getArgument(0));
+        given(memberRepository.save(any(MemberJpaEntity.class))).willAnswer(invocation -> invocation.getArgument(0));
 
         // when
         PostCreatePlaceResponse result = placeService.createPlaceWithManager(1L, request);
@@ -340,7 +342,7 @@ class PlaceServiceTest {
         );
 
         given(memberRepository.findWithPlaceByInviteCode("abc123")).willReturn(List.of(mockMember));
-        given(memberRepository.save(any(Member.class))).willAnswer(invocation -> invocation.getArgument(0));
+        given(memberRepository.save(any(MemberJpaEntity.class))).willAnswer(invocation -> invocation.getArgument(0));
 
         // when
         PostRegisterPlaceResponse result = placeService.joinRequest(mockUser, request);
@@ -390,7 +392,7 @@ class PlaceServiceTest {
     @DisplayName("장소 정보 조회 - 대기 중인 멤버")
     void getPlace_waitingMember() {
         // given
-        Member waitingMember = Member.builder()
+        MemberJpaEntity waitingMember = MemberJpaEntity.builder()
                 .name("대기자")
                 .place(mockPlace)
                 .role(MemberRole.WAITING)
@@ -652,7 +654,7 @@ class PlaceServiceTest {
                 .name("코드 없는 장소")
                 .category(CAFE)
                 .build();
-        Member memberInPlaceWithoutCode = Member.builder()
+        MemberJpaEntity memberInPlaceWithoutCode = MemberJpaEntity.builder()
                 .place(placeWithoutCode)
                 .build();
         MemberContext.set(memberInPlaceWithoutCode);

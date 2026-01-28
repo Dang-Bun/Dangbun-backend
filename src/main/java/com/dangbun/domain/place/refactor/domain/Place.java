@@ -1,13 +1,9 @@
 package com.dangbun.domain.place.refactor.domain;
 
 import com.dangbun.domain.place.original.entity.PlaceCategory;
-import jakarta.persistence.*;
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.Value;
 
 import java.time.LocalTime;
 
@@ -63,8 +59,6 @@ public class Place {
         this.isToday = isToday;
     }
 
-    @Value
-    public static class PlaceId {
-        private Long value;
+    public record PlaceId(Long value) {
     }
 }

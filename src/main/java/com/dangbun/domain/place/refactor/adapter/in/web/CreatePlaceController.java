@@ -1,12 +1,12 @@
 package com.dangbun.domain.place.refactor.adapter.in.web;
 
-import com.dangbun.domain.member.entity.Member;
+import com.dangbun.domain.member.entity.MemberJpaEntity;
 import com.dangbun.domain.member.entity.MemberRole;
 import com.dangbun.domain.member.repository.MemberRepository;
 import com.dangbun.domain.place.original.repository.PlaceRepository;
 import com.dangbun.domain.place.refactor.WebAdapter;
-import com.dangbun.domain.place.refactor.application.port.in.CreatePlaceCommand;
-import com.dangbun.domain.place.refactor.application.port.in.CreatePlaceUseCase;
+import com.dangbun.domain.place.refactor.application.port.in.command.CreatePlaceCommand;
+import com.dangbun.domain.place.refactor.application.port.in.command.CreatePlaceUseCase;
 import com.dangbun.domain.user.entity.CustomUserDetails;
 import com.dangbun.domain.user.exception.custom.NoSuchUserException;
 import com.dangbun.domain.user.repository.UserRepository;
@@ -50,6 +50,7 @@ public class CreatePlaceController {
     public ResponseEntity<BaseResponse<PostCreatePlaceResponse>> createPlace(@AuthenticationPrincipal CustomUserDetails userDetails,
                                                                              @RequestBody PostCreatePlaceRequest request) {
         CreatePlaceCommand command = new CreatePlaceCommand(
+                userDetails.getUser().getUserId(),
                 request.placeName(),
                 request.category(),
                 request.categoryName(),
@@ -64,7 +65,8 @@ public class CreatePlaceController {
           Todo Member 컨텍스트 아키텍처 전환 시 수정
           전용 인커밍 포트 생성
          */
-        Member member = Member.builder()
+
+        MemberJpaEntity member = MemberJpaEntity.builder()
                 .name(request.managerName())
                 .place(placeRepository.findById(placeId).get())
                 .information(request.information())

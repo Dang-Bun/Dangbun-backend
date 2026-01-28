@@ -19,7 +19,7 @@ import java.util.Map;
 @Table(name = "member")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Member extends BaseEntity {
+public class MemberJpaEntity extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "member_id")
@@ -49,7 +49,7 @@ public class Member extends BaseEntity {
     private User user;
 
     @Builder
-    public Member(MemberRole role,String name, Boolean status, Map information, Place place, User user) {
+    public MemberJpaEntity(MemberRole role, String name, Boolean status, Map information, Place place, User user) {
        this.role = role;
        this.name = name;
        this.status = status;

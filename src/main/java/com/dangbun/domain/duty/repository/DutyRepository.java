@@ -20,7 +20,7 @@ public interface DutyRepository extends JpaRepository<Duty, Long> {
     List<Duty> findWithPlaceByPlaceId(Long placeId);
 
     @Query("""
-    SELECT new com.dangbun.domain.place.dto.response.DutyProgressDto(
+    SELECT new com.dangbun.domain.place.original.dto.response.DutyProgressDto(
         d.dutyId,
         d.name,
         COUNT(cl),

@@ -1,7 +1,7 @@
 package com.dangbun.domain.notification.service;
 
 import com.dangbun.global.context.MemberContext;
-import com.dangbun.domain.member.entity.Member;
+import com.dangbun.domain.member.entity.MemberJpaEntity;
 import com.dangbun.domain.member.repository.MemberRepository;
 import com.dangbun.domain.notification.dto.request.*;
 import com.dangbun.domain.notification.dto.response.*;
@@ -37,11 +37,11 @@ public class NotificationService {
 
 
     public GetMemberSearchListResponse searchMembers( String searchName, Pageable pageable) {
-        Member me = MemberContext.get();
+        MemberJpaEntity me = MemberContext.get();
         Long memberId = me.getMemberId();
         Long placeId = me.getPlace().getPlaceId();
 
-        Page<Member> memberPage;
+        Page<MemberJpaEntity> memberPage;
         if (searchName == null || searchName.isBlank()) {
             memberPage = memberRepository.findByPlace_PlaceId(placeId, pageable);
         } else {
@@ -58,7 +58,7 @@ public class NotificationService {
     }
 
     public GetRecentSearchResponse getRecentSearches() {
-        Member me = MemberContext.get();
+        MemberJpaEntity me = MemberContext.get();
         Long memberId = me.getMemberId();
         Long placeId = me.getPlace().getPlaceId();
 
@@ -69,10 +69,10 @@ public class NotificationService {
 
     @Transactional
     public PostNotificationCreateResponse createNotification(PostNotificationCreateRequest request) {
-        Member me = MemberContext.get();
+        MemberJpaEntity me = MemberContext.get();
         Long placeId = me.getPlace().getPlaceId();
 
-        List<Member> receiverMembers = memberRepository.findAllById(request.receiverMemberIds());
+        List<MemberJpaEntity> receiverMembers = memberRepository.findAllById(request.receiverMemberIds());
 
         if (receiverMembers.size() != request.receiverMemberIds().size()) {
             throw new MemberNotFoundException(MEMBER_NOT_FOUND);
@@ -100,7 +100,7 @@ public class NotificationService {
 
         notificationRepository.save(notification);
 
-        for (Member receiverMember : receiverMembers) {
+        for (MemberJpaEntity receiverMember : receiverMembers) {
             NotificationReceiver receiver = NotificationReceiver.builder()
                     .notification(notification)
                     .receiver(receiverMember)
@@ -144,7 +144,7 @@ public class NotificationService {
     }
 
     public GetNotificationInfoResponse getNotificationInfo(Long notificationId) {
-        Member member = MemberContext.get();
+        MemberJpaEntity member = MemberContext.get();
 
         Notification notification = notificationRepository.findById(notificationId)
                 .orElseThrow(() -> new NotificationNotFoundException(NOTIFICATION_NOT_FOUND));

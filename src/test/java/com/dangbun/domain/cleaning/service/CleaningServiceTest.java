@@ -20,7 +20,7 @@ import com.dangbun.domain.cleaningImage.repository.CleaningImageRepository;
 import com.dangbun.domain.cleaningdate.repository.CleaningDateRepository;
 import com.dangbun.domain.duty.entity.Duty;
 import com.dangbun.domain.duty.repository.DutyRepository;
-import com.dangbun.domain.member.entity.Member;
+import com.dangbun.domain.member.entity.MemberJpaEntity;
 import com.dangbun.domain.member.repository.MemberRepository;
 import com.dangbun.domain.membercleaning.repository.MemberCleaningRepository;
 import com.dangbun.domain.place.original.entity.Place;
@@ -40,6 +40,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static com.dangbun.domain.cleaning.entity.CleaningRepeatType.*;
+import static com.dangbun.domain.place.original.entity.PlaceCategory.*;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.*;
@@ -61,7 +62,7 @@ class CleaningServiceTest {
     @Mock private S3Service s3Service;
 
     private Place mockPlace;
-    private Member mockMember;
+    private MemberJpaEntity mockMember;
     private Duty mockDuty;
 
     @BeforeEach
@@ -69,7 +70,7 @@ class CleaningServiceTest {
         mockPlace = Place.builder().name("투썸플레이스").category(CAFE).build();
         ReflectionTestUtils.setField(mockPlace, "placeId", 1L);
 
-        mockMember = Member.builder().name("철수").place(mockPlace).build();
+        mockMember = MemberJpaEntity.builder().name("철수").place(mockPlace).build();
         ReflectionTestUtils.setField(mockMember, "memberId", 10L);
         MemberContext.set(mockMember);
 
@@ -125,13 +126,13 @@ class CleaningServiceTest {
         given(memberCleaningRepository.findMembersByCleaningId(200L))
                 .willReturn(List.of(
                         mockMember,
-                        Member.builder().name("영희").build(),
-                        Member.builder().name("민수").build()
+                        MemberJpaEntity.builder().name("영희").build(),
+                        MemberJpaEntity.builder().name("민수").build()
                 ));
         given(memberCleaningRepository.findMembersByCleaningId(201L))
                 .willReturn(List.of(
-                        Member.builder().name("지윤").build(),
-                        Member.builder().name("종혁").build()
+                        MemberJpaEntity.builder().name("지윤").build(),
+                        MemberJpaEntity.builder().name("종혁").build()
                 ));
 
         // when
@@ -163,14 +164,14 @@ class CleaningServiceTest {
                 .willReturn(List.of(cleaning1, cleaning2));
         given(memberCleaningRepository.findMembersByCleaningId(200L))
                 .willReturn(List.of(
-                        Member.builder().name("영희").build(),
-                        Member.builder().name("철수").build()
+                        MemberJpaEntity.builder().name("영희").build(),
+                        MemberJpaEntity.builder().name("철수").build()
                 ));
         given(memberCleaningRepository.findMembersByCleaningId(201L))
                 .willReturn(List.of(
-                        Member.builder().name("민수").build(),
-                        Member.builder().name("수지").build(),
-                        Member.builder().name("지윤").build()
+                        MemberJpaEntity.builder().name("민수").build(),
+                        MemberJpaEntity.builder().name("수지").build(),
+                        MemberJpaEntity.builder().name("지윤").build()
                 ));
 
         // when
@@ -231,8 +232,8 @@ class CleaningServiceTest {
         given(cleaningRepository.save(any(Cleaning.class))).willReturn(cleaning);
         given(memberRepository.findAllByNameIn(anyList()))
                 .willReturn(List.of(
-                        Member.builder().name("철수").build(),
-                        Member.builder().name("영희").build()
+                        MemberJpaEntity.builder().name("철수").build(),
+                        MemberJpaEntity.builder().name("영희").build()
                 ));
 
         given(cleaningDateRepository.saveAll(anyList()))

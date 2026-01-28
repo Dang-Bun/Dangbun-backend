@@ -13,4 +13,14 @@ class PlaceMapper {
                 place.getCategoryName()
         );
     }
+
+    public Place mapToDomainEntity(PlaceJpaEntity place) {
+        return Place.withId(
+                new Place.PlaceId(place.getPlaceId()),
+                place.getName(),
+                place.getCategory(),
+                place.getCategoryName()
+        );
+    }
+
 }

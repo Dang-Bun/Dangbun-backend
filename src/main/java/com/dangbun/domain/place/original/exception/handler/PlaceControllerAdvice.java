@@ -1,6 +1,6 @@
 package com.dangbun.domain.place.original.exception.handler;
 
-import com.dangbun.domain.place.exception.custom.*;
+import com.dangbun.domain.place.original.exception.custom.*;
 import com.dangbun.domain.place.original.exception.custom.*;
 import com.dangbun.global.response.BaseErrorResponse;
 import org.springframework.core.Ordered;
@@ -9,6 +9,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+import static com.dangbun.domain.place.original.response.status.PlaceExceptionResponse.*;
 
 @Order(Ordered.HIGHEST_PRECEDENCE)
 @RestControllerAdvice

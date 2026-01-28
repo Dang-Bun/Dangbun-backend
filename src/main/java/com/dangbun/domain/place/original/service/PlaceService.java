@@ -6,7 +6,7 @@ import com.dangbun.domain.cleaning.entity.Cleaning;
 import com.dangbun.domain.cleaning.repository.CleaningRepository;
 import com.dangbun.domain.duty.entity.Duty;
 import com.dangbun.domain.duty.repository.DutyRepository;
-import com.dangbun.domain.member.entity.Member;
+import com.dangbun.domain.member.entity.MemberJpaEntity;
 import com.dangbun.domain.member.entity.MemberRole;
 import com.dangbun.domain.member.repository.MemberRepository;
 import com.dangbun.domain.membercleaning.entity.MemberCleaning;
@@ -16,13 +16,11 @@ import com.dangbun.domain.memberduty.repository.MemberDutyRepository;
 import com.dangbun.domain.notificationreceiver.repository.NotificationReceiverRepository;
 import com.dangbun.domain.place.original.dto.response.GetPlaceResponse.DutyDto;
 import com.dangbun.domain.place.original.entity.Place;
-import com.dangbun.domain.place.original.entity.PlaceCategory;
 import com.dangbun.domain.place.original.dto.request.*;
 import com.dangbun.domain.place.original.dto.response.*;
 import com.dangbun.domain.place.original.exception.custom.*;
 import com.dangbun.domain.place.original.repository.PlaceRepository;
 import com.dangbun.domain.user.entity.User;
-import com.dangbun.domain.user.exception.custom.NoSuchUserException;
 import com.dangbun.domain.user.repository.UserRepository;
 import com.dangbun.global.context.MemberContext;
 import lombok.RequiredArgsConstructor;
@@ -41,7 +39,6 @@ import java.util.stream.Collectors;
 import static com.dangbun.domain.place.original.dto.response.GetPlaceListResponse.PlaceDto;
 import static com.dangbun.domain.place.original.dto.response.GetPlaceResponse.of;
 import static com.dangbun.domain.place.original.response.status.PlaceExceptionResponse.*;
-import static com.dangbun.domain.user.response.status.UserExceptionResponse.NO_SUCH_USER;
 
 @Slf4j
 @Service
@@ -68,12 +65,12 @@ public class PlaceService {
     @Transactional(readOnly = true)
     public GetPlaceListResponse getPlaces(Long userId) {
 
-        List<Member> members = memberRepository.findWithPlaceByUserId(userId);
+        List<MemberJpaEntity> members = memberRepository.findWithPlaceByUserId(userId);
 
         List<PlaceDto> placeDtos = new ArrayList<>();
 
 
-        for (Member member : members) {
+        for (MemberJpaEntity member : members) {
                 if (!member.getStatus() || member.getRole().equals(MemberRole.WAITING)) {
                     Place place = member.getPlace();
                     placeDtos.add(PlaceDto.of(place.getPlaceId(), place.getName(), place.getCategory(), place.getCategoryName(), null, null, null, null));
@@ -118,51 +115,51 @@ public class PlaceService {
         return GetPlaceListResponse.of(placeDtos);
     }
 
-    @Transactional
-    public PostCreatePlaceResponse createPlaceWithManager(Long userId, PostCreatePlaceRequest request) {
+//    @Transactional
+//    public PostCreatePlaceResponse createPlaceWithManager(Long userId, PostCreatePlaceRequest request) {
+//
+//
+//        String placeName = request.placeName();
+//        PlaceCategory category = request.category();
+//        String memberName = request.managerName();
+//
+//        String categoryName = request.categoryName() == null ? null : request.categoryName();
+//
+//        if (category != PlaceCategory.ETC) categoryName = category.getDisplayName();
+//
+//        Map<String, String> info = request.information();
+//
+//        Place place = Place.builder()
+//                .name(placeName)
+//                .category(category)
+//                .categoryName(categoryName)
+//                .build();
+//
+//        place.createCode(generateCode());
+//
+//        Place savedPlace = placeRepository.save(place);
+//
+//        Member member = Member.builder()
+//                .name(memberName)
+//                .place(savedPlace)
+//                .information(info)
+//                .role(MemberRole.MANAGER)
+//                .status(true)
+//                .user(userRepository.findById(userId).orElseThrow(() -> new NoSuchUserException(NO_SUCH_USER)))
+//                .build();
+//
+//        memberRepository.save(member);
+//
+//        return PostCreatePlaceResponse.of(savedPlace.getPlaceId());
+//    }
 
-
-        String placeName = request.placeName();
-        PlaceCategory category = request.category();
-        String memberName = request.managerName();
-
-        String categoryName = request.categoryName() == null ? null : request.categoryName();
-
-        if (category != PlaceCategory.ETC) categoryName = category.getDisplayName();
-
-        Map<String, String> info = request.information();
-
-        Place place = Place.builder()
-                .name(placeName)
-                .category(category)
-                .categoryName(categoryName)
-                .build();
-
-        place.createCode(generateCode());
-
-        Place savedPlace = placeRepository.save(place);
-
-        Member member = Member.builder()
-                .name(memberName)
-                .place(savedPlace)
-                .information(info)
-                .role(MemberRole.MANAGER)
-                .status(true)
-                .user(userRepository.findById(userId).orElseThrow(() -> new NoSuchUserException(NO_SUCH_USER)))
-                .build();
-
-        memberRepository.save(member);
-
-        return PostCreatePlaceResponse.of(savedPlace.getPlaceId());
-    }
-
-    @Transactional
-    public PostCreateInviteCodeResponse createInviteCode() {
-        Place place = MemberContext.get().getPlace();
-        String code = place.createCode(generateCode());
-
-        return new PostCreateInviteCodeResponse(code);
-    }
+//    @Transactional
+//    public PostCreateInviteCodeResponse createInviteCode() {
+//        Place place = MemberContext.get().getPlace();
+//        String code = place.createCode(generateCode());
+//
+//        return new PostCreateInviteCodeResponse(code);
+//    }
 
 
     @Transactional(readOnly = true)
@@ -174,44 +171,44 @@ public class PlaceService {
         if (memberRepository.findByPlaceAndUser(place, user).isPresent()) {
             throw new AlreadyInvitedException(ALREADY_INVITED);
         }
-        Member member = memberRepository.findFirstByPlace(place);
+        MemberJpaEntity member = memberRepository.findFirstByPlace(place);
         Set<String> information = member.getInformation().keySet();
         List<String> iList = information.stream().toList();
 
         return PostCheckInviteCodeResponse.of(place.getPlaceId(), iList);
     }
 
-
-    @Transactional
-    public PostRegisterPlaceResponse joinRequest(User user, PostRegisterPlaceRequest request) {
-
-
-        Member tempMember = memberRepository.findWithPlaceByInviteCode(request.inviteCode()).stream().findAny()
-                .orElseThrow(() -> new InvalidInviteCodeException(INVALID_INVITE_CODE));
-
-        Place place = tempMember.getPlace();
-
-        if (!tempMember.getInformation().keySet().equals(request.information().keySet())) {
-            throw new InvalidInformationException(INVALID_INFORMATION);
-        }
-
-        Member member = Member.builder()
-                .user(user)
-                .role(MemberRole.WAITING)
-                .status(false)
-                .place(place)
-                .name(request.name())
-                .information(request.information())
-                .build();
-        log.info(member.getRole().toString());
-        memberRepository.save(member);
-
-        return PostRegisterPlaceResponse.of(place.getPlaceId());
-    }
+//
+//    @Transactional
+//    public PostRegisterPlaceResponse joinRequest(User user, PostRegisterPlaceRequest request) {
+//
+//
+//        MemberJpaEntity tempMember = memberRepository.findWithPlaceByInviteCode(request.inviteCode()).stream().findAny()
+//                .orElseThrow(() -> new InvalidInviteCodeException(INVALID_INVITE_CODE));
+//
+//        Place place = tempMember.getPlace();
+//
+//        if (!tempMember.getInformation().keySet().equals(request.information().keySet())) {
+//            throw new InvalidInformationException(INVALID_INFORMATION);
+//        }
+//
+//        MemberJpaEntity member = MemberJpaEntity.builder()
+//                .user(user)
+//                .role(MemberRole.WAITING)
+//                .status(false)
+//                .place(place)
+//                .name(request.name())
+//                .information(request.information())
+//                .build();
+//        log.info(member.getRole().toString());
+//        memberRepository.save(member);
+//
+//        return PostRegisterPlaceResponse.of(place.getPlaceId());
+//    }
 
     @Transactional(readOnly = true)
     public GetPlaceResponse getPlace() {
-        Member me = MemberContext.get();
+        MemberJpaEntity me = MemberContext.get();
         Place place = me.getPlace();
         Long placeId = place.getPlaceId();
 
@@ -263,38 +260,38 @@ public class PlaceService {
     }
 
 
-    @Transactional
-    public void deletePlace(DeletePlaceRequest request) {
-        Member runner = MemberContext.get();
+//    @Transactional
+//    public void deletePlace(DeletePlaceRequest request) {
+//        MemberJpaEntity runner = MemberContext.get();
+//
+//        Place place = runner.getPlace();
+//        if (!place.getName().equals(request.placeName())) {
+//            throw new InvalidPlaceNameException(INVALID_NAME);
+//        }
+//
+//        placeRepository.delete(place);
+//
+//    }
 
-        Place place = runner.getPlace();
-        if (!place.getName().equals(request.placeName())) {
-            throw new InvalidPlaceNameException(INVALID_NAME);
-        }
+//    @Transactional
+//    public void cancelRegister() {
+//        MemberJpaEntity member = MemberContext.get();
+//
+//        memberRepository.delete(member);
+//    }
 
-        placeRepository.delete(place);
-
-    }
-
-    @Transactional
-    public void cancelRegister() {
-        Member member = MemberContext.get();
-
-        memberRepository.delete(member);
-    }
-
-    @Transactional
-    public PatchUpdateTimeResponse updateTime(PatchUpdateTimeRequest request) {
-        Place place = MemberContext.get().getPlace();
-
-        if (request.isToday() && request.startTime().isAfter(request.endTime())) {
-            throw new InvalidTimeException(INVALID_TIME);
-        }
-
-        place.setTime(request.startTime(), request.endTime(), request.isToday());
-
-        return PatchUpdateTimeResponse.of(place, place.getIsToday());
-    }
+//    @Transactional
+//    public PatchUpdateTimeResponse updateTime(PatchUpdateTimeRequest request) {
+//        Place place = MemberContext.get().getPlace();
+//
+//        if (request.isToday() && request.startTime().isAfter(request.endTime())) {
+//            throw new InvalidTimeException(INVALID_TIME);
+//        }
+//
+//        place.setTime(request.startTime(), request.endTime(), request.isToday());
+//
+//        return PatchUpdateTimeResponse.of(place, place.getIsToday());
+//    }
 
     @Transactional(readOnly = true)
     public GetDutiesProgressResponse getDutiesProgress() {
@@ -338,7 +335,7 @@ public class PlaceService {
         return sb.toString();
     }
 
-    private List<DutyDto> createDutyDtos(Member me, Map<Duty, List<Checklist>> checklistMap, List<MemberCleaning> memberCleanings) {
+    private List<DutyDto> createDutyDtos(MemberJpaEntity me, Map<Duty, List<Checklist>> checklistMap, List<MemberCleaning> memberCleanings) {
         List<DutyDto> duties = new ArrayList<>();
 
         for (Map.Entry<Duty, List<Checklist>> dc : checklistMap.entrySet()) {
@@ -348,12 +345,12 @@ public class PlaceService {
             for (Checklist checkList : dc.getValue()) {
                 Cleaning cleaning = checkList.getCleaning();
 
-                List<Member> members = new ArrayList<>();
+                List<MemberJpaEntity> members = new ArrayList<>();
                 boolean containsMe = false;
 
                 for (MemberCleaning mc : memberCleanings) {
                     if (mc.getCleaning().equals(cleaning)) {
-                        Member m = mc.getMember();
+                        MemberJpaEntity m = mc.getMember();
                         members.add(m);
                         if (m.equals(me)) {
                             containsMe = true;
@@ -383,11 +380,11 @@ public class PlaceService {
             for (Checklist checkList : dc.getValue()) {
                 Cleaning cleaning = checkList.getCleaning();
 
-                List<Member> members = new ArrayList<>();
+                List<MemberJpaEntity> members = new ArrayList<>();
 
                 for (MemberCleaning mc : memberCleanings) {
                     if (mc.getCleaning().equals(cleaning)) {
-                        Member m = mc.getMember();
+                        MemberJpaEntity m = mc.getMember();
                         members.add(m);
                     }
                 }

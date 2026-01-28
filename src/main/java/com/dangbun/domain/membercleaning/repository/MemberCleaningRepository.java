@@ -2,7 +2,7 @@ package com.dangbun.domain.membercleaning.repository;
 
 import com.dangbun.domain.cleaning.entity.Cleaning;
 import com.dangbun.domain.duty.entity.Duty;
-import com.dangbun.domain.member.entity.Member;
+import com.dangbun.domain.member.entity.MemberJpaEntity;
 import com.dangbun.domain.membercleaning.entity.MemberCleaning;
 import com.dangbun.domain.membercleaning.entity.MemberCleaningId;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -20,10 +20,10 @@ public interface MemberCleaningRepository extends JpaRepository<MemberCleaning, 
 
     List<MemberCleaning> findAllByCleaning(Cleaning cleaning);
 
-    List<MemberCleaning> findAllByMember(Member member);
+    List<MemberCleaning> findAllByMember(MemberJpaEntity member);
 
     @Query("select mc.member from MemberCleaning mc where mc.id.cleaningId = :cleaningId")
-    List<Member> findMembersByCleaningId(Long cleaningId);
+    List<MemberJpaEntity> findMembersByCleaningId(Long cleaningId);
 
     void deleteAllByCleaning_CleaningId(Long cleaningId);
 }

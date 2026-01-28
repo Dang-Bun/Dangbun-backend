@@ -17,7 +17,7 @@ import com.dangbun.domain.cleaningdate.entity.CleaningDate;
 import com.dangbun.domain.cleaningdate.repository.CleaningDateRepository;
 import com.dangbun.domain.duty.entity.Duty;
 import com.dangbun.domain.duty.repository.DutyRepository;
-import com.dangbun.domain.member.entity.Member;
+import com.dangbun.domain.member.entity.MemberJpaEntity;
 import com.dangbun.domain.member.repository.MemberRepository;
 import com.dangbun.domain.membercleaning.entity.MemberCleaning;
 import com.dangbun.domain.membercleaning.repository.MemberCleaningRepository;
@@ -75,7 +75,7 @@ public class CleaningService {
         return cleanings.stream()
                 .map(cleaning -> {
                     List<String> names = memberCleaningRepository.findMembersByCleaningId(cleaning.getCleaningId())
-                            .stream().map(Member::getName).toList();
+                            .stream().map(MemberJpaEntity::getName).toList();
 
                     List<String> displayed = names.stream().limit(2).toList();
                     return GetCleaningDetailListResponse.of(cleaning.getName(), displayed, names.size());
@@ -113,7 +113,7 @@ public class CleaningService {
         Cleaning savedCleaning = cleaningRepository.save(cleaning);
 
         if (request.members() != null && !request.members().isEmpty()) {
-            List<Member> members = memberRepository.findAllByNameIn((request.members()));
+            List<MemberJpaEntity> members = memberRepository.findAllByNameIn((request.members()));
             List<MemberCleaning> memberCleanings = members.stream()
                     .map(m -> MemberCleaning.builder().member(m).cleaning(savedCleaning).build())
                     .toList();
@@ -175,7 +175,7 @@ public class CleaningService {
 
         memberCleaningRepository.deleteAllByCleaning_CleaningId(cleaningId);
 
-        List<Member> newMembers = memberRepository.findAllByNameIn(request.members());
+        List<MemberJpaEntity> newMembers = memberRepository.findAllByNameIn(request.members());
         List<MemberCleaning> newMemberCleanings = newMembers.stream()
                 .map(m -> MemberCleaning.builder().member(m).cleaning(cleaning).build())
                 .toList();

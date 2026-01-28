@@ -1,6 +1,5 @@
 package com.dangbun.domain.notificationreceiver.dto.response;
 
-import com.dangbun.domain.member.entity.Member;
 import com.dangbun.domain.notification.entity.Notification;
 import com.dangbun.domain.notificationreceiver.entity.NotificationReceiver;
 import com.dangbun.domain.notificationreceiver.entity.NotificationReceiverId;

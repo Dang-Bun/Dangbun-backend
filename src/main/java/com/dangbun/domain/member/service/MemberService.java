@@ -6,7 +6,7 @@ import com.dangbun.global.context.MemberContext;
 import com.dangbun.domain.member.dto.request.*;
 import com.dangbun.domain.member.dto.response.*;
 
-import com.dangbun.domain.member.entity.Member;
+import com.dangbun.domain.member.entity.MemberJpaEntity;
 import com.dangbun.domain.member.entity.MemberRole;
 import com.dangbun.domain.member.exception.custom.*;
 import com.dangbun.domain.member.repository.MemberRepository;
@@ -32,20 +32,20 @@ public class MemberService {
     @Transactional(readOnly = true)
     public GetMembersResponse getMembers() {
 
-        Member me = MemberContext.get();
+        MemberJpaEntity me = MemberContext.get();
         Long placeId = me.getPlace().getPlaceId();
 
-        Map<Member, List<String>> memberMap = new LinkedHashMap<>();
-        List<Member> members = memberRepository.findByPlace_PlaceId(placeId);
+        Map<MemberJpaEntity, List<String>> memberMap = new LinkedHashMap<>();
+        List<MemberJpaEntity> members = memberRepository.findByPlace_PlaceId(placeId);
 
 
         members.sort(Comparator
-                .comparing((Member m) -> m.getRole() != MemberRole.MANAGER) // MANAGER 먼저
-                .thenComparing(Member::getName, Comparator.nullsLast(String::compareTo))); // 이름 가나다순
+                .comparing((MemberJpaEntity m) -> m.getRole() != MemberRole.MANAGER) // MANAGER 먼저
+                .thenComparing(MemberJpaEntity::getName, Comparator.nullsLast(String::compareTo))); // 이름 가나다순
 
         Integer waitingMemberNumber = 0;
 
-        for (Member member : members) {
+        for (MemberJpaEntity member : members) {
             if (member.getStatus()) {
                 List<MemberDuty> memberDuties = memberDutyRepository.findAllByMember(member);
                 List<String> dutyNames = new ArrayList<>();
@@ -70,7 +70,7 @@ public class MemberService {
     @Transactional(readOnly = true)
     public GetMemberResponse getMember( Long memberId) {
         Long placeId = MemberContext.get().getPlace().getPlaceId();
-        Member member = getMemberByMemberIdAndPlaceId(memberId, placeId);
+        MemberJpaEntity member = getMemberByMemberIdAndPlaceId(memberId, placeId);
 
         List<MemberDuty> memberDuties = memberDutyRepository.findAllByMember(member);
         List<Duty> duties = new ArrayList<>();
@@ -84,36 +84,36 @@ public class MemberService {
 
     @Transactional(readOnly = true)
     public GetWaitingMembersResponse getWaitingMembers() {
-        Member me = MemberContext.get();
+        MemberJpaEntity me = MemberContext.get();
         Long placeId = me.getPlace().getPlaceId();
 
-        List<Member> members = memberRepository.findByPlace_PlaceIdAndStatusIsFalseOrderByNameAsc(placeId);
+        List<MemberJpaEntity> members = memberRepository.findByPlace_PlaceIdAndStatusIsFalseOrderByNameAsc(placeId);
 
         return GetWaitingMembersResponse.of(members);
 
     }
 
     public void registerMember(Long memberId) {
-        Member me = MemberContext.get();
+        MemberJpaEntity me = MemberContext.get();
         Long placeId = me.getPlace().getPlaceId();
 
 
-        Member member = getMemberByMemberIdAndPlaceId(memberId, placeId);
+        MemberJpaEntity member = getMemberByMemberIdAndPlaceId(memberId, placeId);
 
         member.activate();
     }
 
     public void removeWaitingMember(Long memberId) {
-        Member me = MemberContext.get();
+        MemberJpaEntity me = MemberContext.get();
         Long placeId = me.getPlace().getPlaceId();
 
-        Member member = getMemberByMemberIdAndPlaceId(memberId, placeId);
+        MemberJpaEntity member = getMemberByMemberIdAndPlaceId(memberId, placeId);
 
         memberRepository.delete(member);
     }
 
     public void exitPlace(DeleteSelfFromPlaceRequest request) {
-        Member me = MemberContext.get();
+        MemberJpaEntity me = MemberContext.get();
 
         if (me.getRole() == MemberRole.MANAGER) {
             throw new InvalidRoleException(INVALID_ROLE);
@@ -128,10 +128,10 @@ public class MemberService {
 
     public void removeMember(Long memberId, DeleteMemberRequest request) {
 
-        Member me = MemberContext.get();
+        MemberJpaEntity me = MemberContext.get();
         Long placeId = me.getPlace().getPlaceId();
 
-        Member member = getMemberByMemberIdAndPlaceId(memberId, placeId);
+        MemberJpaEntity member = getMemberByMemberIdAndPlaceId(memberId, placeId);
 
         if (!member.getName().equals(request.memberName())) {
             throw new NameNotMatchedException(NAME_NOT_MATCHED);
@@ -142,7 +142,7 @@ public class MemberService {
 
     @Transactional(readOnly = true)
     public GetMyInformationResponse getMyInformation() {
-        Member me = MemberContext.get();
+        MemberJpaEntity me = MemberContext.get();
         return GetMyInformationResponse.of(me);
 
     }
@@ -154,7 +154,7 @@ public class MemberService {
                 .orElse(new GetMemberSearchResponse(null, null));
     }
 
-    private Member getMemberByMemberIdAndPlaceId(Long memberId, Long placeId) {
+    private MemberJpaEntity getMemberByMemberIdAndPlaceId(Long memberId, Long placeId) {
         return memberRepository.findByMemberIdAndPlace_PlaceId(memberId, placeId)
                 .orElseThrow(() -> new MemberNotFoundException(MEMBER_NOT_FOUND));
     }
@@ -163,7 +163,7 @@ public class MemberService {
     public void assignDutyToMember(Long memberId, Long dutyId) {
         Long placeId = MemberContext.get().getPlace().getPlaceId();
 
-        Member targetMember = memberRepository.findByMemberIdAndPlace_PlaceId(memberId, placeId)
+        MemberJpaEntity targetMember = memberRepository.findByMemberIdAndPlace_PlaceId(memberId, placeId)
                 .orElseThrow(() -> new MemberNotFoundException(MEMBER_NOT_FOUND));
 
         Duty duty = dutyRepository.findByDutyIdAndPlace_PlaceId(dutyId, placeId)

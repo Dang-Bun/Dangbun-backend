@@ -13,7 +13,7 @@ import com.dangbun.domain.cleaningImage.service.CleaningImageService;
 import com.dangbun.domain.cleaningdate.entity.CleaningDate;
 import com.dangbun.domain.cleaningdate.repository.CleaningDateRepository;
 import com.dangbun.domain.duty.entity.Duty;
-import com.dangbun.domain.member.entity.Member;
+import com.dangbun.domain.member.entity.MemberJpaEntity;
 import com.dangbun.domain.member.entity.MemberRole;
 import com.dangbun.domain.member.repository.MemberRepository;
 import com.dangbun.domain.membercleaning.entity.MemberCleaning;
@@ -49,7 +49,7 @@ public class CalendarService {
     @Transactional(readOnly = true)
     public GetChecklistsResponse getChecklists(LocalDate date) {
 
-        Member me = MemberContext.get();
+        MemberJpaEntity me = MemberContext.get();
         Long placeId = me.getPlace().getPlaceId();
 
         if (date.isAfter(LocalDate.now())) {
@@ -73,7 +73,7 @@ public class CalendarService {
             String memberName = null;
             LocalTime localTime = null;
             if (checklist.getCompleteMemberId() != null) {
-                memberName = memberRepository.findById(checklist.getCompleteMemberId()).map(Member::getName).orElse(null);
+                memberName = memberRepository.findById(checklist.getCompleteMemberId()).map(MemberJpaEntity::getName).orElse(null);
                 localTime = checklist.getCompleteTime().toLocalTime();
             }
             Boolean needPhoto = checklist.getCleaning().getNeedPhoto();
@@ -87,7 +87,7 @@ public class CalendarService {
 
     @Transactional(readOnly = true)
     public GetProgressBarsResponse getProgressBars(int year, int month) {
-        Member me = MemberContext.get();
+        MemberJpaEntity me = MemberContext.get();
         Long placeId = me.getPlace().getPlaceId();
         YearMonth current = YearMonth.of(year, month);
         LocalDateTime start = current.minusMonths(1).atDay(1).atStartOfDay();
@@ -118,7 +118,7 @@ public class CalendarService {
 
     }
 
-    private void filterMyChecklists(Member me, List<Checklist> checklists) {
+    private void filterMyChecklists(MemberJpaEntity me, List<Checklist> checklists) {
         if (me.getRole().equals(MemberRole.MEMBER)) {
             List<Cleaning> myCleanings = memberCleaningRepository.findAllByMember(me)
                     .stream()
@@ -130,7 +130,7 @@ public class CalendarService {
     }
 
     public PatchUpdateChecklistToCompleteResponse finishChecklist(Long checklistId) {
-        Member me = MemberContext.get();
+        MemberJpaEntity me = MemberContext.get();
 
         Checklist checklist = checklistRepository.findById(checklistId)
                 .orElseThrow();
@@ -157,11 +157,11 @@ public class CalendarService {
         Cleaning cleaning = checklist.getCleaning();
         Duty duty = cleaning.getDuty();
         List<MemberCleaning> memberCleanings = memberCleaningRepository.findAllByCleaning(cleaning);
-        List<Member> members = memberCleanings.stream().map(MemberCleaning::getMember).toList();
+        List<MemberJpaEntity> members = memberCleanings.stream().map(MemberCleaning::getMember).toList();
 
         Long cleaningId = cleaning.getCleaningId();
         String dutyName = duty.getName();
-        List<String> membersName = members.stream().map(Member::getName).toList();
+        List<String> membersName = members.stream().map(MemberJpaEntity::getName).toList();
         Boolean needPhoto = cleaning.getNeedPhoto();
         CleaningRepeatType repeatType = cleaning.getRepeatType();
         List<DayOfWeek> repeatDays = parseRepeatDaysToDayOfWeek(cleaning.getRepeatDays());
@@ -188,7 +188,7 @@ public class CalendarService {
     }
 
     public void deleteChecklist(Long checklistId) {
-        Member me = MemberContext.get();
+        MemberJpaEntity me = MemberContext.get();
 
         cleaningImageRepository.findByChecklist_ChecklistId(checklistId)
                 .ifPresent(img -> s3Service.deleteFile(img.getS3Key()));

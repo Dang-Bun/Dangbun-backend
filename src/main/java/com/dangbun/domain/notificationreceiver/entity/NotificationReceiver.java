@@ -1,6 +1,6 @@
 package com.dangbun.domain.notificationreceiver.entity;
 
-import com.dangbun.domain.member.entity.Member;
+import com.dangbun.domain.member.entity.MemberJpaEntity;
 import com.dangbun.domain.notification.entity.Notification;
 import com.dangbun.global.entity.BaseEntity;
 import jakarta.persistence.*;
@@ -24,7 +24,7 @@ public class NotificationReceiver extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "receiver_id")
     @OnDelete(action = OnDeleteAction.CASCADE)
-    private Member receiver;
+    private MemberJpaEntity receiver;
 
     @MapsId("notificationId")
     @ManyToOne(fetch = FetchType.LAZY)
@@ -37,7 +37,7 @@ public class NotificationReceiver extends BaseEntity {
 
 
     @Builder
-    public NotificationReceiver(Member receiver, Notification notification, boolean isRead) {
+    public NotificationReceiver(MemberJpaEntity receiver, Notification notification, boolean isRead) {
         this.receiver = receiver;
         this.notification = notification;
         this.isRead = isRead;

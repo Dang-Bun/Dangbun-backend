@@ -1,6 +1,6 @@
 package com.dangbun.domain.member.repository;
 
-import com.dangbun.domain.member.entity.Member;
+import com.dangbun.domain.member.entity.MemberJpaEntity;
 import com.dangbun.domain.place.original.entity.Place;
 import com.dangbun.domain.user.entity.User;
 import io.lettuce.core.dynamic.annotation.Param;
@@ -12,35 +12,35 @@ import org.springframework.data.jpa.repository.Query;
 import java.util.List;
 import java.util.Optional;
 
-public interface MemberRepository extends JpaRepository<Member, Long> {
+public interface MemberRepository extends JpaRepository<MemberJpaEntity, Long> {
 
-    @Query("SELECT m FROM Member m JOIN FETCH m.place WHERE m.user.userId = :userId")
-    List<Member> findWithPlaceByUserId(Long userId);
+    @Query("SELECT m FROM MemberJpaEntity m JOIN FETCH m.place WHERE m.user.userId = :userId")
+    List<MemberJpaEntity> findWithPlaceByUserId(Long userId);
 
-    @Query("select m from Member m join fetch m.place where m.user.userId = :userId and m.place.placeId = :placeId")
-    Optional<Member> findWithPlaceByUserIdAndPlaceId(Long userId, Long placeId);
+    @Query("select m from MemberJpaEntity m join fetch m.place where m.user.userId = :userId and m.place.placeId = :placeId")
+    Optional<MemberJpaEntity> findWithPlaceByUserIdAndPlaceId(Long userId, Long placeId);
 
-    Optional<Member> findByPlaceAndUser(Place place, User user);
+    Optional<MemberJpaEntity> findByPlaceAndUser(Place place, User user);
 
-    Member findFirstByPlace(Place place);
+    MemberJpaEntity findFirstByPlace(Place place);
 
-    @Query("select m from Member m join fetch m.place p where p.inviteCode = :inviteCode")
-    List<Member> findWithPlaceByInviteCode(@Param("inviteCode") String inviteCode);
+    @Query("select m from MemberJpaEntity m join fetch m.place p where p.inviteCode = :inviteCode")
+    List<MemberJpaEntity> findWithPlaceByInviteCode(@Param("inviteCode") String inviteCode);
 
-    List<Member> findAllByNameIn(List<String> names);
+    List<MemberJpaEntity> findAllByNameIn(List<String> names);
 
-    List<Member> findByPlace_PlaceId(Long placeId);
+    List<MemberJpaEntity> findByPlace_PlaceId(Long placeId);
 
-    List<Member> findByPlace_PlaceIdAndStatusIsFalseOrderByNameAsc(Long placeId);
+    List<MemberJpaEntity> findByPlace_PlaceIdAndStatusIsFalseOrderByNameAsc(Long placeId);
 
-    Optional<Member> findByMemberIdAndPlace_PlaceId(Long memberId, Long placeId);
+    Optional<MemberJpaEntity> findByMemberIdAndPlace_PlaceId(Long memberId, Long placeId);
 
-    Optional<Member> findByPlace_PlaceIdAndName(Long placeId, String name);
+    Optional<MemberJpaEntity> findByPlace_PlaceIdAndName(Long placeId, String name);
 
-    Page<Member> findByPlace_PlaceId(Long placeId, Pageable pageable);
+    Page<MemberJpaEntity> findByPlace_PlaceId(Long placeId, Pageable pageable);
 
-    Page<Member> findByPlace_PlaceIdAndNameContaining(Long placeId, String name, Pageable pageable);
+    Page<MemberJpaEntity> findByPlace_PlaceIdAndNameContaining(Long placeId, String name, Pageable pageable);
 
-    List<Member> findALLByUser(User user);
+    List<MemberJpaEntity> findALLByUser(User user);
 
 }

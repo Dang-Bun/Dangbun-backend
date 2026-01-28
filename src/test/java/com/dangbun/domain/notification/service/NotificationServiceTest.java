@@ -1,6 +1,6 @@
 package com.dangbun.domain.notification.service;
 
-import com.dangbun.domain.member.entity.Member;
+import com.dangbun.domain.member.entity.MemberJpaEntity;
 import com.dangbun.domain.member.repository.MemberRepository;
 import com.dangbun.domain.notification.dto.request.*;
 import com.dangbun.domain.notification.dto.response.*;
@@ -27,6 +27,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import static com.dangbun.domain.notification.entity.NotificationTemplate.*;
+import static com.dangbun.domain.place.original.entity.PlaceCategory.*;
 import static org.assertj.core.api.Assertions.*;
 
 import java.time.LocalDateTime;
@@ -50,8 +51,8 @@ class NotificationServiceTest {
     @Mock
     private NotificationReceiverRepository notificationReceiverRepository;
 
-    private Member mockMember;
-    private Member mockReceiverMember;
+    private MemberJpaEntity mockMember;
+    private MemberJpaEntity mockReceiverMember;
     private final Long MOCK_PLACE_ID = 1L;
     private final Long MOCK_MEMBER_ID = 10L;
     private final Long MOCK_RECEIVER_ID = 20L;
@@ -62,11 +63,11 @@ class NotificationServiceTest {
         Place mockPlace = Place.builder().name("테스트 장소").category(CAFE).build();
         ReflectionTestUtils.setField(mockPlace, "placeId", MOCK_PLACE_ID);
 
-        mockMember = Member.builder().name("철수").build();
+        mockMember = MemberJpaEntity.builder().name("철수").build();
         ReflectionTestUtils.setField(mockMember, "memberId", MOCK_MEMBER_ID);
         ReflectionTestUtils.setField(mockMember, "place", mockPlace);
 
-        mockReceiverMember = Member.builder().name("영희").build();
+        mockReceiverMember = MemberJpaEntity.builder().name("영희").build();
         ReflectionTestUtils.setField(mockReceiverMember, "memberId", MOCK_RECEIVER_ID);
         ReflectionTestUtils.setField(mockReceiverMember, "place", mockPlace);
 
@@ -79,7 +80,7 @@ class NotificationServiceTest {
     void searchMembers_noSearchName() {
         // given
         Pageable pageable = PageRequest.of(0, 10);
-        Page<Member> memberPage = new PageImpl<>(List.of(mockMember, mockReceiverMember), pageable, 2);
+        Page<MemberJpaEntity> memberPage = new PageImpl<>(List.of(mockMember, mockReceiverMember), pageable, 2);
         given(memberRepository.findByPlace_PlaceId(eq(MOCK_PLACE_ID), any(Pageable.class)))
                 .willReturn(memberPage);
 
@@ -101,7 +102,7 @@ class NotificationServiceTest {
         // given
         String searchName = "영희";
         Pageable pageable = PageRequest.of(0, 10);
-        Page<Member> memberPage = new PageImpl<>(List.of(mockReceiverMember), pageable, 1);
+        Page<MemberJpaEntity> memberPage = new PageImpl<>(List.of(mockReceiverMember), pageable, 1);
         given(memberRepository.findByPlace_PlaceIdAndNameContaining(eq(MOCK_PLACE_ID), eq(searchName), any(Pageable.class)))
                 .willReturn(memberPage);
         given(redisService.getRedisKey(anyLong(), anyLong())).willReturn("key_1_10");
@@ -200,7 +201,7 @@ class NotificationServiceTest {
     @DisplayName("알림 생성 - 수신자 중 해당 플레이스에 없는 멤버가 있을 때 예외 발생")
     void createNotification_memberNotFound() {
         // given
-        Member outsider = Member.builder().name("외부인").build();
+        MemberJpaEntity outsider = MemberJpaEntity.builder().name("외부인").build();
         ReflectionTestUtils.setField(outsider, "memberId", MOCK_RECEIVER_ID);
 
         Place outsidePlace = mock(Place.class);
@@ -305,14 +306,14 @@ class NotificationServiceTest {
     @DisplayName("알림 상세 조회 (수신자) - 성공")
     void getNotificationInfo_asReceiver_success() {
         // given
-        Member senderMember = Member.builder().name("보낸이").build();
+        MemberJpaEntity senderMember = MemberJpaEntity.builder().name("보낸이").build();
         ReflectionTestUtils.setField(senderMember, "memberId", 500L);
 
         Notification notification = Notification.builder().title("제목").content("내용").sender(senderMember).build();
         ReflectionTestUtils.setField(notification, "notificationId", 2L);
 
         given(notificationRepository.findById(anyLong())).willReturn(Optional.of(notification));
-        given(notificationReceiverRepository.existsByNotificationAndReceiver(any(Notification.class), any(Member.class)))
+        given(notificationReceiverRepository.existsByNotificationAndReceiver(any(Notification.class), any(MemberJpaEntity.class)))
                 .willReturn(true);
         given(notificationReceiverRepository.findAllByNotification(any(Notification.class)))
                 .willReturn(List.of(NotificationReceiver.builder().receiver(mockMember).notification(notification).build()));
@@ -344,14 +345,14 @@ class NotificationServiceTest {
     @DisplayName("알림 상세 조회 - 권한 없는 유저 예외 발생")
     void getNotificationInfo_forbidden() {
         // given
-        Member anotherMember = Member.builder().name("다른사람").build();
+        MemberJpaEntity anotherMember = MemberJpaEntity.builder().name("다른사람").build();
         ReflectionTestUtils.setField(anotherMember, "memberId", 888L);
 
         Notification notification = Notification.builder().sender(anotherMember).build();
         ReflectionTestUtils.setField(notification, "notificationId", 3L);
 
         given(notificationRepository.findById(anyLong())).willReturn(Optional.of(notification));
-        given(notificationReceiverRepository.existsByNotificationAndReceiver(any(Notification.class), any(Member.class)))
+        given(notificationReceiverRepository.existsByNotificationAndReceiver(any(Notification.class), any(MemberJpaEntity.class)))
                 .willReturn(false);
 
         // when & then

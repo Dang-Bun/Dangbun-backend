@@ -1,7 +1,7 @@
 package com.dangbun.domain.place.original.dto.response;
 
 import com.dangbun.domain.checklist.entity.Checklist;
-import com.dangbun.domain.member.entity.Member;
+import com.dangbun.domain.member.entity.MemberJpaEntity;
 import com.dangbun.domain.place.original.entity.PlaceCategory;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -86,7 +86,7 @@ public record GetPlaceResponse(
             Boolean needPhoto
 
     ) {
-        public static CheckListDto of(Checklist checklist, List<Member> members) {
+        public static CheckListDto of(Checklist checklist, List<MemberJpaEntity> members) {
 
             List<MemberDto> memberDtos = members.stream()
                     .map(MemberDto::of).toList();
@@ -107,7 +107,7 @@ public record GetPlaceResponse(
             @Schema(description = "청소 담당 맴버 이름", example = "맴버 A")
             String memberName
     ) {
-        public static MemberDto of(Member member) {
+        public static MemberDto of(MemberJpaEntity member) {
             return new MemberDto(member.getMemberId(), member.getName());
         }
     }

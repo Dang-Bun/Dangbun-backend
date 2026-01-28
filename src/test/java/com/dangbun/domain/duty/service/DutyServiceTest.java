@@ -7,7 +7,7 @@ import com.dangbun.domain.duty.dto.response.*;
 import com.dangbun.domain.duty.entity.Duty;
 import com.dangbun.domain.duty.exception.custom.*;
 import com.dangbun.domain.duty.repository.DutyRepository;
-import com.dangbun.domain.member.entity.Member;
+import com.dangbun.domain.member.entity.MemberJpaEntity;
 import com.dangbun.domain.member.repository.MemberRepository;
 import com.dangbun.domain.membercleaning.entity.MemberCleaning;
 import com.dangbun.domain.membercleaning.repository.MemberCleaningRepository;
@@ -30,6 +30,7 @@ import java.util.Optional;
 
 import static com.dangbun.domain.duty.entity.DutyAssignType.*;
 import static com.dangbun.domain.duty.entity.DutyIcon.*;
+import static com.dangbun.domain.place.original.entity.PlaceCategory.CAFE;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
@@ -56,7 +57,7 @@ class DutyServiceTest {
                 .build();
         ReflectionTestUtils.setField(place, "placeId", 1L);
 
-        Member fakeMember = Member.builder()
+        MemberJpaEntity fakeMember = MemberJpaEntity.builder()
                 .name("철수")
                 .place(place)
                 .build();
@@ -155,8 +156,8 @@ class DutyServiceTest {
         ReflectionTestUtils.setField(duty, "dutyId", 1L);
         DutyContext.set(duty);
 
-        Member member1 = Member.builder().name("철수").build();
-        Member member2 = Member.builder().name("영희").build();
+        MemberJpaEntity member1 = MemberJpaEntity.builder().name("철수").build();
+        MemberJpaEntity member2 = MemberJpaEntity.builder().name("영희").build();
 
         MemberDuty md1 = MemberDuty.builder().duty(duty).member(member1).build();
         MemberDuty md2 = MemberDuty.builder().duty(duty).member(member2).build();
@@ -220,10 +221,10 @@ class DutyServiceTest {
         ReflectionTestUtils.setField(duty, "dutyId", 1L);
         DutyContext.set(duty);
 
-        Member member1 = Member.builder().name("철수").place(MemberContext.get().getPlace()).build();
+        MemberJpaEntity member1 = MemberJpaEntity.builder().name("철수").place(MemberContext.get().getPlace()).build();
         ReflectionTestUtils.setField(member1, "memberId", 100L);
 
-        Member member2 = Member.builder().name("영희").place(MemberContext.get().getPlace()).build();
+        MemberJpaEntity member2 = MemberJpaEntity.builder().name("영희").place(MemberContext.get().getPlace()).build();
         ReflectionTestUtils.setField(member2, "memberId", 200L);
 
         given(memberRepository.findAllById(List.of(100L, 200L)))
@@ -248,7 +249,7 @@ class DutyServiceTest {
         ReflectionTestUtils.setField(duty, "dutyId", 1L);
         DutyContext.set(duty);
 
-        Member member1 = Member.builder().name("철수").place(MemberContext.get().getPlace()).build();
+        MemberJpaEntity member1 = MemberJpaEntity.builder().name("철수").place(MemberContext.get().getPlace()).build();
         ReflectionTestUtils.setField(member1, "memberId", 100L);
 
 
@@ -272,10 +273,10 @@ class DutyServiceTest {
         Cleaning cleaning = Cleaning.builder().name("책상 닦기").duty(duty).build();
         ReflectionTestUtils.setField(cleaning, "cleaningId", 10L);
 
-        Member member1 = Member.builder().name("철수").build();
+        MemberJpaEntity member1 = MemberJpaEntity.builder().name("철수").build();
         ReflectionTestUtils.setField(member1, "memberId", 100L);
 
-        Member member2 = Member.builder().name("영희").build();
+        MemberJpaEntity member2 = MemberJpaEntity.builder().name("영희").build();
         ReflectionTestUtils.setField(member2, "memberId", 200L);
 
         given(cleaningRepository.findByCleaningIdAndDuty_DutyId(10L, 1L))
@@ -324,9 +325,9 @@ class DutyServiceTest {
         Cleaning cleaning2 = Cleaning.builder().name("바닥 청소").duty(duty).build();
         ReflectionTestUtils.setField(cleaning2, "cleaningId", 20L);
 
-        Member member1 = Member.builder().name("철수").build();
+        MemberJpaEntity member1 = MemberJpaEntity.builder().name("철수").build();
         ReflectionTestUtils.setField(member1, "memberId", 100L);
-        Member member2 = Member.builder().name("영희").build();
+        MemberJpaEntity member2 = MemberJpaEntity.builder().name("영희").build();
         ReflectionTestUtils.setField(member2, "memberId", 200L);
 
         given(cleaningRepository.findAllByDuty(duty))
@@ -376,11 +377,11 @@ class DutyServiceTest {
         Cleaning cleaning1 = Cleaning.builder().name("책상 닦기").duty(duty).build();
         ReflectionTestUtils.setField(cleaning1, "cleaningId", 10L);
 
-        Member member1 = Member.builder().name("철수").build();
+        MemberJpaEntity member1 = MemberJpaEntity.builder().name("철수").build();
         ReflectionTestUtils.setField(member1, "memberId", 100L);
-        Member member2 = Member.builder().name("영희").build();
+        MemberJpaEntity member2 = MemberJpaEntity.builder().name("영희").build();
         ReflectionTestUtils.setField(member2, "memberId", 200L);
-        Member member3 = Member.builder().name("민수").build();
+        MemberJpaEntity member3 = MemberJpaEntity.builder().name("민수").build();
         ReflectionTestUtils.setField(member3, "memberId", 300L);
 
         given(cleaningRepository.findAllByDuty(duty)).willReturn(List.of(cleaning1));
@@ -408,9 +409,9 @@ class DutyServiceTest {
         Cleaning cleaning = Cleaning.builder().name("책상 닦기").duty(duty).build();
         ReflectionTestUtils.setField(cleaning, "cleaningId", 10L);
 
-        Member member1 = Member.builder().name("철수").build();
-        Member member2 = Member.builder().name("영희").build();
-        Member member3 = Member.builder().name("민수").build();
+        MemberJpaEntity member1 = MemberJpaEntity.builder().name("철수").build();
+        MemberJpaEntity member2 = MemberJpaEntity.builder().name("영희").build();
+        MemberJpaEntity member3 = MemberJpaEntity.builder().name("민수").build();
 
         MemberCleaning mc1 = MemberCleaning.builder().cleaning(cleaning).member(member1).build();
         MemberCleaning mc2 = MemberCleaning.builder().cleaning(cleaning).member(member2).build();

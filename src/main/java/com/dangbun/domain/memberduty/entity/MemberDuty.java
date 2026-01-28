@@ -1,7 +1,7 @@
 package com.dangbun.domain.memberduty.entity;
 
 import com.dangbun.domain.duty.entity.Duty;
-import com.dangbun.domain.member.entity.Member;
+import com.dangbun.domain.member.entity.MemberJpaEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -23,7 +23,7 @@ public class MemberDuty {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id", nullable = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
-    private Member member;
+    private MemberJpaEntity member;
 
     @MapsId("dutyId")
     @ManyToOne(fetch = FetchType.LAZY)
@@ -33,7 +33,7 @@ public class MemberDuty {
 
 
     @Builder
-    public MemberDuty(Member member, Duty duty) {
+    public MemberDuty(MemberJpaEntity member, Duty duty) {
         this.member = member;
         this.duty = duty;
         this.id = new MemberDutyId(member.getMemberId(), duty.getDutyId());

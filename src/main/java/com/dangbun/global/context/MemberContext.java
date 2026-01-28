@@ -1,15 +1,15 @@
 package com.dangbun.global.context;
 
-import com.dangbun.domain.member.entity.Member;
+import com.dangbun.domain.member.entity.MemberJpaEntity;
 
 public class MemberContext {
-    private static final ThreadLocal<Member> currentMember = new ThreadLocal<>();
+    private static final ThreadLocal<MemberJpaEntity> currentMember = new ThreadLocal<>();
 
-    public static void set(Member member){
+    public static void set(MemberJpaEntity member){
         currentMember.set(member);
     }
 
-    public static Member get(){
+    public static MemberJpaEntity get(){
         return currentMember.get();
     }
 

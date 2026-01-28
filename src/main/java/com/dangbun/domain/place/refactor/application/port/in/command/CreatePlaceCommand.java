@@ -1,4 +1,4 @@
-package com.dangbun.domain.place.refactor.application.port.in;
+package com.dangbun.domain.place.refactor.application.port.in.command;
 
 import com.dangbun.domain.place.original.entity.PlaceCategory;
 import com.dangbun.domain.place.refactor.SelfValidating;
@@ -10,6 +10,10 @@ import java.util.Map;
 
 @Value
 public class CreatePlaceCommand extends SelfValidating<CreatePlaceCommand> {
+
+    @NotBlank
+    Long userId;
+
     @NotBlank
     String placeName;
 
@@ -24,12 +28,14 @@ public class CreatePlaceCommand extends SelfValidating<CreatePlaceCommand> {
     Map<String, String> information;
 
     public CreatePlaceCommand(
+            Long userId,
             String placeName,
             PlaceCategory category,
             String categoryName,
             String managerName,
             Map<String, String> information
     ) {
+        this.userId = userId;
         this.placeName = placeName;
         this. category = category;
         this.categoryName = categoryName;

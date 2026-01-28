@@ -64,4 +64,17 @@ public class Place extends BaseEntity {
         this.endTime = endTime;
         this.isToday = isToday;
     }
+
+    public static com.dangbun.domain.place.refactor.domain.Place toDomainEntity(Place place){
+        return new com.dangbun.domain.place.refactor.domain.Place(
+                new com.dangbun.domain.place.refactor.domain.Place.PlaceId(place.placeId),
+                place.getName(),
+                place.category,
+                place.getCategoryName(),
+                place.inviteCode,
+                place.startTime,
+                place.endTime,
+                place.isToday
+        );
+    }
 }
