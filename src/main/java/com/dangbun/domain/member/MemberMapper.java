@@ -1,6 +1,16 @@
 package com.dangbun.domain.member;
 
 import com.dangbun.domain.member.entity.MemberJpaEntity;
+/*
+ * TODO: Place 도메인 헥사고날 아키텍처 전환 완료 후 수정 필요
+ * - import 변경: com.dangbun.domain.place.original.repository.PlaceRepository
+ *   -> com.dangbun.domain.place.refactor.application.port.out.PlaceQueryPort
+ * - PlaceRepository 대신 PlaceQueryPort 사용
+ * - mapToJpaEntity에서 placeRepository.findById() 대신
+ *   PlaceQueryPort.findById()를 사용하고 PlaceJpaEntity로 변환
+ * - Member 도메인 헥사고날 아키텍처 전환 시 MemberCommandPort를 통해
+ *   Place 의존성을 완전히 분리하는 것을 권장
+ */
 import com.dangbun.domain.place.original.repository.PlaceRepository;
 import com.dangbun.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -10,8 +20,6 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 class MemberMapper {
 
-
-    // Todo 의존성 제거
     private final PlaceRepository placeRepository;
     private final UserRepository userRepository;
 

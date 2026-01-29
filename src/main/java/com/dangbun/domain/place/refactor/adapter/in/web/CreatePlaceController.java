@@ -3,6 +3,17 @@ package com.dangbun.domain.place.refactor.adapter.in.web;
 import com.dangbun.domain.member.entity.MemberJpaEntity;
 import com.dangbun.domain.member.entity.MemberRole;
 import com.dangbun.domain.member.repository.MemberRepository;
+/*
+ * TODO: Place 도메인 헥사고날 아키텍처 전환 완료 후 수정 필요
+ * - PlaceRepository 의존성 제거
+ * - Member 도메인 헥사고날 아키텍처 전환 후:
+ *   - MemberRepository 대신 MemberCommandPort 사용
+ *   - UserRepository 대신 UserQueryPort 사용
+ * - 현재 MemberJpaEntity를 직접 생성하는 로직을
+ *   CreatePlaceUseCase 또는 별도 MemberCommandUseCase로 이동
+ * - placeRepository.findById(placeId).get() 호출 제거 후
+ *   PlaceCommandPort에서 반환된 Place 도메인 객체 활용
+ */
 import com.dangbun.domain.place.original.repository.PlaceRepository;
 import com.dangbun.domain.place.refactor.WebAdapter;
 import com.dangbun.domain.place.refactor.application.port.in.command.CreatePlaceCommand;

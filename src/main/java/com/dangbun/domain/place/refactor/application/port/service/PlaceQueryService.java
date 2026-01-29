@@ -14,6 +14,14 @@ import com.dangbun.domain.membercleaning.repository.MemberCleaningRepository;
 import com.dangbun.domain.memberduty.entity.MemberDuty;
 import com.dangbun.domain.memberduty.repository.MemberDutyRepository;
 import com.dangbun.domain.notificationreceiver.repository.NotificationReceiverRepository;
+/*
+ * TODO: Place 도메인 헥사고날 아키텍처 전환 완료 후 수정 필요
+ * - PlaceRepository 제거 후 PlaceQueryPort 사용
+ * - checkInviteCode 메서드에서 placeRepository.findByInviteCode() 대신
+ *   PlaceQueryPort.findByInviteCode() 사용
+ * - MemberRepository.findByPlaceAndUser()가 Place 엔티티 대신
+ *   placeId를 받도록 변경되면 Place 엔티티 의존성 완전 제거 가능
+ */
 import com.dangbun.domain.place.original.repository.PlaceRepository;
 import com.dangbun.domain.place.refactor.adapter.in.web.dto.response.DutyProgressDto;
 import com.dangbun.domain.place.refactor.exception.custom.AlreadyInvitedException;

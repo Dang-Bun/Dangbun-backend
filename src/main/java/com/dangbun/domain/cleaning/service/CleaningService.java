@@ -21,6 +21,13 @@ import com.dangbun.domain.member.entity.MemberJpaEntity;
 import com.dangbun.domain.member.repository.MemberRepository;
 import com.dangbun.domain.membercleaning.entity.MemberCleaning;
 import com.dangbun.domain.membercleaning.repository.MemberCleaningRepository;
+/*
+ * TODO: Place 도메인 헥사고날 아키텍처 전환 완료 후 수정 필요
+ * - import 변경: com.dangbun.domain.place.original.entity.Place
+ *   -> com.dangbun.domain.place.refactor.adapter.out.persistence.PlaceJpaEntity
+ * - MemberContext.get().getPlace() 반환 타입이 PlaceJpaEntity로 변경되면 자동으로 해결
+ * - 또는 Place 관련 조회를 PlaceQueryPort를 통해 수행하도록 변경
+ */
 import com.dangbun.domain.place.original.entity.Place;
 import com.dangbun.global.context.DutyContext;
 import com.dangbun.global.context.MemberContext;

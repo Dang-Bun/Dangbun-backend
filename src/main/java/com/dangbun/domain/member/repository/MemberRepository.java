@@ -1,5 +1,14 @@
 package com.dangbun.domain.member.repository;
 
+/*
+ * TODO: Place 도메인 헥사고날 아키텍처 전환 완료 후 수정 필요
+ * - import 변경: com.dangbun.domain.place.original.entity.Place
+ *   -> com.dangbun.domain.place.refactor.adapter.out.persistence.PlaceJpaEntity
+ * - 메서드 파라미터 타입 변경:
+ *   - findByPlaceAndUser(Place place, User user) -> findByPlaceAndUser(PlaceJpaEntity place, User user)
+ *   - findFirstByPlace(Place place) -> findFirstByPlace(PlaceJpaEntity place)
+ * - 또는 placeId 기반 쿼리로 변경하여 엔티티 의존성 제거 고려
+ */
 import com.dangbun.domain.member.entity.MemberJpaEntity;
 import com.dangbun.domain.place.original.entity.Place;
 import com.dangbun.domain.user.entity.User;
