@@ -30,7 +30,7 @@ import org.springframework.web.bind.annotation.*;
 @Validated
 @RequiredArgsConstructor
 @Tag(name = "Place", description = "PlaceController - 플레이스 관련 API")
-@WebAdapter("/places")
+@WebAdapter(path = "/places")
 public class PlaceCommandController {
 
     private final PlaceCommandUseCase placeCommandUseCase;

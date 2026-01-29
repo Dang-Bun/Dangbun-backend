@@ -14,13 +14,18 @@ class PlaceMapper {
         );
     }
 
-    public Place mapToDomainEntity(PlaceJpaEntity place) {
-        return Place.withId(
-                new Place.PlaceId(place.getPlaceId()),
-                place.getName(),
-                place.getCategory(),
-                place.getCategoryName()
+    public Place mapToDomainEntity(PlaceJpaEntity entity) {
+        Place place = new Place(
+                new Place.PlaceId(entity.getPlaceId()),
+                entity.getName(),
+                entity.getCategory(),
+                entity.getCategoryName(),
+                entity.getInviteCode(),
+                entity.getStartTime(),
+                entity.getEndTime(),
+                entity.getIsToday()
         );
+        return place;
     }
 
 }

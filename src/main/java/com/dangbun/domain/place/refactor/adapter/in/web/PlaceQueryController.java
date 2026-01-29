@@ -5,8 +5,8 @@ import com.dangbun.domain.place.original.dto.request.PostCheckInviteCodeRequest;
 import com.dangbun.domain.place.original.dto.response.*;
 import com.dangbun.domain.place.original.response.status.PlaceExceptionResponse;
 import com.dangbun.domain.place.refactor.WebAdapter;
-import com.dangbun.domain.place.refactor.application.port.in.query.PlaceQuery;
-import com.dangbun.domain.place.refactor.domain.Place;
+import com.dangbun.domain.place.refactor.application.port.in.query.*;
+import com.dangbun.domain.place.refactor.domain.Information;
 import com.dangbun.domain.user.entity.CustomUserDetails;
 import com.dangbun.global.aop.CheckManagerAuthority;
 import com.dangbun.global.aop.CheckPlaceMembership;
@@ -20,7 +20,6 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
 
 
@@ -28,7 +27,7 @@ import java.util.List;
 @Validated
 @RequiredArgsConstructor
 @Tag(name = "Place", description = "PlaceController - 플레이스 관련 API")
-@WebAdapter("/places")
+@WebAdapter(path = "/places")
 public class PlaceQueryController {
 
     private final PlaceQuery placeQuery;
@@ -40,21 +39,22 @@ public class PlaceQueryController {
     )
     @GetMapping()
     public ResponseEntity<BaseResponse<GetPlaceListResponse>> getPlaces(@AuthenticationPrincipal CustomUserDetails userDetails) {
+        PlaceListResult result = placeQuery.getPlaceList(userDetails.getUser().getUserId());
 
-        List<Place> placeList = placeQuery.getPlaceList(userDetails.getUser().getUserId());
-        for (Place place : placeList) {
-            ArrayList<GetPlaceListResponse.PlaceDto> placeDto = GetPlaceListResponse.PlaceDto.of(
-                    place.getPlaceId(),
-                    place.getName(),
-                    place.getCategory(),
-                    place.getCategoryName(),
-                    place,
-                    place.e
-            )
-        }
+        List<GetPlaceListResponse.PlaceDto> placeDtos = result.places().stream()
+                .map(p -> GetPlaceListResponse.PlaceDto.of(
+                        p.placeId(),
+                        p.name(),
+                        p.category(),
+                        p.categoryName(),
+                        p.totalCleaning(),
+                        p.endCleaning(),
+                        p.role(),
+                        p.notifyNumber()
+                ))
+                .toList();
 
-        return ResponseEntity.ok(BaseResponse.ok(placeService.getPlaces(userDetails.getUser().getUserId())));
-
+        return ResponseEntity.ok(BaseResponse.ok(GetPlaceListResponse.of(placeDtos)));
     }
 
 
@@ -66,8 +66,12 @@ public class PlaceQueryController {
     @PostMapping("/invite-code")
     public ResponseEntity<BaseResponse<PostCheckInviteCodeResponse>> checkInviteCode(@AuthenticationPrincipal CustomUserDetails userDetails,
                                                                                      @RequestBody PostCheckInviteCodeRequest request) {
+        Information information = placeQuery.checkInviteCode(userDetails.getUser().getUserId(), request.inviteCode());
 
-        PostCheckInviteCodeResponse response = placeService.checkInviteCode(userDetails.getUser(), request);
+        PostCheckInviteCodeResponse response = PostCheckInviteCodeResponse.of(
+                information.getPlaceId(),
+                information.getInformation()
+        );
         return ResponseEntity.ok(BaseResponse.ok(response));
     }
 
@@ -80,7 +84,44 @@ public class PlaceQueryController {
     @CheckPlaceMembership()
     @GetMapping("/{placeId}")
     public ResponseEntity<BaseResponse<GetPlaceResponse>> getPlace(@PathVariable Long placeId) {
-        return ResponseEntity.ok(BaseResponse.ok(placeService.getPlace()));
+        PlaceResult result = placeQuery.getPlace();
+
+        List<GetPlaceResponse.DutyDto> dutyDtos = null;
+        if (result.duty() != null) {
+            PlaceResult.DutyDto duty = result.duty();
+
+            List<GetPlaceResponse.CheckListDto> checkListDtos = duty.checkLists().stream()
+                    .map(cl -> new GetPlaceResponse.CheckListDto(
+                            cl.checkListId(),
+                            cl.members().stream()
+                                    .map(m -> new GetPlaceResponse.MemberDto(m.memberId(), m.memberName()))
+                                    .toList(),
+                            cl.cleaningName(),
+                            cl.completeTime(),
+                            cl.needPhoto()
+                    ))
+                    .toList();
+
+            dutyDtos = List.of(new GetPlaceResponse.DutyDto(
+                    duty.dutyId(),
+                    duty.dutyName(),
+                    duty.totalCleaning(),
+                    duty.endCleaning(),
+                    checkListDtos
+            ));
+        }
+
+        GetPlaceResponse response = new GetPlaceResponse(
+                result.memberId(),
+                result.placeId(),
+                result.placeName(),
+                result.placeCategory(),
+                result.categoryName(),
+                result.endTime(),
+                dutyDtos
+        );
+
+        return ResponseEntity.ok(BaseResponse.ok(response));
     }
 
 
@@ -93,7 +134,14 @@ public class PlaceQueryController {
     @CheckPlaceMembership()
     @CheckManagerAuthority
     public ResponseEntity<BaseResponse<GetTimeResponse>> getTime(@PathVariable Long placeId) {
-        return ResponseEntity.ok(BaseResponse.ok(placeService.getTimeAndIsToday()));
+        PlaceTimeResult result = placeQuery.getTimeAndIsToday();
+
+        GetTimeResponse response = GetTimeResponse.of(
+                result.startTime(),
+                result.endTime(),
+                result.isToday()
+        );
+        return ResponseEntity.ok(BaseResponse.ok(response));
     }
 
 
@@ -106,7 +154,18 @@ public class PlaceQueryController {
     @CheckManagerAuthority
     @GetMapping("/{placeId}/duties/progress")
     public ResponseEntity<BaseResponse<GetDutiesProgressResponse>> getDutiesProgress(@PathVariable Long placeId) {
-        return ResponseEntity.ok(BaseResponse.ok(placeService.getDutiesProgress()));
+        DutyProgressResult result = placeQuery.getDutiesProgress();
+
+        List<DutyProgressDto> dutyProgressDtos = result.dutyProgressDtos().stream()
+                .map(dto -> DutyProgressDto.of(
+                        dto.dutyId(),
+                        dto.dutyName(),
+                        dto.totalCleaning(),
+                        dto.endCleaning()
+                ))
+                .toList();
+
+        return ResponseEntity.ok(BaseResponse.ok(GetDutiesProgressResponse.of(dutyProgressDtos)));
     }
 
 
@@ -119,6 +178,8 @@ public class PlaceQueryController {
     @CheckPlaceMembership()
     @CheckManagerAuthority
     public ResponseEntity<BaseResponse<GetPlaceInvitedCodeResponse>> getInviteCode(@PathVariable Long placeId) {
-        return ResponseEntity.ok(BaseResponse.ok(placeService.getInviteCode()));
+        String inviteCode = placeQuery.getInviteCode();
+
+        return ResponseEntity.ok(BaseResponse.ok(GetPlaceInvitedCodeResponse.of(inviteCode)));
     }
 }
