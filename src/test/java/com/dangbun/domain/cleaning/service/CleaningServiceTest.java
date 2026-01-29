@@ -40,7 +40,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static com.dangbun.domain.cleaning.entity.CleaningRepeatType.*;
-import static com.dangbun.domain.place.original.entity.PlaceCategory.*;
+import static com.dangbun.domain.place.refactor.domain.PlaceCategory.*;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.*;

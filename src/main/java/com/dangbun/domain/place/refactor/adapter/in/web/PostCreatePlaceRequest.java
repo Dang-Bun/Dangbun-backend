@@ -1,6 +1,6 @@
 package com.dangbun.domain.place.refactor.adapter.in.web;
 
-import com.dangbun.domain.place.original.entity.PlaceCategory;
+import com.dangbun.domain.place.refactor.domain.PlaceCategory;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.NotBlank;

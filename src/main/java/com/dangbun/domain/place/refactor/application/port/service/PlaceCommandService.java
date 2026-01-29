@@ -5,11 +5,11 @@ import com.dangbun.domain.member.GetMemberByInviteCodePort;
 import com.dangbun.domain.member.Member;
 import com.dangbun.domain.member.entity.MemberJpaEntity;
 import com.dangbun.domain.member.entity.MemberRole;
-import com.dangbun.domain.place.original.dto.response.PatchUpdateTimeResponse;
-import com.dangbun.domain.place.original.entity.PlaceCategory;
-import com.dangbun.domain.place.original.exception.custom.InvalidInformationException;
-import com.dangbun.domain.place.original.exception.custom.InvalidPlaceNameException;
-import com.dangbun.domain.place.original.exception.custom.InvalidTimeException;
+import com.dangbun.domain.place.refactor.adapter.in.web.dto.response.PatchUpdateTimeResponse;
+import com.dangbun.domain.place.refactor.domain.PlaceCategory;
+import com.dangbun.domain.place.refactor.exception.custom.InvalidInformationException;
+import com.dangbun.domain.place.refactor.exception.custom.InvalidPlaceNameException;
+import com.dangbun.domain.place.refactor.exception.custom.InvalidTimeException;
 import com.dangbun.domain.place.refactor.application.port.in.command.*;
 import com.dangbun.domain.place.refactor.application.port.out.PlaceCommandPort;
 import com.dangbun.domain.place.refactor.application.port.out.UpdatePlaceTimeCommand;
@@ -22,7 +22,7 @@ import org.springframework.stereotype.Service;
 import java.security.SecureRandom;
 import java.util.Map;
 
-import static com.dangbun.domain.place.original.response.status.PlaceExceptionResponse.*;
+import static com.dangbun.domain.place.refactor.exception.status.PlaceExceptionResponse.*;
 import static org.reflections.Reflections.log;
 
 @RequiredArgsConstructor

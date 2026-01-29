@@ -1,6 +1,6 @@
 package com.dangbun.domain.place.refactor.domain;
 
-import com.dangbun.domain.place.original.entity.PlaceCategory;
+import com.dangbun.domain.place.refactor.domain.PlaceCategory;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;

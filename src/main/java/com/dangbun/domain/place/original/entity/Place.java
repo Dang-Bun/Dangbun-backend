@@ -1,6 +1,7 @@
 package com.dangbun.domain.place.original.entity;
 
 
+import com.dangbun.domain.place.refactor.domain.PlaceCategory;
 import com.dangbun.global.entity.BaseEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotEmpty;

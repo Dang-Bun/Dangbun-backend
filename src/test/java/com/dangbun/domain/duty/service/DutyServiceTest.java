@@ -30,7 +30,7 @@ import java.util.Optional;
 
 import static com.dangbun.domain.duty.entity.DutyAssignType.*;
 import static com.dangbun.domain.duty.entity.DutyIcon.*;
-import static com.dangbun.domain.place.original.entity.PlaceCategory.CAFE;
+import static com.dangbun.domain.place.refactor.domain.PlaceCategory.CAFE;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;

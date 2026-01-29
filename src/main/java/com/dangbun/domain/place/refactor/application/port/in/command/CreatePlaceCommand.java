@@ -1,6 +1,6 @@
 package com.dangbun.domain.place.refactor.application.port.in.command;
 
-import com.dangbun.domain.place.original.entity.PlaceCategory;
+import com.dangbun.domain.place.refactor.domain.PlaceCategory;
 import com.dangbun.domain.place.refactor.SelfValidating;
 import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.NotBlank;

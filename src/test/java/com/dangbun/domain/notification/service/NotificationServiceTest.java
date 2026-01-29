@@ -27,7 +27,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import static com.dangbun.domain.notification.entity.NotificationTemplate.*;
-import static com.dangbun.domain.place.original.entity.PlaceCategory.*;
+import static com.dangbun.domain.place.refactor.domain.PlaceCategory.*;
 import static org.assertj.core.api.Assertions.*;
 
 import java.time.LocalDateTime;

@@ -1,9 +1,9 @@
 package com.dangbun.domain.place.refactor.adapter.in.web;
 
 import com.dangbun.domain.member.response.status.MemberExceptionResponse;
-import com.dangbun.domain.place.original.dto.request.PostCheckInviteCodeRequest;
-import com.dangbun.domain.place.original.dto.response.*;
-import com.dangbun.domain.place.original.response.status.PlaceExceptionResponse;
+import com.dangbun.domain.place.refactor.adapter.in.web.dto.request.PostCheckInviteCodeRequest;
+import com.dangbun.domain.place.refactor.adapter.in.web.dto.response.*;
+import com.dangbun.domain.place.refactor.exception.status.PlaceExceptionResponse;
 import com.dangbun.domain.place.refactor.WebAdapter;
 import com.dangbun.domain.place.refactor.application.port.in.query.*;
 import com.dangbun.domain.place.refactor.domain.Information;

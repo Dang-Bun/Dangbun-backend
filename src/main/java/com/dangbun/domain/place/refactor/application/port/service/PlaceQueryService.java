@@ -14,11 +14,11 @@ import com.dangbun.domain.membercleaning.repository.MemberCleaningRepository;
 import com.dangbun.domain.memberduty.entity.MemberDuty;
 import com.dangbun.domain.memberduty.repository.MemberDutyRepository;
 import com.dangbun.domain.notificationreceiver.repository.NotificationReceiverRepository;
-import com.dangbun.domain.place.original.dto.response.DutyProgressDto;
-import com.dangbun.domain.place.original.exception.custom.AlreadyInvitedException;
-import com.dangbun.domain.place.original.exception.custom.InvalidInviteCodeException;
-import com.dangbun.domain.place.original.exception.custom.InviteCodeNotExistsException;
 import com.dangbun.domain.place.original.repository.PlaceRepository;
+import com.dangbun.domain.place.refactor.adapter.in.web.dto.response.DutyProgressDto;
+import com.dangbun.domain.place.refactor.exception.custom.AlreadyInvitedException;
+import com.dangbun.domain.place.refactor.exception.custom.InvalidInviteCodeException;
+import com.dangbun.domain.place.refactor.exception.custom.InviteCodeNotExistsException;
 import com.dangbun.domain.place.refactor.application.port.in.query.DutyProgressResult;
 import com.dangbun.domain.place.refactor.application.port.in.query.PlaceListResult;
 import com.dangbun.domain.place.refactor.application.port.in.query.PlaceQuery;
@@ -39,7 +39,7 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static com.dangbun.domain.place.original.response.status.PlaceExceptionResponse.*;
+import static com.dangbun.domain.place.refactor.exception.status.PlaceExceptionResponse.*;
 
 @Service
 @RequiredArgsConstructor
