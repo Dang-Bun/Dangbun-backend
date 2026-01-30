@@ -7,14 +7,21 @@ import com.dangbun.domain.duty.dto.response.*;
 import com.dangbun.domain.duty.entity.Duty;
 import com.dangbun.domain.duty.exception.custom.*;
 import com.dangbun.domain.duty.repository.DutyRepository;
-import com.dangbun.domain.member.entity.Member;
+import com.dangbun.domain.member.entity.MemberJpaEntity;
 import com.dangbun.domain.member.entity.MemberRole;
 import com.dangbun.domain.member.repository.MemberRepository;
 import com.dangbun.domain.membercleaning.entity.MemberCleaning;
 import com.dangbun.domain.membercleaning.repository.MemberCleaningRepository;
 import com.dangbun.domain.memberduty.entity.MemberDuty;
 import com.dangbun.domain.memberduty.repository.MemberDutyRepository;
-import com.dangbun.domain.place.entity.Place;
+/*
+ * TODO: Place 도메인 헥사고날 아키텍처 전환 완료 후 수정 필요
+ * - import 변경: com.dangbun.domain.place.original.entity.Place
+ *   -> com.dangbun.domain.place.refactor.adapter.out.persistence.PlaceJpaEntity
+ * - MemberContext.get().getPlace() 반환 타입이 PlaceJpaEntity로 변경되면 자동으로 해결
+ * - 또는 Place 관련 조회를 PlaceQueryPort를 통해 수행하도록 변경
+ */
+import com.dangbun.domain.place.original.entity.Place;
 import com.dangbun.global.context.DutyContext;
 import com.dangbun.global.context.MemberContext;
 
@@ -92,8 +99,8 @@ public class DutyService {
                 .map(MemberDuty::getMember)
                 .sorted(
                         Comparator
-                                .comparing((Member m) -> m.getRole() != MemberRole.MANAGER) // 매니저 먼저
-                                .thenComparing(Member::getName, Comparator.nullsLast(String::compareTo)) // 이름 가나다순
+                                .comparing((MemberJpaEntity m) -> m.getRole() != MemberRole.MANAGER) // 매니저 먼저
+                                .thenComparing(MemberJpaEntity::getName, Comparator.nullsLast(String::compareTo)) // 이름 가나다순
                 )
                 .map(GetDutyMemberNameListResponse::of)
                 .toList();
@@ -117,7 +124,7 @@ public class DutyService {
 
         List<Long> requestedIds = request.memberIds();
 
-        List<Member> members = memberRepository.findAllById(requestedIds);
+        List<MemberJpaEntity> members = memberRepository.findAllById(requestedIds);
         if (members.size() != requestedIds.size()) {
             throw new MemberNotFoundException(MEMBER_NOT_FOUND);
         }
@@ -125,7 +132,7 @@ public class DutyService {
         memberDutyRepository.deleteAllByDuty(duty);
 
         List<Long> addedMemberIds = new ArrayList<>();
-        for (Member member : members) {
+        for (MemberJpaEntity member : members) {
             MemberDuty md = MemberDuty.builder()
                     .duty(duty)
                     .member(member)
@@ -142,7 +149,7 @@ public class DutyService {
         Duty duty = DutyContext.get();
 
         List<Cleaning> cleanings = cleaningRepository.findAllByDuty(duty);
-        List<Member> allMembers = memberDutyRepository.findMembersByDuty(duty);
+        List<MemberJpaEntity> allMembers = memberDutyRepository.findMembersByDuty(duty);
 
         switch (request.assignType()) {
 
@@ -154,7 +161,7 @@ public class DutyService {
                 if(request.memberIds() == null){
                     return;
                 }
-                List<Member> selectedMembers = memberRepository.findAllById(request.memberIds());
+                List<MemberJpaEntity> selectedMembers = memberRepository.findAllById(request.memberIds());
 
                 List<MemberCleaning> mappings = selectedMembers.stream()
                         .map(m -> MemberCleaning.builder().member(m).cleaning(cleaning).build())
@@ -180,9 +187,9 @@ public class DutyService {
                 for (Cleaning cleaning : cleanings) {
                     memberCleaningRepository.deleteAllByCleaning_CleaningId(cleaning.getCleaningId());
 
-                    List<Member> shuffled = new ArrayList<>(allMembers);
+                    List<MemberJpaEntity> shuffled = new ArrayList<>(allMembers);
                     Collections.shuffle(shuffled, random);
-                    List<Member> assigned = shuffled.stream()
+                    List<MemberJpaEntity> assigned = shuffled.stream()
                             .limit(request.assignCount())
                             .toList();
 
@@ -204,13 +211,13 @@ public class DutyService {
         return cleanings.stream()
                 .map(cleaning -> {
                     List<MemberCleaning> mappings = memberCleaningRepository.findAllByCleaning(cleaning);
-                    List<Member> members = mappings.stream()
+                    List<MemberJpaEntity> members = mappings.stream()
                             .map(MemberCleaning::getMember)
                             .distinct()
                             .toList();
 
                     List<String> displayednames = members.stream()
-                            .map(Member::getName)
+                            .map(MemberJpaEntity::getName)
                             .limit(2)
                             .toList();
 

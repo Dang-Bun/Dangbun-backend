@@ -1,18 +1,16 @@
 package com.dangbun.domain.member.dto.response;
 
-import com.dangbun.domain.member.entity.Member;
+import com.dangbun.domain.member.entity.MemberJpaEntity;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.List;
 import java.util.Map;
 
 public record GetWaitingMembersResponse (
     @Schema(description = "맴버 목록") List<MemberDto> members
 ){
-    public static GetWaitingMembersResponse of(List<Member> members){
+    public static GetWaitingMembersResponse of(List<MemberJpaEntity> members){
         List<MemberDto> memberDtos = members.stream()
                 .map( m ->new MemberDto(
                         m.getMemberId(),

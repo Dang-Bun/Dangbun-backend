@@ -1,6 +1,6 @@
 package com.dangbun.domain.duty.dto.response;
 
-import com.dangbun.domain.member.entity.Member;
+import com.dangbun.domain.member.entity.MemberJpaEntity;
 import com.dangbun.domain.member.entity.MemberRole;
 import io.swagger.v3.oas.annotations.media.Schema;
 
@@ -12,7 +12,7 @@ public record GetDutyMemberNameListResponse(
         @Schema(description = "멤버 이름", example = "박완")
         String name
 ) {
-        public static GetDutyMemberNameListResponse of(Member member) {
+        public static GetDutyMemberNameListResponse of(MemberJpaEntity member) {
             return new GetDutyMemberNameListResponse(member.getMemberId(), member.getRole(), member.getName());
         }
 }

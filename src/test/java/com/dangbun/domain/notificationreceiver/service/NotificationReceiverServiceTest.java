@@ -1,6 +1,6 @@
 package com.dangbun.domain.notificationreceiver.service;
 
-import com.dangbun.domain.member.entity.Member;
+import com.dangbun.domain.member.entity.MemberJpaEntity;
 import com.dangbun.domain.notification.entity.Notification;
 import com.dangbun.domain.notificationreceiver.dto.response.GetNotificationReceivedListResponse;
 import com.dangbun.domain.notificationreceiver.entity.NotificationReceiver;
@@ -37,12 +37,12 @@ class NotificationReceiverServiceTest {
     @Mock
     private NotificationReceiverRepository notificationReceiverRepository;
 
-    private Member mockMember;
+    private MemberJpaEntity mockMember;
     private final Long MOCK_MEMBER_ID = 100L;
 
     @BeforeEach
     void setUp() {
-        mockMember = Member.builder()
+        mockMember = MemberJpaEntity.builder()
                 .name("테스트멤버")
                 .build();
         ReflectionTestUtils.setField(mockMember, "memberId", MOCK_MEMBER_ID);

@@ -1,7 +1,7 @@
 package com.dangbun.domain.member.dto.response;
 
 
-import com.dangbun.domain.member.entity.Member;
+import com.dangbun.domain.member.entity.MemberJpaEntity;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.util.List;
@@ -11,7 +11,7 @@ public record GetMembersResponse(
         @Schema(description = "대기 맴버 숫자", example = "4") Integer waitingMemberNumber,
         @Schema(description = "맴버 리스트") List<MemberDto> members
 ) {
-    public static GetMembersResponse of(Integer waitingMemberNumber, Map<Member, List<String>> memberMap) {
+    public static GetMembersResponse of(Integer waitingMemberNumber, Map<MemberJpaEntity, List<String>> memberMap) {
         List<MemberDto> memberDtos = memberMap.entrySet().stream()
                 .map(entry -> new MemberDto(
                         entry.getKey().getMemberId(),

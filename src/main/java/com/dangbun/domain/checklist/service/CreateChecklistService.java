@@ -5,7 +5,17 @@ import com.dangbun.domain.checklist.repository.ChecklistRepository;
 import com.dangbun.domain.cleaning.entity.Cleaning;
 import com.dangbun.domain.cleaning.entity.CleaningRepeatType;
 import com.dangbun.domain.cleaningdate.entity.CleaningDate;
-import com.dangbun.domain.place.entity.Place;
+/*
+ * TODO: Place 도메인 헥사고날 아키텍처 전환 완료 후 수정 필요
+ * - import 변경: com.dangbun.domain.place.original.entity.Place
+ *   -> com.dangbun.domain.place.refactor.adapter.out.persistence.PlaceJpaEntity
+ * - createChecklistByDateAndTime 메서드 파라미터 타입 변경:
+ *   Place place -> PlaceJpaEntity place
+ * - checkDateState 메서드 파라미터 타입 변경:
+ *   Place place -> PlaceJpaEntity place
+ * - 또는 Place 관련 정보(startTime, endTime, isToday)를 별도 DTO로 전달받도록 변경
+ */
+import com.dangbun.domain.place.original.entity.Place;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

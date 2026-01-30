@@ -1,6 +1,6 @@
 package com.dangbun.global.aop;
 
-import com.dangbun.domain.member.entity.Member;
+import com.dangbun.domain.member.entity.MemberJpaEntity;
 import com.dangbun.domain.member.entity.MemberRole;
 import com.dangbun.domain.member.exception.custom.*;
 import com.dangbun.global.context.MemberContext;
@@ -19,7 +19,7 @@ public class CheckManagerAuthorityAspect {
 
     @Before("@within(com.dangbun.global.aop.CheckManagerAuthority) || @annotation(com.dangbun.global.aop.CheckManagerAuthority)")
     public void checkManagerAuthority() {
-        Member me = MemberContext.get();
+        MemberJpaEntity me = MemberContext.get();
         if (me == null) {
             throw new MembershipUnauthorizedException(MEMBERSHIP_UNAUTHORIZED);
         }

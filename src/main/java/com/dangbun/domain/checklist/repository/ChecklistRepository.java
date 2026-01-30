@@ -29,7 +29,7 @@ public interface ChecklistRepository extends JpaRepository<Checklist, Long> {
     @Query("SELECT c FROM Checklist c " +
             "JOIN c.cleaning cl " +
             "JOIN MemberCleaning mc ON cl.cleaningId = mc.cleaning.cleaningId " +
-            "JOIN Member m ON mc.member.memberId = m.memberId " +
+            "JOIN MemberJpaEntity m ON mc.member.memberId = m.memberId " +
             "WHERE c.checklistId = :checklistId AND m.memberId = :memberId")
     Optional<Checklist> findByChecklistAndMemberId(@Param("checklistId") Long checklistId, @Param("memberId") Long memberId);
 

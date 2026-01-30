@@ -9,7 +9,7 @@ import com.dangbun.domain.checklist.entity.Checklist;
 import com.dangbun.domain.cleaning.entity.Cleaning;
 import com.dangbun.domain.cleaningImage.service.CleaningImageService;
 import com.dangbun.global.context.MemberContext;
-import com.dangbun.domain.member.entity.Member;
+import com.dangbun.domain.member.entity.MemberJpaEntity;
 import com.dangbun.domain.membercleaning.repository.MemberCleaningRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -33,7 +33,7 @@ public class ChecklistService {
     private final ChecklistGenerateService checklistGenerateService;
 
     public PostCompleteChecklistResponse completeChecklist() {
-        Member member = MemberContext.get();
+        MemberJpaEntity member = MemberContext.get();
         Checklist checklist = ChecklistContext.get();
         if(isRequiredImage(checklist)){
             checkIsImageRegistered(checklist);
@@ -47,8 +47,8 @@ public class ChecklistService {
         Checklist checklist = ChecklistContext.get();
 
         Cleaning cleaning = checklist.getCleaning();
-        List<Member> members = memberCleaningRepository.findMembersByCleaningId(cleaning.getCleaningId());
-        List<String> membersName = members.stream().map(Member::getName).toList();
+        List<MemberJpaEntity> members = memberCleaningRepository.findMembersByCleaningId(cleaning.getCleaningId());
+        List<String> membersName = members.stream().map(MemberJpaEntity::getName).toList();
         LocalTime endTime = cleaning.getPlace().getEndTime();
 
         checklist.incompleteChecklist();

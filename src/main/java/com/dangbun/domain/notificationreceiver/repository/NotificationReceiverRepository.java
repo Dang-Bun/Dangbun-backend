@@ -1,6 +1,6 @@
 package com.dangbun.domain.notificationreceiver.repository;
 
-import com.dangbun.domain.member.entity.Member;
+import com.dangbun.domain.member.entity.MemberJpaEntity;
 import com.dangbun.domain.notification.entity.Notification;
 import com.dangbun.domain.notificationreceiver.entity.NotificationReceiver;
 import com.dangbun.domain.notificationreceiver.entity.NotificationReceiverId;
@@ -18,7 +18,7 @@ public interface NotificationReceiverRepository extends JpaRepository<Notificati
 
     List<NotificationReceiver> findAllByNotification(Notification notification);
 
-    boolean existsByNotificationAndReceiver(Notification notification, Member receiver);
+    boolean existsByNotificationAndReceiver(Notification notification, MemberJpaEntity receiver);
 
     @Query("""
                 select count(nr) from NotificationReceiver nr

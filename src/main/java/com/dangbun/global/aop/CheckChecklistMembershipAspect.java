@@ -9,7 +9,7 @@ import com.dangbun.domain.checklist.entity.Checklist;
 import com.dangbun.domain.checklist.exception.custom.ChecklistAccessDeniedException;
 import com.dangbun.domain.checklist.repository.ChecklistRepository;
 import com.dangbun.global.context.MemberContext;
-import com.dangbun.domain.member.entity.Member;
+import com.dangbun.domain.member.entity.MemberJpaEntity;
 import com.dangbun.global.exception.RequiredParamMissingException;
 import lombok.RequiredArgsConstructor;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -46,7 +46,7 @@ public class CheckChecklistMembershipAspect {
             throw new RequiredParamMissingException(REQUIRED_PARAM_MISSING);
         }
 
-        Member me = MemberContext.get();
+        MemberJpaEntity me = MemberContext.get();
 
         Checklist checklist;
         if (me.getRole() == MemberRole.MANAGER) {

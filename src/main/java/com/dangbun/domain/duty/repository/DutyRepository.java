@@ -1,7 +1,7 @@
 package com.dangbun.domain.duty.repository;
 
 import com.dangbun.domain.duty.entity.Duty;
-import com.dangbun.domain.place.dto.response.DutyProgressDto;
+import com.dangbun.domain.place.refactor.adapter.in.web.dto.response.DutyProgressDto;
 import io.lettuce.core.dynamic.annotation.Param;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -20,7 +20,7 @@ public interface DutyRepository extends JpaRepository<Duty, Long> {
     List<Duty> findWithPlaceByPlaceId(Long placeId);
 
     @Query("""
-    SELECT new com.dangbun.domain.place.dto.response.DutyProgressDto(
+    SELECT new com.dangbun.domain.place.refactor.adapter.in.web.dto.response.DutyProgressDto(
         d.dutyId,
         d.name,
         COUNT(cl),

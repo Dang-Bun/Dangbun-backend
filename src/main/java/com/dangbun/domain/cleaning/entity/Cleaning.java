@@ -1,7 +1,15 @@
 package com.dangbun.domain.cleaning.entity;
 
 import com.dangbun.domain.duty.entity.Duty;
-import com.dangbun.domain.place.entity.Place;
+/*
+ * TODO: Place 도메인 헥사고날 아키텍처 전환 완료 후 수정 필요
+ * - import 변경: com.dangbun.domain.place.original.entity.Place
+ *   -> com.dangbun.domain.place.refactor.adapter.out.persistence.PlaceJpaEntity
+ * - place 필드 타입 변경: Place -> PlaceJpaEntity
+ * - @ManyToOne 관계 유지, JoinColumn 동일
+ * - Builder 파라미터 타입도 함께 변경
+ */
+import com.dangbun.domain.place.original.entity.Place;
 import com.dangbun.global.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;

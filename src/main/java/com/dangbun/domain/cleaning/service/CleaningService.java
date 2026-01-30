@@ -17,11 +17,18 @@ import com.dangbun.domain.cleaningdate.entity.CleaningDate;
 import com.dangbun.domain.cleaningdate.repository.CleaningDateRepository;
 import com.dangbun.domain.duty.entity.Duty;
 import com.dangbun.domain.duty.repository.DutyRepository;
-import com.dangbun.domain.member.entity.Member;
+import com.dangbun.domain.member.entity.MemberJpaEntity;
 import com.dangbun.domain.member.repository.MemberRepository;
 import com.dangbun.domain.membercleaning.entity.MemberCleaning;
 import com.dangbun.domain.membercleaning.repository.MemberCleaningRepository;
-import com.dangbun.domain.place.entity.Place;
+/*
+ * TODO: Place 도메인 헥사고날 아키텍처 전환 완료 후 수정 필요
+ * - import 변경: com.dangbun.domain.place.original.entity.Place
+ *   -> com.dangbun.domain.place.refactor.adapter.out.persistence.PlaceJpaEntity
+ * - MemberContext.get().getPlace() 반환 타입이 PlaceJpaEntity로 변경되면 자동으로 해결
+ * - 또는 Place 관련 조회를 PlaceQueryPort를 통해 수행하도록 변경
+ */
+import com.dangbun.domain.place.original.entity.Place;
 import com.dangbun.global.context.DutyContext;
 import com.dangbun.global.context.MemberContext;
 import com.dangbun.global.s3.S3Service;
@@ -75,7 +82,7 @@ public class CleaningService {
         return cleanings.stream()
                 .map(cleaning -> {
                     List<String> names = memberCleaningRepository.findMembersByCleaningId(cleaning.getCleaningId())
-                            .stream().map(Member::getName).toList();
+                            .stream().map(MemberJpaEntity::getName).toList();
 
                     List<String> displayed = names.stream().limit(2).toList();
                     return GetCleaningDetailListResponse.of(cleaning.getName(), displayed, names.size());
@@ -113,7 +120,7 @@ public class CleaningService {
         Cleaning savedCleaning = cleaningRepository.save(cleaning);
 
         if (request.members() != null && !request.members().isEmpty()) {
-            List<Member> members = memberRepository.findAllByNameIn((request.members()));
+            List<MemberJpaEntity> members = memberRepository.findAllByNameIn((request.members()));
             List<MemberCleaning> memberCleanings = members.stream()
                     .map(m -> MemberCleaning.builder().member(m).cleaning(savedCleaning).build())
                     .toList();
@@ -175,7 +182,7 @@ public class CleaningService {
 
         memberCleaningRepository.deleteAllByCleaning_CleaningId(cleaningId);
 
-        List<Member> newMembers = memberRepository.findAllByNameIn(request.members());
+        List<MemberJpaEntity> newMembers = memberRepository.findAllByNameIn(request.members());
         List<MemberCleaning> newMemberCleanings = newMembers.stream()
                 .map(m -> MemberCleaning.builder().member(m).cleaning(cleaning).build())
                 .toList();

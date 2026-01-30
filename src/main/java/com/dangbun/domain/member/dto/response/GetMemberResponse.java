@@ -1,7 +1,7 @@
 package com.dangbun.domain.member.dto.response;
 
 import com.dangbun.domain.duty.entity.Duty;
-import com.dangbun.domain.member.entity.Member;
+import com.dangbun.domain.member.entity.MemberJpaEntity;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.util.List;
@@ -13,7 +13,7 @@ public record GetMemberResponse(
         @Schema(description = "당번 정보(당번 Id, 당번 이름)") List<DutyDto> duties
 ) {
 
-    public static GetMemberResponse of(Member member, List<Duty> duties) {
+    public static GetMemberResponse of(MemberJpaEntity member, List<Duty> duties) {
         List<DutyDto> dutyDtos = duties.stream()
                 .map(d -> new DutyDto(
                         d.getDutyId(),

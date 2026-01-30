@@ -1,6 +1,6 @@
 package com.dangbun.domain.notification.entity;
 
-import com.dangbun.domain.member.entity.Member;
+import com.dangbun.domain.member.entity.MemberJpaEntity;
 import com.dangbun.global.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -32,10 +32,10 @@ public class Notification extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "sender_id", nullable = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
-    private Member sender;
+    private MemberJpaEntity sender;
 
     @Builder
-    public Notification(Long notificationId, NotificationTemplate template, String title, String content, Member sender) {
+    public Notification(Long notificationId, NotificationTemplate template, String title, String content, MemberJpaEntity sender) {
         this.notificationId = notificationId;
         this.template = template;
         this.title = title;

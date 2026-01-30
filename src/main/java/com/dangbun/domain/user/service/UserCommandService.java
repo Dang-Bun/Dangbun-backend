@@ -1,6 +1,6 @@
 package com.dangbun.domain.user.service;
 
-import com.dangbun.domain.member.entity.Member;
+import com.dangbun.domain.member.entity.MemberJpaEntity;
 import com.dangbun.domain.member.repository.MemberRepository;
 import com.dangbun.domain.user.client.KakaoApiClient;
 import com.dangbun.domain.user.dto.request.DeleteUserAccountRequest;
@@ -127,7 +127,7 @@ public class UserCommandService {
          */
 //        userRepository.delete(user);
 
-        List<Member> members = memberRepository.findALLByUser(user);
+        List<MemberJpaEntity> members = memberRepository.findALLByUser(user);
         memberRepository.deleteAll(members);
 
         return;

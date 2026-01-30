@@ -1,6 +1,6 @@
 package com.dangbun.domain.user.service;
 
-import com.dangbun.domain.member.entity.Member;
+import com.dangbun.domain.member.entity.MemberJpaEntity;
 import com.dangbun.domain.member.repository.MemberRepository;
 import com.dangbun.domain.user.dto.request.DeleteUserAccountRequest;
 import com.dangbun.domain.user.dto.request.PostUserPasswordUpdateRequest;
@@ -253,8 +253,8 @@ class UserCommandServiceTest {
         // given
         DeleteUserAccountRequest request = new DeleteUserAccountRequest("test@test.com");
 
-        Member member1 = Member.builder().user(mockUser).build();
-        Member member2 = Member.builder().user(mockUser).build();
+        MemberJpaEntity member1 = MemberJpaEntity.builder().user(mockUser).build();
+        MemberJpaEntity member2 = MemberJpaEntity.builder().user(mockUser).build();
 
         given(memberRepository.findALLByUser(mockUser)).willReturn(List.of(member1, member2));
 

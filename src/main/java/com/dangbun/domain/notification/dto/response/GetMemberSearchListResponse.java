@@ -1,6 +1,6 @@
 package com.dangbun.domain.notification.dto.response;
 
-import com.dangbun.domain.member.entity.Member;
+import com.dangbun.domain.member.entity.MemberJpaEntity;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.util.List;
@@ -19,7 +19,7 @@ public record GetMemberSearchListResponse(
             @Schema(description = "멤버 이름", example = "멤버1")
             String memberName
     ) {
-        public static MemberDto of(Member member) {
+        public static MemberDto of(MemberJpaEntity member) {
             return new MemberDto(member.getMemberId(), member.getName());
         }
     }
