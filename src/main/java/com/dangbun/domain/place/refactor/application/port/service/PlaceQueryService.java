@@ -6,23 +6,15 @@ import com.dangbun.domain.cleaning.entity.Cleaning;
 import com.dangbun.domain.cleaning.repository.CleaningRepository;
 import com.dangbun.domain.duty.entity.Duty;
 import com.dangbun.domain.duty.repository.DutyRepository;
-import com.dangbun.domain.member.entity.MemberJpaEntity;
-import com.dangbun.domain.member.entity.MemberRole;
-import com.dangbun.domain.member.repository.MemberRepository;
+import com.dangbun.domain.member.original.entity.MemberJpaEntity;
+import com.dangbun.domain.member.original.entity.MemberRole;
+import com.dangbun.domain.member.original.repository.MemberRepository;
 import com.dangbun.domain.membercleaning.entity.MemberCleaning;
 import com.dangbun.domain.membercleaning.repository.MemberCleaningRepository;
-import com.dangbun.domain.memberduty.entity.MemberDuty;
+import com.dangbun.domain.memberduty.entity.MemberDutyJpaEntity;
 import com.dangbun.domain.memberduty.repository.MemberDutyRepository;
 import com.dangbun.domain.notificationreceiver.repository.NotificationReceiverRepository;
-/*
- * TODO: Place 도메인 헥사고날 아키텍처 전환 완료 후 수정 필요
- * - PlaceRepository 제거 후 PlaceQueryPort 사용
- * - checkInviteCode 메서드에서 placeRepository.findByInviteCode() 대신
- *   PlaceQueryPort.findByInviteCode() 사용
- * - MemberRepository.findByPlaceAndUser()가 Place 엔티티 대신
- *   placeId를 받도록 변경되면 Place 엔티티 의존성 완전 제거 가능
- */
-import com.dangbun.domain.place.original.repository.PlaceRepository;
+import com.dangbun.domain.place.refactor.application.port.out.PlaceQueryPort;
 import com.dangbun.domain.place.refactor.adapter.in.web.dto.response.DutyProgressDto;
 import com.dangbun.domain.place.refactor.exception.custom.AlreadyInvitedException;
 import com.dangbun.domain.place.refactor.exception.custom.InvalidInviteCodeException;
@@ -54,7 +46,7 @@ import static com.dangbun.domain.place.refactor.exception.status.PlaceExceptionR
 @Transactional(readOnly = true)
 public class PlaceQueryService implements PlaceQuery {
 
-    private final PlaceRepository placeRepository;
+    private final PlaceQueryPort placeQueryPort;
 
     /*
      * TODO: 다른 도메인 헥사고날 아키텍처 전환 시 수정
@@ -146,22 +138,28 @@ public class PlaceQueryService implements PlaceQuery {
 
     @Override
     public Information checkInviteCode(Long userId, String invitedCode) {
-        com.dangbun.domain.place.original.entity.Place originalPlace = placeRepository.findByInviteCode(invitedCode);
-        if (originalPlace == null) {
-            throw new InvalidInviteCodeException(INVALID_INVITE_CODE);
-        }
+        com.dangbun.domain.place.refactor.domain.Place place = placeQueryPort.findByInviteCode(invitedCode)
+                .orElseThrow(() -> new InvalidInviteCodeException(INVALID_INVITE_CODE));
 
         User user = userRepository.findById(userId).orElseThrow();
 
-        if (memberRepository.findByPlaceAndUser(originalPlace, user).isPresent()) {
+        /*
+         * TODO: Member 도메인 헥사고날 아키텍처 전환 시 수정
+         * memberRepository.findByPlaceIdAndUserId() 메서드로 변경 필요
+         */
+        if (memberRepository.findWithPlaceByUserIdAndPlaceId(userId, place.getPlaceId().value()).isPresent()) {
             throw new AlreadyInvitedException(ALREADY_INVITED);
         }
 
-        MemberJpaEntity member = memberRepository.findFirstByPlace(originalPlace);
+        /*
+         * TODO: Member 도메인 헥사고날 아키텍처 전환 시 수정
+         * MemberQueryPort를 통해 조회하도록 변경 필요
+         */
+        MemberJpaEntity member = memberRepository.findByPlace_PlaceId(place.getPlaceId().value()).stream().findFirst().orElseThrow();
         Set<String> information = member.getInformation().keySet();
         List<String> informationList = information.stream().toList();
 
-        return new Information(originalPlace.getPlaceId(), informationList);
+        return new Information(place.getPlaceId().value(), informationList);
     }
 
     @Override
@@ -183,7 +181,7 @@ public class PlaceQueryService implements PlaceQuery {
             );
         }
 
-        List<MemberDuty> memberDuties = memberDutyRepository.findAllWithMemberAndPlaceByPlaceId(placeId);
+        List<MemberDutyJpaEntity> memberDuties = memberDutyRepository.findAllWithMemberAndPlaceByPlaceId(placeId);
 
         List<MemberCleaning> memberCleanings = memberDuties.stream()
                 .flatMap(md -> memberCleaningRepository.findAllByMember(md.getMember()).stream())
@@ -213,7 +211,7 @@ public class PlaceQueryService implements PlaceQuery {
             );
         }
 
-        List<Duty> duties = memberDuties.stream().map(MemberDuty::getDuty).distinct().toList();
+        List<Duty> duties = memberDuties.stream().map(MemberDutyJpaEntity::getDuty).distinct().toList();
 
         Map<Duty, List<Checklist>> checklistMap = duties.stream()
                 .collect(Collectors.toMap(

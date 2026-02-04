@@ -1,7 +1,7 @@
 package com.dangbun.domain.duty.dto.response;
 
-import com.dangbun.domain.member.entity.MemberJpaEntity;
-import com.dangbun.domain.member.entity.MemberRole;
+import com.dangbun.domain.member.original.entity.MemberJpaEntity;
+import com.dangbun.domain.member.original.entity.MemberRole;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 public record GetDutyMemberNameListResponse(

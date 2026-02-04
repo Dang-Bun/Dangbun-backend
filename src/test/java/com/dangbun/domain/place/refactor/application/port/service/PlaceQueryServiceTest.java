@@ -6,12 +6,12 @@ import com.dangbun.domain.cleaning.entity.Cleaning;
 import com.dangbun.domain.cleaning.repository.CleaningRepository;
 import com.dangbun.domain.duty.entity.Duty;
 import com.dangbun.domain.duty.repository.DutyRepository;
-import com.dangbun.domain.member.entity.MemberJpaEntity;
-import com.dangbun.domain.member.entity.MemberRole;
-import com.dangbun.domain.member.repository.MemberRepository;
+import com.dangbun.domain.member.original.entity.MemberJpaEntity;
+import com.dangbun.domain.member.original.entity.MemberRole;
+import com.dangbun.domain.member.original.repository.MemberRepository;
 import com.dangbun.domain.membercleaning.entity.MemberCleaning;
 import com.dangbun.domain.membercleaning.repository.MemberCleaningRepository;
-import com.dangbun.domain.memberduty.entity.MemberDuty;
+import com.dangbun.domain.memberduty.entity.MemberDutyJpaEntity;
 import com.dangbun.domain.memberduty.repository.MemberDutyRepository;
 import com.dangbun.domain.notificationreceiver.repository.NotificationReceiverRepository;
 import com.dangbun.domain.place.original.entity.Place;
@@ -290,7 +290,7 @@ class PlaceQueryServiceTest {
         // given
         MemberContext.set(mockMember);
 
-        MemberDuty memberDuty = MemberDuty.builder()
+        MemberDutyJpaEntity memberDutyJpaEntity = MemberDutyJpaEntity.builder()
                 .member(mockMember)
                 .duty(mockDuty)
                 .build();
@@ -311,7 +311,7 @@ class PlaceQueryServiceTest {
         ReflectionTestUtils.setField(checklist, "createdAt", createdAt);
 
         given(memberDutyRepository.findAllWithMemberAndPlaceByPlaceId(10L))
-                .willReturn(List.of(memberDuty));
+                .willReturn(List.of(memberDutyJpaEntity));
         given(memberCleaningRepository.findAllByMember(mockMember))
                 .willReturn(List.of(memberCleaning));
         given(checklistRepository.findWithCleaningByDutyId(1000L))
@@ -331,7 +331,7 @@ class PlaceQueryServiceTest {
         // given
         MemberContext.set(mockManager);
 
-        MemberDuty memberDuty = MemberDuty.builder()
+        MemberDutyJpaEntity memberDutyJpaEntity = MemberDutyJpaEntity.builder()
                 .member(mockMember)
                 .duty(mockDuty)
                 .build();
@@ -353,7 +353,7 @@ class PlaceQueryServiceTest {
 
         given(dutyRepository.findByPlace_PlaceId(10L)).willReturn(List.of(mockDuty));
         given(memberDutyRepository.findAllWithMemberAndPlaceByPlaceId(10L))
-                .willReturn(List.of(memberDuty));
+                .willReturn(List.of(memberDutyJpaEntity));
         given(memberCleaningRepository.findAllByMember(mockMember))
                 .willReturn(List.of(memberCleaning));
         given(checklistRepository.findWithCleaningByDutyId(1000L))

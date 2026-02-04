@@ -12,10 +12,8 @@ import java.util.Objects;
 @NoArgsConstructor
 public class MemberDutyId implements Serializable {
 
-    @Column(name = "member_id")
     private Long memberId;
 
-    @Column(name = "duty_id")
     private Long dutyId;
 
     public MemberDutyId(Long memberId, Long dutyId) {

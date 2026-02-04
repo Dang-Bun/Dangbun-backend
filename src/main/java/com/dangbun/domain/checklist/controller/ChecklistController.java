@@ -1,7 +1,7 @@
 package com.dangbun.domain.checklist.controller;
 
 import com.dangbun.domain.checklist.dto.response.*;
-import com.dangbun.domain.member.response.status.MemberExceptionResponse;
+import com.dangbun.domain.member.original.response.status.MemberExceptionResponse;
 import com.dangbun.global.aop.CheckChecklistMembership;
 import com.dangbun.domain.checklist.dto.request.PostGetPresignedUrlRequest;
 import com.dangbun.domain.checklist.dto.request.PostSaveUploadResultRequest;

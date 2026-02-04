@@ -1,11 +1,10 @@
 package com.dangbun.domain.place.refactor.application.port.service;
 
-import com.dangbun.domain.member.MemberCommandPort;
-import com.dangbun.domain.member.GetMemberByInviteCodePort;
-import com.dangbun.domain.member.Member;
-import com.dangbun.domain.member.entity.MemberJpaEntity;
-import com.dangbun.domain.member.entity.MemberRole;
-import com.dangbun.domain.place.refactor.adapter.in.web.dto.response.PatchUpdateTimeResponse;
+import com.dangbun.domain.member.refactor.application.port.out.MemberCommandPort;
+import com.dangbun.domain.member.refactor.application.port.out.GetMemberByInviteCodePort;
+import com.dangbun.domain.member.refactor.domain.Member;
+import com.dangbun.domain.member.refactor.domain.MemberRole;
+import com.dangbun.domain.member.original.entity.MemberJpaEntity;
 import com.dangbun.domain.place.refactor.domain.PlaceCategory;
 import com.dangbun.domain.place.refactor.exception.custom.InvalidInformationException;
 import com.dangbun.domain.place.refactor.exception.custom.InvalidPlaceNameException;
@@ -138,12 +137,14 @@ public class PlaceCommandService implements PlaceCommandUseCase {
 
         Member member = Member.withId(
                 jpaMember.getMemberId(),
-                jpaMember.getRole(),
+                MemberRole.valueOf(jpaMember.getRole().name()),
                 jpaMember.getName(),
                 jpaMember.getStatus(),
                 jpaMember.getInformation(),
                 jpaMember.getPlace().getPlaceId(),
-                jpaMember.getUser().getUserId());
+                jpaMember.getUser().getUserId(),
+                jpaMember.getUser().getCreatedAt()
+        );
 
         memberCommandPort.delete(member);
     }

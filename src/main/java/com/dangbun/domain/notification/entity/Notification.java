@@ -1,6 +1,6 @@
 package com.dangbun.domain.notification.entity;
 
-import com.dangbun.domain.member.entity.MemberJpaEntity;
+import com.dangbun.domain.member.original.entity.MemberJpaEntity;
 import com.dangbun.global.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;

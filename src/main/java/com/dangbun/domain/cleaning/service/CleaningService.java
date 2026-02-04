@@ -17,8 +17,8 @@ import com.dangbun.domain.cleaningdate.entity.CleaningDate;
 import com.dangbun.domain.cleaningdate.repository.CleaningDateRepository;
 import com.dangbun.domain.duty.entity.Duty;
 import com.dangbun.domain.duty.repository.DutyRepository;
-import com.dangbun.domain.member.entity.MemberJpaEntity;
-import com.dangbun.domain.member.repository.MemberRepository;
+import com.dangbun.domain.member.original.entity.MemberJpaEntity;
+import com.dangbun.domain.member.original.repository.MemberRepository;
 import com.dangbun.domain.membercleaning.entity.MemberCleaning;
 import com.dangbun.domain.membercleaning.repository.MemberCleaningRepository;
 /*

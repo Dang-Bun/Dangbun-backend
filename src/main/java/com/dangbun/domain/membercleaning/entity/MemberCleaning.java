@@ -2,7 +2,7 @@ package com.dangbun.domain.membercleaning.entity;
 
 
 import com.dangbun.domain.cleaning.entity.Cleaning;
-import com.dangbun.domain.member.entity.MemberJpaEntity;
+import com.dangbun.domain.member.original.entity.MemberJpaEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;

@@ -7,12 +7,12 @@ import com.dangbun.domain.duty.dto.response.*;
 import com.dangbun.domain.duty.entity.Duty;
 import com.dangbun.domain.duty.exception.custom.*;
 import com.dangbun.domain.duty.repository.DutyRepository;
-import com.dangbun.domain.member.entity.MemberJpaEntity;
-import com.dangbun.domain.member.entity.MemberRole;
-import com.dangbun.domain.member.repository.MemberRepository;
+import com.dangbun.domain.member.original.entity.MemberJpaEntity;
+import com.dangbun.domain.member.original.entity.MemberRole;
+import com.dangbun.domain.member.original.repository.MemberRepository;
 import com.dangbun.domain.membercleaning.entity.MemberCleaning;
 import com.dangbun.domain.membercleaning.repository.MemberCleaningRepository;
-import com.dangbun.domain.memberduty.entity.MemberDuty;
+import com.dangbun.domain.memberduty.entity.MemberDutyJpaEntity;
 import com.dangbun.domain.memberduty.repository.MemberDutyRepository;
 /*
  * TODO: Place 도메인 헥사고날 아키텍처 전환 완료 후 수정 필요
@@ -93,10 +93,10 @@ public class DutyService {
     @Transactional(readOnly = true)
     public List<GetDutyMemberNameListResponse> getDutyMemberNameList() {
         Duty duty = DutyContext.get();
-        List<MemberDuty> members = memberDutyRepository.findAllByDuty(duty);
+        List<MemberDutyJpaEntity> members = memberDutyRepository.findAllByDuty(duty);
 
         return members.stream()
-                .map(MemberDuty::getMember)
+                .map(MemberDutyJpaEntity::getMember)
                 .sorted(
                         Comparator
                                 .comparing((MemberJpaEntity m) -> m.getRole() != MemberRole.MANAGER) // 매니저 먼저
@@ -133,7 +133,7 @@ public class DutyService {
 
         List<Long> addedMemberIds = new ArrayList<>();
         for (MemberJpaEntity member : members) {
-            MemberDuty md = MemberDuty.builder()
+            MemberDutyJpaEntity md = MemberDutyJpaEntity.builder()
                     .duty(duty)
                     .member(member)
                     .build();

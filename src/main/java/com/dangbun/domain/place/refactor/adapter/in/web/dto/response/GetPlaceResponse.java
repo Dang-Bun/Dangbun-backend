@@ -1,7 +1,7 @@
 package com.dangbun.domain.place.refactor.adapter.in.web.dto.response;
 
 import com.dangbun.domain.checklist.entity.Checklist;
-import com.dangbun.domain.member.entity.MemberJpaEntity;
+import com.dangbun.domain.member.original.entity.MemberJpaEntity;
 import com.dangbun.domain.place.refactor.domain.PlaceCategory;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.v3.oas.annotations.media.Schema;

@@ -1,7 +1,7 @@
 package com.dangbun.domain.notification.service;
 
-import com.dangbun.domain.member.entity.MemberJpaEntity;
-import com.dangbun.domain.member.repository.MemberRepository;
+import com.dangbun.domain.member.original.entity.MemberJpaEntity;
+import com.dangbun.domain.member.original.repository.MemberRepository;
 import com.dangbun.domain.notification.dto.request.*;
 import com.dangbun.domain.notification.dto.response.*;
 import com.dangbun.domain.notification.entity.Notification;

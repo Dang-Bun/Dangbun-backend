@@ -1,6 +1,6 @@
 package com.dangbun.domain.notificationreceiver.service;
 
-import com.dangbun.domain.member.entity.MemberJpaEntity;
+import com.dangbun.domain.member.original.entity.MemberJpaEntity;
 import com.dangbun.domain.notification.entity.Notification;
 import com.dangbun.domain.notificationreceiver.dto.response.GetNotificationReceivedListResponse;
 import com.dangbun.domain.notificationreceiver.entity.NotificationReceiver;

@@ -1,6 +1,6 @@
 package com.dangbun.domain.place.refactor.adapter.in.web;
 
-import com.dangbun.domain.member.response.status.MemberExceptionResponse;
+import com.dangbun.domain.member.original.response.status.MemberExceptionResponse;
 import com.dangbun.domain.place.refactor.adapter.in.web.dto.request.DeletePlaceRequest;
 import com.dangbun.domain.place.refactor.adapter.in.web.dto.request.PatchUpdateTimeRequest;
 import com.dangbun.domain.place.refactor.adapter.in.web.dto.request.PostRegisterPlaceRequest;
@@ -8,7 +8,7 @@ import com.dangbun.domain.place.refactor.adapter.in.web.dto.response.PatchUpdate
 import com.dangbun.domain.place.refactor.adapter.in.web.dto.response.PostCreateInviteCodeResponse;
 import com.dangbun.domain.place.refactor.adapter.in.web.dto.response.PostRegisterPlaceResponse;
 import com.dangbun.domain.place.refactor.exception.status.PlaceExceptionResponse;
-import com.dangbun.domain.place.refactor.WebAdapter;
+import com.dangbun.common.hexagonal.WebAdapter;
 import com.dangbun.domain.place.refactor.application.port.in.command.JoinPlaceCommand;
 import com.dangbun.domain.place.refactor.application.port.in.command.PlaceCommandUseCase;
 import com.dangbun.domain.place.refactor.application.port.in.command.UpdateTimeCommand;

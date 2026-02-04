@@ -1,6 +1,6 @@
 package com.dangbun.domain.notification.controller;
 
-import com.dangbun.domain.member.response.status.MemberExceptionResponse;
+import com.dangbun.domain.member.original.response.status.MemberExceptionResponse;
 import com.dangbun.domain.notification.dto.request.PostNotificationCreateRequest;
 import com.dangbun.domain.notification.dto.response.*;
 import com.dangbun.domain.notification.response.status.NotificationExceptionResponse;

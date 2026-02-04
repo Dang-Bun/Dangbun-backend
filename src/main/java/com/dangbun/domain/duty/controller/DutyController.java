@@ -4,7 +4,7 @@ import com.dangbun.domain.duty.dto.request.*;
 import com.dangbun.domain.duty.dto.response.*;
 import com.dangbun.domain.duty.response.status.DutyExceptionResponse;
 import com.dangbun.domain.duty.service.DutyService;
-import com.dangbun.domain.member.response.status.MemberExceptionResponse;
+import com.dangbun.domain.member.original.response.status.MemberExceptionResponse;
 import com.dangbun.global.aop.CheckDutyInPlace;
 import com.dangbun.global.aop.CheckManagerAuthority;
 import com.dangbun.global.aop.CheckPlaceMembership;

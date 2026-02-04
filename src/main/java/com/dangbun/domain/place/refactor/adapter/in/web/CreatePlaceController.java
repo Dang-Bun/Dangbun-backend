@@ -1,8 +1,8 @@
 package com.dangbun.domain.place.refactor.adapter.in.web;
 
-import com.dangbun.domain.member.entity.MemberJpaEntity;
-import com.dangbun.domain.member.entity.MemberRole;
-import com.dangbun.domain.member.repository.MemberRepository;
+import com.dangbun.domain.member.original.entity.MemberJpaEntity;
+import com.dangbun.domain.member.original.entity.MemberRole;
+import com.dangbun.domain.member.original.repository.MemberRepository;
 /*
  * TODO: Place 도메인 헥사고날 아키텍처 전환 완료 후 수정 필요
  * - PlaceRepository 의존성 제거
@@ -15,7 +15,7 @@ import com.dangbun.domain.member.repository.MemberRepository;
  *   PlaceCommandPort에서 반환된 Place 도메인 객체 활용
  */
 import com.dangbun.domain.place.original.repository.PlaceRepository;
-import com.dangbun.domain.place.refactor.WebAdapter;
+import com.dangbun.common.hexagonal.WebAdapter;
 import com.dangbun.domain.place.refactor.application.port.in.command.CreatePlaceCommand;
 import com.dangbun.domain.place.refactor.application.port.in.command.CreatePlaceUseCase;
 import com.dangbun.domain.user.entity.CustomUserDetails;

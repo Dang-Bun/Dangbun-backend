@@ -7,11 +7,11 @@ import com.dangbun.domain.duty.dto.response.*;
 import com.dangbun.domain.duty.entity.Duty;
 import com.dangbun.domain.duty.exception.custom.*;
 import com.dangbun.domain.duty.repository.DutyRepository;
-import com.dangbun.domain.member.entity.MemberJpaEntity;
-import com.dangbun.domain.member.repository.MemberRepository;
+import com.dangbun.domain.member.original.entity.MemberJpaEntity;
+import com.dangbun.domain.member.original.repository.MemberRepository;
 import com.dangbun.domain.membercleaning.entity.MemberCleaning;
 import com.dangbun.domain.membercleaning.repository.MemberCleaningRepository;
-import com.dangbun.domain.memberduty.entity.MemberDuty;
+import com.dangbun.domain.memberduty.entity.MemberDutyJpaEntity;
 import com.dangbun.domain.memberduty.repository.MemberDutyRepository;
 import com.dangbun.domain.place.original.entity.Place;
 import com.dangbun.global.context.DutyContext;
@@ -159,8 +159,8 @@ class DutyServiceTest {
         MemberJpaEntity member1 = MemberJpaEntity.builder().name("철수").build();
         MemberJpaEntity member2 = MemberJpaEntity.builder().name("영희").build();
 
-        MemberDuty md1 = MemberDuty.builder().duty(duty).member(member1).build();
-        MemberDuty md2 = MemberDuty.builder().duty(duty).member(member2).build();
+        MemberDutyJpaEntity md1 = MemberDutyJpaEntity.builder().duty(duty).member(member1).build();
+        MemberDutyJpaEntity md2 = MemberDutyJpaEntity.builder().duty(duty).member(member2).build();
 
         given(memberDutyRepository.findAllByDuty(duty)).willReturn(List.of(md1, md2));
 
@@ -238,7 +238,7 @@ class DutyServiceTest {
         // then
         assertThat(response.addedMemberIds()).containsExactlyInAnyOrder(100L, 200L);
         then(memberDutyRepository).should().deleteAllByDuty(duty);
-        then(memberDutyRepository).should(times(2)).save(any(MemberDuty.class));
+        then(memberDutyRepository).should(times(2)).save(any(MemberDutyJpaEntity.class));
     }
 
     @Test

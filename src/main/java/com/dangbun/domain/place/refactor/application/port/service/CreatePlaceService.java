@@ -1,6 +1,6 @@
 package com.dangbun.domain.place.refactor.application.port.service;
 
-import com.dangbun.domain.place.refactor.UseCase;
+import com.dangbun.common.hexagonal.UseCase;
 import com.dangbun.domain.place.refactor.application.port.in.command.CreatePlaceCommand;
 import com.dangbun.domain.place.refactor.application.port.in.command.CreatePlaceUseCase;
 import com.dangbun.domain.place.refactor.application.port.out.UpdatePlaceStatePort;

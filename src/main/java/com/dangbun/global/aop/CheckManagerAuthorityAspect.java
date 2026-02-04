@@ -1,15 +1,16 @@
 package com.dangbun.global.aop;
 
-import com.dangbun.domain.member.entity.MemberJpaEntity;
-import com.dangbun.domain.member.entity.MemberRole;
-import com.dangbun.domain.member.exception.custom.*;
+import com.dangbun.domain.member.original.entity.MemberJpaEntity;
+import com.dangbun.domain.member.original.entity.MemberRole;
+import com.dangbun.domain.member.original.exception.custom.InvalidRoleException;
+import com.dangbun.domain.member.original.exception.custom.MembershipUnauthorizedException;
 import com.dangbun.global.context.MemberContext;
+
+import static com.dangbun.domain.member.original.response.status.MemberExceptionResponse.*;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
-
-import static com.dangbun.domain.member.response.status.MemberExceptionResponse.*;
 
 
 @Aspect

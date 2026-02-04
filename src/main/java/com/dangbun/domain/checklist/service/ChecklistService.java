@@ -9,7 +9,7 @@ import com.dangbun.domain.checklist.entity.Checklist;
 import com.dangbun.domain.cleaning.entity.Cleaning;
 import com.dangbun.domain.cleaningImage.service.CleaningImageService;
 import com.dangbun.global.context.MemberContext;
-import com.dangbun.domain.member.entity.MemberJpaEntity;
+import com.dangbun.domain.member.original.entity.MemberJpaEntity;
 import com.dangbun.domain.membercleaning.repository.MemberCleaningRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
