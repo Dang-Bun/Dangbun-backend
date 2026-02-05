@@ -14,4 +14,6 @@ public interface MemberQueryPort {
     Optional<Member> findByMemberIdAndPlaceId(Long memberId, Long placeId);
 
     Optional<Member> findByPlaceIdAndName(Long placeId, String name);
+
+    List<Member> findAllByNameIn(List<String> members);
 }

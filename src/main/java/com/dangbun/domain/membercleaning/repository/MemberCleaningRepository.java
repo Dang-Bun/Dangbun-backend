@@ -1,29 +1,31 @@
 package com.dangbun.domain.membercleaning.repository;
 
-import com.dangbun.domain.cleaning.entity.Cleaning;
-import com.dangbun.domain.duty.entity.Duty;
+import com.dangbun.domain.cleaning.refactor.adapter.out.CleaningJpaEntity;
+import com.dangbun.domain.duty.refactor.adapter.out.persistence.DutyJpaEntity;
 import com.dangbun.domain.member.original.entity.MemberJpaEntity;
-import com.dangbun.domain.membercleaning.entity.MemberCleaning;
+import com.dangbun.domain.membercleaning.entity.MemberCleaningJpaEntity;
 import com.dangbun.domain.membercleaning.entity.MemberCleaningId;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 
-public interface MemberCleaningRepository extends JpaRepository<MemberCleaning, MemberCleaningId> {
+public interface MemberCleaningRepository extends JpaRepository<MemberCleaningJpaEntity, MemberCleaningId> {
     @Query("""
-        SELECT DISTINCT mc.cleaning.duty
-        FROM MemberCleaning mc
+        SELECT DISTINCT mc.cleaningJpaEntity.duty
+        FROM MemberCleaningJpaEntity mc
         WHERE mc.id.memberId IN :memberIds
     """)
-    List<Duty> findDistinctDutiesByMemberIds(List<Long> memberIds);
+    List<DutyJpaEntity> findDistinctDutiesByMemberIds(List<Long> memberIds);
 
-    List<MemberCleaning> findAllByCleaning(Cleaning cleaning);
+    List<MemberCleaningJpaEntity> findAllByCleaningJpaEntity(CleaningJpaEntity cleaningJpaEntity);
 
-    List<MemberCleaning> findAllByMember(MemberJpaEntity member);
+    List<MemberCleaningJpaEntity> findAllByMember(MemberJpaEntity member);
 
-    @Query("select mc.member from MemberCleaning mc where mc.id.cleaningId = :cleaningId")
+    List<MemberCleaningJpaEntity> findAllByMember_MemberId(Long memberMemberId);
+
+    @Query("select mc.member from MemberCleaningJpaEntity mc where mc.id.cleaningId = :cleaningId")
     List<MemberJpaEntity> findMembersByCleaningId(Long cleaningId);
 
-    void deleteAllByCleaning_CleaningId(Long cleaningId);
+    void deleteAllByCleaningJpaEntity_CleaningId(Long cleaningId);
 }

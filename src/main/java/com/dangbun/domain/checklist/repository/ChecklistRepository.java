@@ -1,7 +1,7 @@
 package com.dangbun.domain.checklist.repository;
 
 import com.dangbun.domain.checklist.entity.Checklist;
-import com.dangbun.domain.cleaning.entity.Cleaning;
+import com.dangbun.domain.cleaning.refactor.adapter.out.CleaningJpaEntity;
 import io.lettuce.core.dynamic.annotation.Param;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -15,30 +15,30 @@ import java.util.Optional;
 @Repository
 public interface ChecklistRepository extends JpaRepository<Checklist, Long> {
 
-    @Query("select ch from Checklist ch join fetch ch.cleaning c where c.duty.dutyId = :dutyId")
+    @Query("select ch from Checklist ch join fetch ch.cleaningJpaEntity c where c.duty.dutyId = :dutyId")
     List<Checklist> findWithCleaningByDutyId(Long dutyId);
 
-    List<Checklist> findByCleaning_CleaningId(Long cleaningId);
+    List<Checklist> findByCleaningJpaEntity_CleaningId(Long cleaningId);
 
-    @Query("select ch from Checklist ch join fetch Cleaning c where ch.checklistId = :checklistId")
+    @Query("select ch from Checklist ch join fetch CleaningJpaEntity c where ch.checklistId = :checklistId")
     Optional<Checklist> findWithCleaningById(Long checklistId);
 
-    @Query("select ch from Checklist ch join fetch Cleaning c join fetch Duty d where ch.checklistId = :checklistId")
+    @Query("select ch from Checklist ch join fetch CleaningJpaEntity c join fetch DutyJpaEntity d where ch.checklistId = :checklistId")
     Optional<Checklist> findWithCleaningAndDutyById(Long checklistId);
 
     @Query("SELECT c FROM Checklist c " +
-            "JOIN c.cleaning cl " +
-            "JOIN MemberCleaning mc ON cl.cleaningId = mc.cleaning.cleaningId " +
+            "JOIN c.cleaningJpaEntity cl " +
+            "JOIN MemberCleaningJpaEntity mc ON cl.cleaningId = mc.cleaningJpaEntity.cleaningId " +
             "JOIN MemberJpaEntity m ON mc.member.memberId = m.memberId " +
             "WHERE c.checklistId = :checklistId AND m.memberId = :memberId")
     Optional<Checklist> findByChecklistAndMemberId(@Param("checklistId") Long checklistId, @Param("memberId") Long memberId);
 
 
-    Boolean existsByCleaningAndCreatedAt(@NotNull Cleaning cleaning, LocalDateTime createdAt);
+    Boolean existsByCleaningJpaEntityAndCreatedAt(@NotNull CleaningJpaEntity cleaningJpaEntity, LocalDateTime createdAt);
 
     @Query("""
             select ch from Checklist ch
-            join fetch ch.cleaning c
+            join fetch ch.cleaningJpaEntity c
             join fetch c.duty d
             where ch.createdAt >= :start and ch.createdAt < :end
             and c.place.placeId = :placeId
@@ -49,15 +49,15 @@ public interface ChecklistRepository extends JpaRepository<Checklist, Long> {
             select case when count(ch)>0 then true else false end
             from Checklist ch
             where ch.createdAt >= :start and ch.createdAt< :end
-            and ch.cleaning = :cleaning
+            and ch.cleaningJpaEntity = :cleaningJpaEntity
             and ch.isComplete = true
             """)
-    boolean existsCompletedChecklistByDateAndCleaning(@Param("start") LocalDateTime start, @Param("end") LocalDateTime end, @Param("cleaning") Cleaning cleaning);
+    boolean existsCompletedChecklistByDateAndCleaning(@Param("start") LocalDateTime start, @Param("end") LocalDateTime end, @Param("cleaningJpaEntity") CleaningJpaEntity cleaningJpaEntity);
 
 
     @Query("""
             select ch from Checklist ch
-            where ch.cleaning.place.placeId = :placeId 
+            where ch.cleaningJpaEntity.place.placeId = :placeId 
             and ch.createdAt >= :startDateTime
             and ch.createdAt < :endDateTime
             """)

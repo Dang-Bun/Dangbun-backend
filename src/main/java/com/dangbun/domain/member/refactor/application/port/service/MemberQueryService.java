@@ -6,7 +6,7 @@ import com.dangbun.domain.member.refactor.application.port.in.query.*;
 import com.dangbun.domain.member.refactor.application.port.out.MemberQueryPort;
 import com.dangbun.domain.member.refactor.domain.Member;
 import com.dangbun.domain.member.refactor.domain.MemberRole;
-import com.dangbun.domain.memberduty.entity.MemberDutyJpaEntity;
+import com.dangbun.domain.memberduty.refactor.adapter.out.MemberDutyJpaEntity;
 import com.dangbun.domain.memberduty.repository.MemberDutyRepository;
 import com.dangbun.global.context.MemberContext;
 import lombok.RequiredArgsConstructor;

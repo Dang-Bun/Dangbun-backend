@@ -1,17 +1,18 @@
 package com.dangbun.domain.duty.service;
 
-import com.dangbun.domain.cleaning.entity.Cleaning;
+import com.dangbun.domain.cleaning.refactor.adapter.out.CleaningJpaEntity;
 import com.dangbun.domain.cleaning.repository.CleaningRepository;
-import com.dangbun.domain.duty.dto.request.*;
-import com.dangbun.domain.duty.dto.response.*;
-import com.dangbun.domain.duty.entity.Duty;
-import com.dangbun.domain.duty.exception.custom.*;
-import com.dangbun.domain.duty.repository.DutyRepository;
+import com.dangbun.domain.duty.original.dto.request.*;
+import com.dangbun.domain.duty.original.dto.response.*;
+import com.dangbun.domain.duty.original.entity.Duty;
+import com.dangbun.domain.duty.original.exception.custom.*;
+import com.dangbun.domain.duty.original.repository.DutyRepository;
+import com.dangbun.domain.duty.original.service.DutyService;
 import com.dangbun.domain.member.original.entity.MemberJpaEntity;
 import com.dangbun.domain.member.original.repository.MemberRepository;
-import com.dangbun.domain.membercleaning.entity.MemberCleaning;
+import com.dangbun.domain.membercleaning.entity.MemberCleaningJpaEntity;
 import com.dangbun.domain.membercleaning.repository.MemberCleaningRepository;
-import com.dangbun.domain.memberduty.entity.MemberDutyJpaEntity;
+import com.dangbun.domain.memberduty.refactor.adapter.out.MemberDutyJpaEntity;
 import com.dangbun.domain.memberduty.repository.MemberDutyRepository;
 import com.dangbun.domain.place.original.entity.Place;
 import com.dangbun.global.context.DutyContext;
@@ -28,8 +29,6 @@ import org.springframework.test.util.ReflectionTestUtils;
 import java.util.List;
 import java.util.Optional;
 
-import static com.dangbun.domain.duty.entity.DutyAssignType.*;
-import static com.dangbun.domain.duty.entity.DutyIcon.*;
 import static com.dangbun.domain.place.refactor.domain.PlaceCategory.CAFE;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -177,10 +176,10 @@ class DutyServiceTest {
         ReflectionTestUtils.setField(duty, "dutyId", 1L);
         DutyContext.set(duty);
 
-        Cleaning cleaning1 = Cleaning.builder().name("책상 닦기").duty(duty).build();
-        Cleaning cleaning2 = Cleaning.builder().name("바닥 청소").duty(duty).build();
+        CleaningJpaEntity cleaningJpaEntity1 = CleaningJpaEntity.builder().name("책상 닦기").duty(duty).build();
+        CleaningJpaEntity cleaningJpaEntity2 = CleaningJpaEntity.builder().name("바닥 청소").duty(duty).build();
 
-        given(cleaningRepository.findAllByDuty(duty)).willReturn(List.of(cleaning1, cleaning2));
+        given(cleaningRepository.findAllByDuty(duty)).willReturn(List.of(cleaningJpaEntity1, cleaningJpaEntity2));
 
         List<GetDutyCleaningNameListResponse> result = dutyService.getDutyCleaningNameList();
 
@@ -270,8 +269,8 @@ class DutyServiceTest {
         ReflectionTestUtils.setField(duty, "dutyId", 1L);
         DutyContext.set(duty);
 
-        Cleaning cleaning = Cleaning.builder().name("책상 닦기").duty(duty).build();
-        ReflectionTestUtils.setField(cleaning, "cleaningId", 10L);
+        CleaningJpaEntity cleaningJpaEntity = CleaningJpaEntity.builder().name("책상 닦기").duty(duty).build();
+        ReflectionTestUtils.setField(cleaningJpaEntity, "cleaningId", 10L);
 
         MemberJpaEntity member1 = MemberJpaEntity.builder().name("철수").build();
         ReflectionTestUtils.setField(member1, "memberId", 100L);
@@ -280,7 +279,7 @@ class DutyServiceTest {
         ReflectionTestUtils.setField(member2, "memberId", 200L);
 
         given(cleaningRepository.findByCleaningIdAndDuty_DutyId(10L, 1L))
-                .willReturn(Optional.of(cleaning));
+                .willReturn(Optional.of(cleaningJpaEntity));
         given(memberRepository.findAllById(List.of(100L, 200L)))
                 .willReturn(List.of(member1, member2));
 
@@ -290,7 +289,7 @@ class DutyServiceTest {
         dutyService.assignMember(request);
 
         // then
-        then(memberCleaningRepository).should().deleteAllByCleaning_CleaningId(10L);
+        then(memberCleaningRepository).should().deleteAllByCleaningJpaEntity_CleaningId(10L);
         then(memberCleaningRepository).should().saveAll(anyList());
     }
 
@@ -320,10 +319,10 @@ class DutyServiceTest {
         ReflectionTestUtils.setField(duty, "dutyId", 1L);
         DutyContext.set(duty);
 
-        Cleaning cleaning1 = Cleaning.builder().name("책상 닦기").duty(duty).build();
-        ReflectionTestUtils.setField(cleaning1, "cleaningId", 10L);
-        Cleaning cleaning2 = Cleaning.builder().name("바닥 청소").duty(duty).build();
-        ReflectionTestUtils.setField(cleaning2, "cleaningId", 20L);
+        CleaningJpaEntity cleaningJpaEntity1 = CleaningJpaEntity.builder().name("책상 닦기").duty(duty).build();
+        ReflectionTestUtils.setField(cleaningJpaEntity1, "cleaningId", 10L);
+        CleaningJpaEntity cleaningJpaEntity2 = CleaningJpaEntity.builder().name("바닥 청소").duty(duty).build();
+        ReflectionTestUtils.setField(cleaningJpaEntity2, "cleaningId", 20L);
 
         MemberJpaEntity member1 = MemberJpaEntity.builder().name("철수").build();
         ReflectionTestUtils.setField(member1, "memberId", 100L);
@@ -331,7 +330,7 @@ class DutyServiceTest {
         ReflectionTestUtils.setField(member2, "memberId", 200L);
 
         given(cleaningRepository.findAllByDuty(duty))
-                .willReturn(List.of(cleaning1, cleaning2));
+                .willReturn(List.of(cleaningJpaEntity1, cleaningJpaEntity2));
         given(memberDutyRepository.findMembersByDuty(duty))
                 .willReturn(List.of(member1, member2));
 
@@ -341,7 +340,7 @@ class DutyServiceTest {
         dutyService.assignMember(request);
 
         // then
-        then(memberCleaningRepository).should(times(2)).deleteAllByCleaning_CleaningId(anyLong());
+        then(memberCleaningRepository).should(times(2)).deleteAllByCleaningJpaEntity_CleaningId(anyLong());
         then(memberCleaningRepository).should(times(2)).saveAll(anyList());
     }
 
@@ -353,10 +352,10 @@ class DutyServiceTest {
         ReflectionTestUtils.setField(duty, "dutyId", 1L);
         DutyContext.set(duty);
 
-        Cleaning cleaning = Cleaning.builder().name("책상 닦기").duty(duty).build();
-        ReflectionTestUtils.setField(cleaning, "cleaningId", 10L);
+        CleaningJpaEntity cleaningJpaEntity = CleaningJpaEntity.builder().name("책상 닦기").duty(duty).build();
+        ReflectionTestUtils.setField(cleaningJpaEntity, "cleaningId", 10L);
 
-        given(cleaningRepository.findAllByDuty(duty)).willReturn(List.of(cleaning));
+        given(cleaningRepository.findAllByDuty(duty)).willReturn(List.of(cleaningJpaEntity));
         given(memberDutyRepository.findMembersByDuty(duty)).willReturn(List.of());
 
         PatchAssignMemberRequest request = new PatchAssignMemberRequest(COMMON, null, null, null);
@@ -374,8 +373,8 @@ class DutyServiceTest {
         ReflectionTestUtils.setField(duty, "dutyId", 1L);
         DutyContext.set(duty);
 
-        Cleaning cleaning1 = Cleaning.builder().name("책상 닦기").duty(duty).build();
-        ReflectionTestUtils.setField(cleaning1, "cleaningId", 10L);
+        CleaningJpaEntity cleaningJpaEntity1 = CleaningJpaEntity.builder().name("책상 닦기").duty(duty).build();
+        ReflectionTestUtils.setField(cleaningJpaEntity1, "cleaningId", 10L);
 
         MemberJpaEntity member1 = MemberJpaEntity.builder().name("철수").build();
         ReflectionTestUtils.setField(member1, "memberId", 100L);
@@ -384,7 +383,7 @@ class DutyServiceTest {
         MemberJpaEntity member3 = MemberJpaEntity.builder().name("민수").build();
         ReflectionTestUtils.setField(member3, "memberId", 300L);
 
-        given(cleaningRepository.findAllByDuty(duty)).willReturn(List.of(cleaning1));
+        given(cleaningRepository.findAllByDuty(duty)).willReturn(List.of(cleaningJpaEntity1));
         given(memberDutyRepository.findMembersByDuty(duty)).willReturn(List.of(member1, member2, member3));
 
         PatchAssignMemberRequest request = new PatchAssignMemberRequest(RANDOM, null, null, 2);
@@ -393,7 +392,7 @@ class DutyServiceTest {
         dutyService.assignMember(request);
 
         // then
-        then(memberCleaningRepository).should().deleteAllByCleaning_CleaningId(10L);
+        then(memberCleaningRepository).should().deleteAllByCleaningJpaEntity_CleaningId(10L);
         then(memberCleaningRepository).should().saveAll(anyList());
     }
 
@@ -406,19 +405,19 @@ class DutyServiceTest {
         ReflectionTestUtils.setField(duty, "dutyId", 1L);
         DutyContext.set(duty);
 
-        Cleaning cleaning = Cleaning.builder().name("책상 닦기").duty(duty).build();
-        ReflectionTestUtils.setField(cleaning, "cleaningId", 10L);
+        CleaningJpaEntity cleaningJpaEntity = CleaningJpaEntity.builder().name("책상 닦기").duty(duty).build();
+        ReflectionTestUtils.setField(cleaningJpaEntity, "cleaningId", 10L);
 
         MemberJpaEntity member1 = MemberJpaEntity.builder().name("철수").build();
         MemberJpaEntity member2 = MemberJpaEntity.builder().name("영희").build();
         MemberJpaEntity member3 = MemberJpaEntity.builder().name("민수").build();
 
-        MemberCleaning mc1 = MemberCleaning.builder().cleaning(cleaning).member(member1).build();
-        MemberCleaning mc2 = MemberCleaning.builder().cleaning(cleaning).member(member2).build();
-        MemberCleaning mc3 = MemberCleaning.builder().cleaning(cleaning).member(member3).build();
+        MemberCleaningJpaEntity mc1 = MemberCleaningJpaEntity.builder().cleaning(cleaningJpaEntity).member(member1).build();
+        MemberCleaningJpaEntity mc2 = MemberCleaningJpaEntity.builder().cleaning(cleaningJpaEntity).member(member2).build();
+        MemberCleaningJpaEntity mc3 = MemberCleaningJpaEntity.builder().cleaning(cleaningJpaEntity).member(member3).build();
 
-        given(cleaningRepository.findAllByDuty(duty)).willReturn(List.of(cleaning));
-        given(memberCleaningRepository.findAllByCleaning(cleaning)).willReturn(List.of(mc1, mc2, mc3));
+        given(cleaningRepository.findAllByDuty(duty)).willReturn(List.of(cleaningJpaEntity));
+        given(memberCleaningRepository.findAllByCleaningJpaEntity(cleaningJpaEntity)).willReturn(List.of(mc1, mc2, mc3));
 
         // when
         List<GetCleaningInfoListResponse> result = dutyService.getCleaningInfoList();
@@ -441,18 +440,18 @@ class DutyServiceTest {
         ReflectionTestUtils.setField(duty, "dutyId", 1L);
         DutyContext.set(duty);
 
-        Cleaning cleaning1 = Cleaning.builder()
+        CleaningJpaEntity cleaningJpaEntity1 = CleaningJpaEntity.builder()
                 .name("책상 닦기")
                 .build();
-        ReflectionTestUtils.setField(cleaning1, "cleaningId", 100L);
+        ReflectionTestUtils.setField(cleaningJpaEntity1, "cleaningId", 100L);
 
-        Cleaning cleaning2 = Cleaning.builder()
+        CleaningJpaEntity cleaningJpaEntity2 = CleaningJpaEntity.builder()
                 .name("바닥 청소")
                 .build();
-        ReflectionTestUtils.setField(cleaning2, "cleaningId", 200L);
+        ReflectionTestUtils.setField(cleaningJpaEntity2, "cleaningId", 200L);
 
         given(cleaningRepository.findAllById(List.of(100L, 200L)))
-                .willReturn(List.of(cleaning1, cleaning2));
+                .willReturn(List.of(cleaningJpaEntity1, cleaningJpaEntity2));
 
         PostAddCleaningsRequest request = new PostAddCleaningsRequest(List.of(100L, 200L));
 
@@ -461,8 +460,8 @@ class DutyServiceTest {
 
         // then
         assertThat(response.addedCleaningId()).containsExactlyInAnyOrder(100L, 200L);
-        assertThat(cleaning1.getDuty()).isEqualTo(duty);
-        assertThat(cleaning2.getDuty()).isEqualTo(duty);
+        assertThat(cleaningJpaEntity1.getDuty()).isEqualTo(duty);
+        assertThat(cleaningJpaEntity2.getDuty()).isEqualTo(duty);
         then(cleaningRepository).should().saveAll(anyList());
     }
 
@@ -485,19 +484,19 @@ class DutyServiceTest {
                 .build();
         ReflectionTestUtils.setField(anotherDuty, "dutyId", 2L);
 
-        Cleaning cleaning1 = Cleaning.builder()
+        CleaningJpaEntity cleaningJpaEntity1 = CleaningJpaEntity.builder()
                 .name("책상 닦기")
                 .duty(anotherDuty)
                 .build();
-        ReflectionTestUtils.setField(cleaning1, "cleaningId", 100L);
+        ReflectionTestUtils.setField(cleaningJpaEntity1, "cleaningId", 100L);
 
-        Cleaning cleaning2 = Cleaning.builder()
+        CleaningJpaEntity cleaningJpaEntity2 = CleaningJpaEntity.builder()
                 .name("바닥 청소")
                 .build();
-        ReflectionTestUtils.setField(cleaning2, "cleaningId", 200L);
+        ReflectionTestUtils.setField(cleaningJpaEntity2, "cleaningId", 200L);
 
         given(cleaningRepository.findAllById(List.of(100L, 200L)))
-                .willReturn(List.of(cleaning1, cleaning2));
+                .willReturn(List.of(cleaningJpaEntity1, cleaningJpaEntity2));
 
         PostAddCleaningsRequest request = new PostAddCleaningsRequest(List.of(100L, 200L));
 
@@ -506,8 +505,8 @@ class DutyServiceTest {
 
         // then
         assertThat(response.addedCleaningId()).containsExactly(200L);
-        assertThat(cleaning1.getDuty()).isEqualTo(anotherDuty);
-        assertThat(cleaning2.getDuty()).isEqualTo(duty);
+        assertThat(cleaningJpaEntity1.getDuty()).isEqualTo(anotherDuty);
+        assertThat(cleaningJpaEntity2.getDuty()).isEqualTo(duty);
         verify(cleaningRepository).saveAll(anyList());
     }
 
@@ -523,13 +522,13 @@ class DutyServiceTest {
         ReflectionTestUtils.setField(duty, "dutyId", 1L);
         DutyContext.set(duty);
 
-        Cleaning cleaning1 = Cleaning.builder()
+        CleaningJpaEntity cleaningJpaEntity1 = CleaningJpaEntity.builder()
                 .name("책상 닦기")
                 .build();
-        ReflectionTestUtils.setField(cleaning1, "cleaningId", 100L);
+        ReflectionTestUtils.setField(cleaningJpaEntity1, "cleaningId", 100L);
 
         given(cleaningRepository.findAllById(List.of(100L, 200L)))
-                .willReturn(List.of(cleaning1));
+                .willReturn(List.of(cleaningJpaEntity1));
 
         PostAddCleaningsRequest request = new PostAddCleaningsRequest(List.of(100L, 200L));
 
@@ -538,7 +537,7 @@ class DutyServiceTest {
 
         // then
         assertThat(response.addedCleaningId()).containsExactly(100L);
-        assertThat(cleaning1.getDuty()).isEqualTo(duty);
+        assertThat(cleaningJpaEntity1.getDuty()).isEqualTo(duty);
         verify(cleaningRepository).saveAll(anyList());
     }
 
@@ -555,19 +554,19 @@ class DutyServiceTest {
         ReflectionTestUtils.setField(duty, "dutyId", 1L);
         DutyContext.set(duty);
 
-        Cleaning cleaning = Cleaning.builder()
+        CleaningJpaEntity cleaningJpaEntity = CleaningJpaEntity.builder()
                 .name("휴지통 비우기")
                 .duty(duty)
                 .build();
-        ReflectionTestUtils.setField(cleaning, "cleaningId", 100L);
+        ReflectionTestUtils.setField(cleaningJpaEntity, "cleaningId", 100L);
 
-        given(cleaningRepository.findById(100L)).willReturn(Optional.of(cleaning));
+        given(cleaningRepository.findById(100L)).willReturn(Optional.of(cleaningJpaEntity));
 
         // when
         dutyService.removeCleaningFromDuty(100L);
 
         // then
-        assertThat(cleaning.getDuty()).isNull();
+        assertThat(cleaningJpaEntity.getDuty()).isNull();
     }
 
 
@@ -609,13 +608,13 @@ class DutyServiceTest {
                 .build();
         ReflectionTestUtils.setField(anotherDuty, "dutyId", 2L);
 
-        Cleaning cleaning = Cleaning.builder()
+        CleaningJpaEntity cleaningJpaEntity = CleaningJpaEntity.builder()
                 .name("회의실 책상 닦기")
                 .duty(anotherDuty)
                 .build();
-        ReflectionTestUtils.setField(cleaning, "cleaningId", 200L);
+        ReflectionTestUtils.setField(cleaningJpaEntity, "cleaningId", 200L);
 
-        given(cleaningRepository.findById(200L)).willReturn(Optional.of(cleaning));
+        given(cleaningRepository.findById(200L)).willReturn(Optional.of(cleaningJpaEntity));
 
         // when & then
         assertThatThrownBy(() -> dutyService.removeCleaningFromDuty(200L))

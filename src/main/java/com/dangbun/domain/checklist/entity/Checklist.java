@@ -1,7 +1,7 @@
 package com.dangbun.domain.checklist.entity;
 
 import com.dangbun.domain.checklist.exception.custom.ChecklistStatusConflictException;
-import com.dangbun.domain.cleaning.entity.Cleaning;
+import com.dangbun.domain.cleaning.refactor.adapter.out.CleaningJpaEntity;
 import com.dangbun.domain.member.original.entity.MemberJpaEntity;
 import com.dangbun.global.entity.BaseEntity;
 import jakarta.persistence.*;
@@ -30,7 +30,7 @@ public class Checklist extends BaseEntity {
     @JoinColumn(name = "cleaning_id")
     @NotNull
     @OnDelete(action = OnDeleteAction.CASCADE)
-    private Cleaning cleaning;
+    private CleaningJpaEntity cleaningJpaEntity;
 
     @Column(name = "is_complete")
     private Boolean isComplete;
@@ -42,9 +42,9 @@ public class Checklist extends BaseEntity {
     private LocalDateTime completeTime;
 
     @Builder
-    public Checklist(Long checklistId, Cleaning cleaning, Boolean isComplete, Long completeMemberId, LocalDateTime completeTime) {
+    public Checklist(Long checklistId, CleaningJpaEntity cleaningJpaEntity, Boolean isComplete, Long completeMemberId, LocalDateTime completeTime) {
         this.checklistId = checklistId;
-        this.cleaning = cleaning;
+        this.cleaningJpaEntity = cleaningJpaEntity;
         this.isComplete = isComplete;
         this.completeMemberId = completeMemberId;
         this.completeTime = completeTime;

@@ -95,7 +95,7 @@ public record GetPlaceResponse(
                     ? checklist.getCompleteTime().toLocalTime()
                     : null;
 
-            return new CheckListDto(checklist.getChecklistId(), memberDtos, checklist.getCleaning().getName(), time, checklist.getCleaning().getNeedPhoto());
+            return new CheckListDto(checklist.getChecklistId(), memberDtos, checklist.getCleaningJpaEntity().getName(), time, checklist.getCleaningJpaEntity().getNeedPhoto());
         }
     }
 

@@ -6,17 +6,17 @@ import com.dangbun.domain.calendar.exception.custom.InvalidDateException;
 import com.dangbun.domain.calendar.exception.custom.NoPhotoException;
 import com.dangbun.domain.checklist.entity.Checklist;
 import com.dangbun.domain.checklist.repository.ChecklistRepository;
-import com.dangbun.domain.cleaning.entity.Cleaning;
-import com.dangbun.domain.cleaning.entity.CleaningRepeatType;
+import com.dangbun.domain.cleaning.refactor.adapter.out.CleaningJpaEntity;
+import com.dangbun.domain.cleaning.refactor.domain.CleaningRepeatType;
 import com.dangbun.domain.cleaningImage.repository.CleaningImageRepository;
 import com.dangbun.domain.cleaningImage.service.CleaningImageService;
-import com.dangbun.domain.cleaningdate.entity.CleaningDate;
+import com.dangbun.domain.cleaningdate.entity.CleaningDateJpaEntity;
 import com.dangbun.domain.cleaningdate.repository.CleaningDateRepository;
-import com.dangbun.domain.duty.entity.Duty;
+import com.dangbun.domain.duty.refactor.adapter.out.persistence.DutyJpaEntity;
 import com.dangbun.domain.member.original.entity.MemberJpaEntity;
 import com.dangbun.domain.member.original.entity.MemberRole;
 import com.dangbun.domain.member.original.repository.MemberRepository;
-import com.dangbun.domain.membercleaning.entity.MemberCleaning;
+import com.dangbun.domain.membercleaning.entity.MemberCleaningJpaEntity;
 import com.dangbun.domain.membercleaning.repository.MemberCleaningRepository;
 import com.dangbun.global.context.MemberContext;
 import com.dangbun.global.s3.S3Service;
@@ -66,8 +66,8 @@ public class CalendarService {
 
         for (Checklist checklist : checklists) {
             Long checklistId = checklist.getChecklistId();
-            String cleaningName = checklist.getCleaning().getName();
-            String dutyName = checklist.getCleaning().getDuty().getName();
+            String cleaningName = checklist.getCleaningJpaEntity().getName();
+            String dutyName = checklist.getCleaningJpaEntity().getDuty().getName();
             Boolean isComplete = checklist.getIsComplete();
 
             String memberName = null;
@@ -76,7 +76,7 @@ public class CalendarService {
                 memberName = memberRepository.findById(checklist.getCompleteMemberId()).map(MemberJpaEntity::getName).orElse(null);
                 localTime = checklist.getCompleteTime().toLocalTime();
             }
-            Boolean needPhoto = checklist.getCleaning().getNeedPhoto();
+            Boolean needPhoto = checklist.getCleaningJpaEntity().getNeedPhoto();
 
             checklistDtos.add(ChecklistDto.of(checklistId, cleaningName, dutyName, isComplete, memberName, localTime, needPhoto));
         }
@@ -120,12 +120,12 @@ public class CalendarService {
 
     private void filterMyChecklists(MemberJpaEntity me, List<Checklist> checklists) {
         if (me.getRole().equals(MemberRole.MEMBER)) {
-            List<Cleaning> myCleanings = memberCleaningRepository.findAllByMember(me)
+            List<CleaningJpaEntity> myCleaningJpaEntities = memberCleaningRepository.findAllByMember(me)
                     .stream()
-                    .map(MemberCleaning::getCleaning)
+                    .map(MemberCleaningJpaEntity::getCleaningJpaEntity)
                     .toList();
 
-            checklists.removeIf(checklist -> !myCleanings.contains(checklist.getCleaning()));
+            checklists.removeIf(checklist -> !myCleaningJpaEntities.contains(checklist.getCleaningJpaEntity()));
         }
     }
 
@@ -143,7 +143,7 @@ public class CalendarService {
     public GetImageUrlResponse getPhotoUrl(Long checklistId) {
         Checklist checklist = checklistRepository.findWithCleaningById(checklistId).orElseThrow();
 
-        if (!checklist.getCleaning().getNeedPhoto()) {
+        if (!checklist.getCleaningJpaEntity().getNeedPhoto()) {
             throw new NoPhotoException(NO_PHOTO);
         }
 
@@ -154,21 +154,21 @@ public class CalendarService {
     public GetCleaningInfoResponse getCleaningInfo(Long checklistId) {
         Checklist checklist = checklistRepository.findWithCleaningAndDutyById(checklistId).orElseThrow();
 
-        Cleaning cleaning = checklist.getCleaning();
-        Duty duty = cleaning.getDuty();
-        List<MemberCleaning> memberCleanings = memberCleaningRepository.findAllByCleaning(cleaning);
-        List<MemberJpaEntity> members = memberCleanings.stream().map(MemberCleaning::getMember).toList();
+        CleaningJpaEntity cleaningJpaEntity = checklist.getCleaningJpaEntity();
+        DutyJpaEntity duty = cleaningJpaEntity.getDuty();
+        List<MemberCleaningJpaEntity> memberCleaningJpaEntities = memberCleaningRepository.findAllByCleaningJpaEntity(cleaningJpaEntity);
+        List<MemberJpaEntity> members = memberCleaningJpaEntities.stream().map(MemberCleaningJpaEntity::getMember).toList();
 
-        Long cleaningId = cleaning.getCleaningId();
+        Long cleaningId = cleaningJpaEntity.getCleaningId();
         String dutyName = duty.getName();
         List<String> membersName = members.stream().map(MemberJpaEntity::getName).toList();
-        Boolean needPhoto = cleaning.getNeedPhoto();
-        CleaningRepeatType repeatType = cleaning.getRepeatType();
-        List<DayOfWeek> repeatDays = parseRepeatDaysToDayOfWeek(cleaning.getRepeatDays());
+        Boolean needPhoto = cleaningJpaEntity.getNeedPhoto();
+        CleaningRepeatType repeatType = cleaningJpaEntity.getRepeatType();
+        List<DayOfWeek> repeatDays = parseRepeatDaysToDayOfWeek(cleaningJpaEntity.getRepeatDays());
 
-        List<CleaningDate> cleaningDates = cleaningDateRepository.findByCleaning(cleaning);
+        List<CleaningDateJpaEntity> cleaningDateJpaEntities = cleaningDateRepository.findByCleaningJpaEntity(cleaningJpaEntity);
 
-        List<LocalDate> dates = cleaningDates.stream().map(CleaningDate::getDate).toList();
+        List<LocalDate> dates = cleaningDateJpaEntities.stream().map(CleaningDateJpaEntity::getDate).toList();
 
         return GetCleaningInfoResponse.of(cleaningId, dutyName, membersName, needPhoto, repeatType, repeatDays, dates);
 

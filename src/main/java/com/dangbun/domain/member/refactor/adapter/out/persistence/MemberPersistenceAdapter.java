@@ -62,6 +62,13 @@ public class MemberPersistenceAdapter implements MemberCommandPort, MemberQueryP
                 .map(memberMapper::mapToDomainEntity);
     }
 
+    @Override
+    public List<Member> findAllByNameIn(List<String> members) {
+        List<MemberJpaEntity> memberJpaEntities = memberRepository.findAllByNameIn(members);
+
+        return memberJpaEntities.stream().map(memberMapper::mapToDomainEntity).toList();
+    }
+
     // ===== GetMemberByInviteCodePort =====
 
     @Override

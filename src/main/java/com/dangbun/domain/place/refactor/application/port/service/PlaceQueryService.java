@@ -2,16 +2,20 @@ package com.dangbun.domain.place.refactor.application.port.service;
 
 import com.dangbun.domain.checklist.entity.Checklist;
 import com.dangbun.domain.checklist.repository.ChecklistRepository;
-import com.dangbun.domain.cleaning.entity.Cleaning;
+import com.dangbun.domain.cleaning.refactor.adapter.out.CleaningJpaEntity;
 import com.dangbun.domain.cleaning.repository.CleaningRepository;
-import com.dangbun.domain.duty.entity.Duty;
-import com.dangbun.domain.duty.repository.DutyRepository;
+import com.dangbun.domain.duty.original.repository.DutyRepository;
+import com.dangbun.domain.duty.refactor.application.port.out.DutyCommandPort;
+import com.dangbun.domain.duty.refactor.application.port.out.DutyQueryPort;
+import com.dangbun.domain.duty.refactor.domain.Duty;
 import com.dangbun.domain.member.original.entity.MemberJpaEntity;
 import com.dangbun.domain.member.original.entity.MemberRole;
 import com.dangbun.domain.member.original.repository.MemberRepository;
-import com.dangbun.domain.membercleaning.entity.MemberCleaning;
+import com.dangbun.domain.membercleaning.entity.MemberCleaningJpaEntity;
 import com.dangbun.domain.membercleaning.repository.MemberCleaningRepository;
-import com.dangbun.domain.memberduty.entity.MemberDutyJpaEntity;
+import com.dangbun.domain.memberduty.refactor.MemberDuty;
+import com.dangbun.domain.memberduty.refactor.MemberDutyCommandPort;
+import com.dangbun.domain.memberduty.refactor.MemberDutyQueryPort;
 import com.dangbun.domain.memberduty.repository.MemberDutyRepository;
 import com.dangbun.domain.notificationreceiver.repository.NotificationReceiverRepository;
 import com.dangbun.domain.place.refactor.application.port.out.PlaceQueryPort;
@@ -39,6 +43,7 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static com.dangbun.domain.duty.refactor.domain.Duty.*;
 import static com.dangbun.domain.place.refactor.exception.status.PlaceExceptionResponse.*;
 
 @Service
@@ -47,7 +52,8 @@ import static com.dangbun.domain.place.refactor.exception.status.PlaceExceptionR
 public class PlaceQueryService implements PlaceQuery {
 
     private final PlaceQueryPort placeQueryPort;
-
+    private final DutyQueryPort dutyQueryPort;
+    private final MemberDutyQueryPort memberDutyQueryPort;
     /*
      * TODO: 다른 도메인 헥사고날 아키텍처 전환 시 수정
      * 각 도메인의 Query Port를 통해 조회하도록 변경 필요
@@ -68,6 +74,8 @@ public class PlaceQueryService implements PlaceQuery {
     private final MemberCleaningRepository memberCleaningRepository;
     private final MemberDutyRepository memberDutyRepository;
     private final NotificationReceiverRepository notificationReceiverRepository;
+    private final DutyCommandPort dutyCommandPort;
+    private final MemberDutyCommandPort memberDutyCommandPort;
 
     @Override
     public PlaceListResult getPlaceList(Long userId) {
@@ -91,7 +99,7 @@ public class PlaceQueryService implements PlaceQuery {
             } else {
                 com.dangbun.domain.place.original.entity.Place place = member.getPlace();
 
-                List<MemberCleaning> memberCleanings = memberCleaningRepository.findAllByMember(member);
+                List<MemberCleaningJpaEntity> memberCleaningJpaEntities = memberCleaningRepository.findAllByMember(member);
                 Integer totalCleaning = 0;
                 Integer endCleaning = 0;
                 LocalDate now = LocalDate.now();
@@ -99,20 +107,20 @@ public class PlaceQueryService implements PlaceQuery {
                 LocalDateTime end = now.plusDays(1).atStartOfDay();
 
                 if (member.getRole().equals(MemberRole.MANAGER)) {
-                    List<Cleaning> cleanings = cleaningRepository.findByPlace(place);
-                    totalCleaning = cleanings.size();
-                    for (Cleaning cleaning : cleanings) {
-                        if (checklistRepository.existsCompletedChecklistByDateAndCleaning(start, end, cleaning)) {
+                    List<CleaningJpaEntity> cleaningJpaEntities = cleaningRepository.findByPlace(place);
+                    totalCleaning = cleaningJpaEntities.size();
+                    for (CleaningJpaEntity cleaningJpaEntity : cleaningJpaEntities) {
+                        if (checklistRepository.existsCompletedChecklistByDateAndCleaning(start, end, cleaningJpaEntity)) {
                             endCleaning++;
                         }
                     }
                 }
                 if (member.getRole().equals(MemberRole.MEMBER)) {
-                    totalCleaning = memberCleanings.size();
-                    for (MemberCleaning memberCleaning : memberCleanings) {
-                        Cleaning cleaning = memberCleaning.getCleaning();
+                    totalCleaning = memberCleaningJpaEntities.size();
+                    for (MemberCleaningJpaEntity memberCleaningJpaEntity : memberCleaningJpaEntities) {
+                        CleaningJpaEntity cleaningJpaEntity = memberCleaningJpaEntity.getCleaningJpaEntity();
 
-                        if (checklistRepository.existsCompletedChecklistByDateAndCleaning(start, end, cleaning)) {
+                        if (checklistRepository.existsCompletedChecklistByDateAndCleaning(start, end, cleaningJpaEntity)) {
                             endCleaning++;
                         }
                     }
@@ -181,17 +189,20 @@ public class PlaceQueryService implements PlaceQuery {
             );
         }
 
-        List<MemberDutyJpaEntity> memberDuties = memberDutyRepository.findAllWithMemberAndPlaceByPlaceId(placeId);
+        List<MemberDuty> memberDuties = memberDutyQueryPort.findAllWithMemberAndPlaceByPlaceId(placeId);
+//        List<MemberDutyJpaEntity> memberDuties = memberDutyRepository.findAllWithMemberAndPlaceByPlaceId(placeId);
 
-        List<MemberCleaning> memberCleanings = memberDuties.stream()
-                .flatMap(md -> memberCleaningRepository.findAllByMember(md.getMember()).stream())
+        List<MemberCleaningJpaEntity> memberCleaningJpaEntities = memberDuties.stream()
+                .flatMap(md -> memberCleaningRepository.findAllByMember_MemberId(md.getMemberId().value()).stream())
                 .distinct()
                 .toList();
 
         if (me.getRole() == MemberRole.MANAGER) {
-            List<Duty> duties = dutyRepository.findByPlace_PlaceId(placeId);
+            List<Duty> duties = dutyQueryPort.findByPlaceId(placeId);
+            List<DutyId> dutyIds = duties.stream().map(Duty::getDutyId).toList();
+//            List<Duty> duties = dutyRepository.findByPlace_PlaceId(placeId);
 
-            Map<Duty, List<Checklist>> checklistMap = duties.stream()
+            Map<DutyId, List<Checklist>> checklistMap = dutyIds.stream()
                     .collect(Collectors.toMap(
                             Function.identity(),
                             d -> filterChecklist(d, place),
@@ -199,7 +210,7 @@ public class PlaceQueryService implements PlaceQuery {
                             LinkedHashMap::new
                     ));
 
-            PlaceResult.DutyDto dutyDto = createManagerDutyResult(checklistMap, memberCleanings);
+            PlaceResult.DutyDto dutyDto = createManagerDutyResult(checklistMap, memberCleaningJpaEntities);
             return new PlaceResult(
                     me.getMemberId(),
                     placeId,
@@ -211,9 +222,9 @@ public class PlaceQueryService implements PlaceQuery {
             );
         }
 
-        List<Duty> duties = memberDuties.stream().map(MemberDutyJpaEntity::getDuty).distinct().toList();
+        List<DutyId> duties = memberDuties.stream().map(MemberDuty::getDutyId).distinct().toList();
 
-        Map<Duty, List<Checklist>> checklistMap = duties.stream()
+        Map<DutyId, List<Checklist>> checklistMap = duties.stream()
                 .collect(Collectors.toMap(
                         Function.identity(),
                         d -> filterChecklist(d, place),
@@ -223,7 +234,7 @@ public class PlaceQueryService implements PlaceQuery {
 
         PlaceResult.DutyDto dutyDto = null;
         if (me.getRole() == MemberRole.MEMBER) {
-            dutyDto = createMemberDutyResult(me, checklistMap, memberCleanings);
+            dutyDto = createMemberDutyResult(me, checklistMap, memberCleaningJpaEntities);
         }
 
         return new PlaceResult(
@@ -279,7 +290,7 @@ public class PlaceQueryService implements PlaceQuery {
         return code;
     }
 
-    private List<Checklist> filterChecklist(Duty duty, com.dangbun.domain.place.original.entity.Place place) {
+    private List<Checklist> filterChecklist(DutyId dutyId, com.dangbun.domain.place.original.entity.Place place) {
         List<Checklist> result = new ArrayList<>();
 
         Boolean isToday = place.getIsToday();
@@ -287,7 +298,7 @@ public class PlaceQueryService implements PlaceQuery {
         LocalTime startTime = place.getStartTime();
         LocalTime endTime = place.getEndTime();
 
-        List<Checklist> checklists = checklistRepository.findWithCleaningByDutyId(duty.getDutyId());
+        List<Checklist> checklists = checklistRepository.findWithCleaningByDutyId(dutyId.value());
         for (Checklist checklist : checklists) {
             LocalDateTime createdAt = checklist.getCreatedAt();
             if (isToday && (createdAt.toLocalTime().isAfter(startTime) && createdAt.toLocalTime().isBefore(endTime)) && now.toLocalDate().equals(createdAt.toLocalDate())) {
@@ -303,22 +314,21 @@ public class PlaceQueryService implements PlaceQuery {
         return result;
     }
 
-    private PlaceResult.DutyDto createManagerDutyResult(Map<Duty, List<Checklist>> checklistMap, List<MemberCleaning> memberCleanings) {
+    private PlaceResult.DutyDto createManagerDutyResult(Map<DutyId, List<Checklist>> checklistMap, List<MemberCleaningJpaEntity> memberCleaningJpaEntities) {
         List<PlaceResult.CheckListDto> allCheckLists = new ArrayList<>();
         String dutyName = null;
         Long dutyId = null;
 
-        for (Map.Entry<Duty, List<Checklist>> entry : checklistMap.entrySet()) {
-            Duty duty = entry.getKey();
-            dutyId = duty.getDutyId();
-            dutyName = duty.getName();
+        for (Map.Entry<DutyId, List<Checklist>> entry : checklistMap.entrySet()) {
+            dutyId = entry.getKey().value();
+            dutyName = dutyQueryPort.getDutyNameById(dutyId);
 
             for (Checklist checklist : entry.getValue()) {
-                Cleaning cleaning = checklist.getCleaning();
+                CleaningJpaEntity cleaningJpaEntity = checklist.getCleaningJpaEntity();
 
                 List<PlaceResult.MemberDto> members = new ArrayList<>();
-                for (MemberCleaning mc : memberCleanings) {
-                    if (mc.getCleaning().equals(cleaning)) {
+                for (MemberCleaningJpaEntity mc : memberCleaningJpaEntities) {
+                    if (mc.getCleaningJpaEntity().equals(cleaningJpaEntity)) {
                         MemberJpaEntity m = mc.getMember();
                         members.add(new PlaceResult.MemberDto(m.getMemberId(), m.getName()));
                     }
@@ -331,9 +341,9 @@ public class PlaceQueryService implements PlaceQuery {
                 allCheckLists.add(new PlaceResult.CheckListDto(
                         checklist.getChecklistId(),
                         members,
-                        cleaning.getName(),
+                        cleaningJpaEntity.getName(),
                         completeTime,
-                        cleaning.getNeedPhoto()
+                        cleaningJpaEntity.getNeedPhoto()
                 ));
             }
         }
@@ -355,24 +365,24 @@ public class PlaceQueryService implements PlaceQuery {
         );
     }
 
-    private PlaceResult.DutyDto createMemberDutyResult(MemberJpaEntity me, Map<Duty, List<Checklist>> checklistMap, List<MemberCleaning> memberCleanings) {
+    private PlaceResult.DutyDto createMemberDutyResult(MemberJpaEntity me, Map<DutyId, List<Checklist>> checklistMap, List<MemberCleaningJpaEntity> memberCleaningJpaEntities) {
         List<PlaceResult.CheckListDto> allCheckLists = new ArrayList<>();
         String dutyName = null;
         Long dutyId = null;
 
-        for (Map.Entry<Duty, List<Checklist>> entry : checklistMap.entrySet()) {
-            Duty duty = entry.getKey();
-            dutyId = duty.getDutyId();
-            dutyName = duty.getName();
+        for (Map.Entry<DutyId, List<Checklist>> entry : checklistMap.entrySet()) {
+            dutyId = entry.getKey().value();
+//            dutyId = duty.getDutyId();
+            dutyName = dutyQueryPort.getDutyNameById(dutyId);
 
             for (Checklist checklist : entry.getValue()) {
-                Cleaning cleaning = checklist.getCleaning();
+                CleaningJpaEntity cleaningJpaEntity = checklist.getCleaningJpaEntity();
 
                 List<PlaceResult.MemberDto> members = new ArrayList<>();
                 boolean containsMe = false;
 
-                for (MemberCleaning mc : memberCleanings) {
-                    if (mc.getCleaning().equals(cleaning)) {
+                for (MemberCleaningJpaEntity mc : memberCleaningJpaEntities) {
+                    if (mc.getCleaningJpaEntity().equals(cleaningJpaEntity)) {
                         MemberJpaEntity m = mc.getMember();
                         members.add(new PlaceResult.MemberDto(m.getMemberId(), m.getName()));
                         if (m.equals(me)) {
@@ -389,9 +399,9 @@ public class PlaceQueryService implements PlaceQuery {
                     allCheckLists.add(new PlaceResult.CheckListDto(
                             checklist.getChecklistId(),
                             members,
-                            cleaning.getName(),
+                            cleaningJpaEntity.getName(),
                             completeTime,
-                            cleaning.getNeedPhoto()
+                            cleaningJpaEntity.getNeedPhoto()
                     ));
                 }
             }

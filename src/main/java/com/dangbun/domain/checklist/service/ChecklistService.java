@@ -6,7 +6,7 @@ import com.dangbun.global.context.ChecklistContext;
 import com.dangbun.domain.checklist.dto.request.PostGetPresignedUrlRequest;
 import com.dangbun.domain.checklist.dto.request.PostSaveUploadResultRequest;
 import com.dangbun.domain.checklist.entity.Checklist;
-import com.dangbun.domain.cleaning.entity.Cleaning;
+import com.dangbun.domain.cleaning.refactor.adapter.out.CleaningJpaEntity;
 import com.dangbun.domain.cleaningImage.service.CleaningImageService;
 import com.dangbun.global.context.MemberContext;
 import com.dangbun.domain.member.original.entity.MemberJpaEntity;
@@ -46,10 +46,10 @@ public class ChecklistService {
     public PostIncompleteChecklistResponse incompleteChecklist() {
         Checklist checklist = ChecklistContext.get();
 
-        Cleaning cleaning = checklist.getCleaning();
-        List<MemberJpaEntity> members = memberCleaningRepository.findMembersByCleaningId(cleaning.getCleaningId());
+        CleaningJpaEntity cleaningJpaEntity = checklist.getCleaningJpaEntity();
+        List<MemberJpaEntity> members = memberCleaningRepository.findMembersByCleaningId(cleaningJpaEntity.getCleaningId());
         List<String> membersName = members.stream().map(MemberJpaEntity::getName).toList();
-        LocalTime endTime = cleaning.getPlace().getEndTime();
+        LocalTime endTime = cleaningJpaEntity.getPlace().getEndTime();
 
         checklist.incompleteChecklist();
 
@@ -89,8 +89,8 @@ public class ChecklistService {
 
 
     private boolean isRequiredImage(Checklist checklist) {
-        Cleaning cleaning = checklist.getCleaning();
-        return cleaning.getNeedPhoto();
+        CleaningJpaEntity cleaningJpaEntity = checklist.getCleaningJpaEntity();
+        return cleaningJpaEntity.getNeedPhoto();
     }
 
     private void checkIsImageRegistered(Checklist checklist){

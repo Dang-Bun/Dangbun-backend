@@ -2,9 +2,9 @@ package com.dangbun.domain.checklist.service;
 
 import com.dangbun.domain.checklist.entity.Checklist;
 import com.dangbun.domain.checklist.repository.ChecklistRepository;
-import com.dangbun.domain.cleaning.entity.Cleaning;
+import com.dangbun.domain.cleaning.refactor.adapter.out.CleaningJpaEntity;
 import com.dangbun.domain.cleaning.repository.CleaningRepository;
-import com.dangbun.domain.cleaningdate.entity.CleaningDate;
+import com.dangbun.domain.cleaningdate.entity.CleaningDateJpaEntity;
 import com.dangbun.domain.cleaningdate.repository.CleaningDateRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -16,7 +16,7 @@ import java.time.temporal.TemporalAdjusters;
 import java.util.Arrays;
 import java.util.List;
 
-import static com.dangbun.domain.cleaning.entity.CleaningRepeatType.*;
+import static com.dangbun.domain.cleaning.refactor.domain.CleaningRepeatType.*;
 
 @RequiredArgsConstructor
 @Service
@@ -27,19 +27,19 @@ public class ChecklistGenerateService {
     private final CleaningRepository cleaningRepository;
 
 
-    public boolean isDueToday(Cleaning cleaning) {
+    public boolean isDueToday(CleaningJpaEntity cleaningJpaEntity) {
 
-        if (cleaning.getRepeatType().equals(NONE)) {
-            List<CleaningDate> cleaningDates = cleaningDateRepository.findByCleaning(cleaning);
+        if (cleaningJpaEntity.getRepeatType().equals(NONE)) {
+            List<CleaningDateJpaEntity> cleaningDateJpaEntities = cleaningDateRepository.findByCleaningJpaEntity(cleaningJpaEntity);
 
-            for (CleaningDate cleaningDate : cleaningDates) {
-                if (cleaningDate.getDate().isEqual(LocalDate.now())) {
+            for (CleaningDateJpaEntity cleaningDateJpaEntity : cleaningDateJpaEntities) {
+                if (cleaningDateJpaEntity.getDate().isEqual(LocalDate.now())) {
                     return true;
                 }
             }
         }
 
-        if (cleaning.getRepeatType().equals(DAILY)) {
+        if (cleaningJpaEntity.getRepeatType().equals(DAILY)) {
             return true;
         }
 
@@ -47,8 +47,8 @@ public class ChecklistGenerateService {
         LocalDate now = LocalDate.now();
         DayOfWeek dow = now.getDayOfWeek();
 
-        if (cleaning.getRepeatType().equals(WEEKLY)) {
-            List<String> days = Arrays.stream(cleaning.getRepeatDays().split(","))
+        if (cleaningJpaEntity.getRepeatType().equals(WEEKLY)) {
+            List<String> days = Arrays.stream(cleaningJpaEntity.getRepeatDays().split(","))
                     .toList();
 
             if (days.contains(dow.name())) {
@@ -57,13 +57,13 @@ public class ChecklistGenerateService {
         }
 
 
-        if (cleaning.getRepeatType().equals(MONTHLY_FIRST)) {
+        if (cleaningJpaEntity.getRepeatType().equals(MONTHLY_FIRST)) {
             if (now.getDayOfMonth() == 1) {
                 return true;
             }
         }
 
-        if (cleaning.getRepeatType().equals(MONTHLY_LAST)) {
+        if (cleaningJpaEntity.getRepeatType().equals(MONTHLY_LAST)) {
             LocalDate lastDay = now.with(TemporalAdjusters.lastDayOfMonth());
             if (now.getDayOfMonth() == lastDay.getDayOfMonth()) {
                 return true;
@@ -73,17 +73,17 @@ public class ChecklistGenerateService {
     }
 
     public void generateDailyChecklists(LocalDateTime now) {
-        List<Cleaning> cleanings = cleaningRepository.findAll();
+        List<CleaningJpaEntity> cleaningJpaEntities = cleaningRepository.findAll();
 
-        for (Cleaning cleaning : cleanings) {
-            if (!isDueToday(cleaning)) continue;
+        for (CleaningJpaEntity cleaningJpaEntity : cleaningJpaEntities) {
+            if (!isDueToday(cleaningJpaEntity)) continue;
 
-            Boolean exists = checklistRepository.existsByCleaningAndCreatedAt(cleaning, now);
+            Boolean exists = checklistRepository.existsByCleaningJpaEntityAndCreatedAt(cleaningJpaEntity, now);
 
             if (exists) continue;
 
             Checklist checklist = Checklist.builder()
-                    .cleaning(cleaning)
+                    .cleaningJpaEntity(cleaningJpaEntity)
                     .isComplete(false)
                     .completeMemberId(null)
                     .completeTime(null)

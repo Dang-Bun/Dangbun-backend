@@ -1,7 +1,7 @@
 package com.dangbun.domain.member.original.service;
 
-import com.dangbun.domain.duty.entity.Duty;
-import com.dangbun.domain.duty.repository.DutyRepository;
+import com.dangbun.domain.duty.original.repository.DutyRepository;
+import com.dangbun.domain.duty.refactor.adapter.out.persistence.DutyJpaEntity;
 import com.dangbun.domain.member.original.dto.request.DeleteMemberRequest;
 import com.dangbun.domain.member.original.dto.request.DeleteSelfFromPlaceRequest;
 import com.dangbun.domain.member.original.dto.response.*;
@@ -11,7 +11,7 @@ import com.dangbun.global.context.MemberContext;
 import com.dangbun.domain.member.original.entity.MemberJpaEntity;
 import com.dangbun.domain.member.original.entity.MemberRole;
 import com.dangbun.domain.member.original.repository.MemberRepository;
-import com.dangbun.domain.memberduty.entity.MemberDutyJpaEntity;
+import com.dangbun.domain.memberduty.refactor.adapter.out.MemberDutyJpaEntity;
 import com.dangbun.domain.memberduty.repository.MemberDutyRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -74,9 +74,9 @@ public class MemberService {
         MemberJpaEntity member = getMemberByMemberIdAndPlaceId(memberId, placeId);
 
         List<MemberDutyJpaEntity> memberDuties = memberDutyRepository.findAllByMember(member);
-        List<Duty> duties = new ArrayList<>();
+        List<DutyJpaEntity> duties = new ArrayList<>();
         for (MemberDutyJpaEntity memberDutyJpaEntity : memberDuties) {
-            Duty duty = memberDutyJpaEntity.getDuty();
+            DutyJpaEntity duty = memberDutyJpaEntity.getDuty();
             duties.add(duty);
         }
 
@@ -167,7 +167,7 @@ public class MemberService {
         MemberJpaEntity targetMember = memberRepository.findByMemberIdAndPlace_PlaceId(memberId, placeId)
                 .orElseThrow(() -> new MemberNotFoundException(MEMBER_NOT_FOUND));
 
-        Duty duty = dutyRepository.findByDutyIdAndPlace_PlaceId(dutyId, placeId)
+        DutyJpaEntity duty = dutyRepository.findByDutyIdAndPlace_PlaceId(dutyId, placeId)
                 .orElseThrow(() -> new DutyNotInPlaceException(DUTY_NOT_IN_PLACE));
 
         if (memberDutyRepository.existsByDutyAndMember(duty, targetMember)) {

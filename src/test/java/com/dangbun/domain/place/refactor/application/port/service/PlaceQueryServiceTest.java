@@ -2,16 +2,16 @@ package com.dangbun.domain.place.refactor.application.port.service;
 
 import com.dangbun.domain.checklist.entity.Checklist;
 import com.dangbun.domain.checklist.repository.ChecklistRepository;
-import com.dangbun.domain.cleaning.entity.Cleaning;
+import com.dangbun.domain.cleaning.refactor.adapter.out.CleaningJpaEntity;
 import com.dangbun.domain.cleaning.repository.CleaningRepository;
-import com.dangbun.domain.duty.entity.Duty;
-import com.dangbun.domain.duty.repository.DutyRepository;
+import com.dangbun.domain.duty.original.entity.Duty;
+import com.dangbun.domain.duty.original.repository.DutyRepository;
 import com.dangbun.domain.member.original.entity.MemberJpaEntity;
 import com.dangbun.domain.member.original.entity.MemberRole;
 import com.dangbun.domain.member.original.repository.MemberRepository;
-import com.dangbun.domain.membercleaning.entity.MemberCleaning;
+import com.dangbun.domain.membercleaning.entity.MemberCleaningJpaEntity;
 import com.dangbun.domain.membercleaning.repository.MemberCleaningRepository;
-import com.dangbun.domain.memberduty.entity.MemberDutyJpaEntity;
+import com.dangbun.domain.memberduty.refactor.adapter.out.MemberDutyJpaEntity;
 import com.dangbun.domain.memberduty.repository.MemberDutyRepository;
 import com.dangbun.domain.notificationreceiver.repository.NotificationReceiverRepository;
 import com.dangbun.domain.place.original.entity.Place;
@@ -81,7 +81,7 @@ class PlaceQueryServiceTest {
     private MemberJpaEntity mockMember;
     private MemberJpaEntity mockManager;
     private Duty mockDuty;
-    private Cleaning mockCleaning;
+    private CleaningJpaEntity mockCleaningJpaEntity;
 
     @BeforeEach
     void setUp() {
@@ -127,11 +127,11 @@ class PlaceQueryServiceTest {
                 .build();
         ReflectionTestUtils.setField(mockDuty, "dutyId", 1000L);
 
-        mockCleaning = Cleaning.builder()
+        mockCleaningJpaEntity = CleaningJpaEntity.builder()
                 .place(mockPlace)
                 .name("화장실 청소")
                 .build();
-        ReflectionTestUtils.setField(mockCleaning, "cleaningId", 2000L);
+        ReflectionTestUtils.setField(mockCleaningJpaEntity, "cleaningId", 2000L);
     }
 
     @AfterEach
@@ -173,13 +173,13 @@ class PlaceQueryServiceTest {
     @DisplayName("플레이스 목록 조회 - 일반 멤버")
     void getPlaceList_withActiveMember() {
         // given
-        MemberCleaning memberCleaning = MemberCleaning.builder()
+        MemberCleaningJpaEntity memberCleaningJpaEntity = MemberCleaningJpaEntity.builder()
                 .member(mockMember)
-                .cleaning(mockCleaning)
+                .cleaning(mockCleaningJpaEntity)
                 .build();
 
         given(memberRepository.findWithPlaceByUserId(1L)).willReturn(List.of(mockMember));
-        given(memberCleaningRepository.findAllByMember(mockMember)).willReturn(List.of(memberCleaning));
+        given(memberCleaningRepository.findAllByMember(mockMember)).willReturn(List.of(memberCleaningJpaEntity));
         given(checklistRepository.existsCompletedChecklistByDateAndCleaning(any(), any(), any())).willReturn(false);
         given(notificationReceiverRepository.countUnreadByMemberId(100L)).willReturn(3);
 
@@ -201,7 +201,7 @@ class PlaceQueryServiceTest {
     void getPlaceList_withManager() {
         // given
         given(memberRepository.findWithPlaceByUserId(1L)).willReturn(List.of(mockManager));
-        given(cleaningRepository.findByPlace(mockPlace)).willReturn(List.of(mockCleaning));
+        given(cleaningRepository.findByPlace(mockPlace)).willReturn(List.of(mockCleaningJpaEntity));
         given(checklistRepository.existsCompletedChecklistByDateAndCleaning(any(), any(), any())).willReturn(true);
         given(notificationReceiverRepository.countUnreadByMemberId(200L)).willReturn(0);
 
@@ -295,15 +295,15 @@ class PlaceQueryServiceTest {
                 .duty(mockDuty)
                 .build();
 
-        MemberCleaning memberCleaning = MemberCleaning.builder()
+        MemberCleaningJpaEntity memberCleaningJpaEntity = MemberCleaningJpaEntity.builder()
                 .member(mockMember)
-                .cleaning(mockCleaning)
+                .cleaning(mockCleaningJpaEntity)
                 .build();
 
         mockPlace.setTime(LocalTime.of(9, 0), LocalTime.of(18, 0), true);
 
         Checklist checklist = Checklist.builder()
-                .cleaning(mockCleaning)
+                .cleaning(mockCleaningJpaEntity)
                 .isComplete(false)
                 .build();
         ReflectionTestUtils.setField(checklist, "checklistId", 3000L);
@@ -313,7 +313,7 @@ class PlaceQueryServiceTest {
         given(memberDutyRepository.findAllWithMemberAndPlaceByPlaceId(10L))
                 .willReturn(List.of(memberDutyJpaEntity));
         given(memberCleaningRepository.findAllByMember(mockMember))
-                .willReturn(List.of(memberCleaning));
+                .willReturn(List.of(memberCleaningJpaEntity));
         given(checklistRepository.findWithCleaningByDutyId(1000L))
                 .willReturn(List.of(checklist));
 
@@ -336,15 +336,15 @@ class PlaceQueryServiceTest {
                 .duty(mockDuty)
                 .build();
 
-        MemberCleaning memberCleaning = MemberCleaning.builder()
+        MemberCleaningJpaEntity memberCleaningJpaEntity = MemberCleaningJpaEntity.builder()
                 .member(mockMember)
-                .cleaning(mockCleaning)
+                .cleaning(mockCleaningJpaEntity)
                 .build();
 
         mockPlace.setTime(LocalTime.of(9, 0), LocalTime.of(18, 0), true);
 
         Checklist checklist = Checklist.builder()
-                .cleaning(mockCleaning)
+                .cleaning(mockCleaningJpaEntity)
                 .isComplete(false)
                 .build();
         ReflectionTestUtils.setField(checklist, "checklistId", 4000L);
@@ -355,7 +355,7 @@ class PlaceQueryServiceTest {
         given(memberDutyRepository.findAllWithMemberAndPlaceByPlaceId(10L))
                 .willReturn(List.of(memberDutyJpaEntity));
         given(memberCleaningRepository.findAllByMember(mockMember))
-                .willReturn(List.of(memberCleaning));
+                .willReturn(List.of(memberCleaningJpaEntity));
         given(checklistRepository.findWithCleaningByDutyId(1000L))
                 .willReturn(List.of(checklist));
 
