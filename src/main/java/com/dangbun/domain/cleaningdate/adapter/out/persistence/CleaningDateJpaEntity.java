@@ -1,4 +1,4 @@
-package com.dangbun.domain.cleaningdate.entity;
+package com.dangbun.domain.cleaningdate.adapter.out.persistence;
 
 import com.dangbun.domain.cleaning.adapter.out.persistence.CleaningJpaEntity;
 import jakarta.persistence.*;

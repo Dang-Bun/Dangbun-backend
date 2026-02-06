@@ -1,13 +1,10 @@
-package com.dangbun.domain.cleaningdate.refactor.adapter.out.persistence;
+package com.dangbun.domain.cleaningdate.adapter.out.persistence;
 
 import com.dangbun.common.hexagonal.PersistenceAdapter;
-import com.dangbun.domain.cleaningdate.entity.CleaningDateJpaEntity;
-import com.dangbun.domain.cleaningdate.refactor.application.port.out.CleaningDateCommandPort;
-import com.dangbun.domain.cleaningdate.refactor.domain.CleaningDate;
-import com.dangbun.domain.cleaningdate.repository.CleaningDateRepository;
+import com.dangbun.domain.cleaningdate.application.port.out.CleaningDateCommandPort;
+import com.dangbun.domain.cleaningdate.domain.CleaningDate;
 import lombok.RequiredArgsConstructor;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @PersistenceAdapter

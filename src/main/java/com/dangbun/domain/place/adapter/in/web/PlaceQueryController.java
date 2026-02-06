@@ -4,10 +4,10 @@ import com.dangbun.domain.member.original.response.status.MemberExceptionRespons
 import com.dangbun.domain.place.adapter.in.web.dto.request.PostCheckInviteCodeRequest;
 import com.dangbun.domain.place.adapter.in.web.dto.response.*;
 import com.dangbun.domain.place.application.port.in.query.*;
-import com.dangbun.domain.place.refactor.adapter.in.web.dto.response.*;
+import com.dangbun.domain.place.adapter.in.web.dto.response.*;
 import com.dangbun.domain.place.exception.status.PlaceExceptionResponse;
 import com.dangbun.common.hexagonal.WebAdapter;
-import com.dangbun.domain.place.refactor.application.port.in.query.*;
+import com.dangbun.domain.place.application.port.in.query.*;
 import com.dangbun.domain.place.domain.Information;
 import com.dangbun.domain.user.entity.CustomUserDetails;
 import com.dangbun.global.aop.CheckManagerAuthority;

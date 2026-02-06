@@ -1,7 +1,7 @@
 package com.dangbun.domain.place.exception.handler;
 
 import com.dangbun.domain.place.exception.custom.*;
-import com.dangbun.domain.place.refactor.exception.custom.*;
+import com.dangbun.domain.place.exception.custom.*;
 import com.dangbun.global.response.BaseErrorResponse;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;

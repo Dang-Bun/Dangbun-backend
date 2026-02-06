@@ -1,6 +1,6 @@
-package com.dangbun.domain.cleaningdate.refactor.application.port.out;
+package com.dangbun.domain.cleaningdate.application.port.out;
 
-import com.dangbun.domain.cleaningdate.refactor.domain.CleaningDate;
+import com.dangbun.domain.cleaningdate.domain.CleaningDate;
 
 import java.util.List;
 

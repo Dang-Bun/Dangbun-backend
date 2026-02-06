@@ -6,7 +6,7 @@ import com.dangbun.domain.checklist.repository.ChecklistRepository;
 import com.dangbun.domain.cleaning.adapter.out.persistence.CleaningJpaEntity;
 import com.dangbun.domain.cleaning.domain.CleaningRepeatType;
 import com.dangbun.domain.cleaning.adapter.out.persistence.CleaningRepository;
-import com.dangbun.domain.cleaningdate.refactor.domain.CleaningDate;
+import com.dangbun.domain.cleaningdate.domain.CleaningDate;
 import com.dangbun.domain.place.adapter.out.persistence.PlaceJpaEntity;
 import com.dangbun.domain.place.adapter.out.persistence.SpringDataPlaceRepository;
 import lombok.RequiredArgsConstructor;

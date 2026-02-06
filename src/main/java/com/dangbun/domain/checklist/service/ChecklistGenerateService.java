@@ -4,8 +4,8 @@ import com.dangbun.domain.checklist.entity.Checklist;
 import com.dangbun.domain.checklist.repository.ChecklistRepository;
 import com.dangbun.domain.cleaning.adapter.out.persistence.CleaningJpaEntity;
 import com.dangbun.domain.cleaning.adapter.out.persistence.CleaningRepository;
-import com.dangbun.domain.cleaningdate.entity.CleaningDateJpaEntity;
-import com.dangbun.domain.cleaningdate.repository.CleaningDateRepository;
+import com.dangbun.domain.cleaningdate.adapter.out.persistence.CleaningDateJpaEntity;
+import com.dangbun.domain.cleaningdate.adapter.out.persistence.CleaningDateRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

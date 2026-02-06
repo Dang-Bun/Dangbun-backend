@@ -12,7 +12,7 @@ import com.dangbun.domain.place.domain.PlaceCategory;
 import com.dangbun.domain.place.exception.custom.InvalidInformationException;
 import com.dangbun.domain.place.exception.custom.InvalidPlaceNameException;
 import com.dangbun.domain.place.exception.custom.InvalidTimeException;
-import com.dangbun.domain.place.refactor.application.port.in.command.*;
+import com.dangbun.domain.place.application.port.in.command.*;
 import com.dangbun.domain.place.application.port.out.PlaceCommandPort;
 import com.dangbun.domain.place.application.port.out.UpdatePlaceTimeCommand;
 import com.dangbun.domain.place.domain.Place;
