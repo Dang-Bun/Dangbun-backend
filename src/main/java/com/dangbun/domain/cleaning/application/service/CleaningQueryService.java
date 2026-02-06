@@ -9,7 +9,7 @@ import com.dangbun.domain.cleaning.domain.Cleaning;
 import com.dangbun.domain.duty.refactor.adapter.out.persistence.DutyJpaEntity;
 import com.dangbun.domain.duty.refactor.application.port.out.DutyQueryPort;
 import com.dangbun.domain.duty.refactor.domain.Duty;
-import com.dangbun.domain.membercleaning.refactor.MemberCleaningQueryPort;
+import com.dangbun.domain.membercleaning.application.port.out.MemberCleaningQueryPort;
 import com.dangbun.global.context.DutyContext;
 import com.dangbun.global.context.MemberContext;
 import lombok.RequiredArgsConstructor;

@@ -1,6 +1,6 @@
-package com.dangbun.domain.membercleaning.refactor;
+package com.dangbun.domain.membercleaning.application.port.out;
 
-import com.dangbun.domain.membercleaning.refactor.domain.MemberCleaning;
+import com.dangbun.domain.membercleaning.domain.MemberCleaning;
 
 import java.util.List;
 

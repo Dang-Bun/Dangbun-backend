@@ -1,4 +1,4 @@
-package com.dangbun.domain.membercleaning.refactor.domain;
+package com.dangbun.domain.membercleaning.domain;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

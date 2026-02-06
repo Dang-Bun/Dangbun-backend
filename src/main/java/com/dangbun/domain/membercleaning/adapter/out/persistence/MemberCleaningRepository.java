@@ -1,10 +1,8 @@
-package com.dangbun.domain.membercleaning.repository;
+package com.dangbun.domain.membercleaning.adapter.out.persistence;
 
 import com.dangbun.domain.cleaning.adapter.out.persistence.CleaningJpaEntity;
 import com.dangbun.domain.duty.refactor.adapter.out.persistence.DutyJpaEntity;
 import com.dangbun.domain.member.original.entity.MemberJpaEntity;
-import com.dangbun.domain.membercleaning.entity.MemberCleaningJpaEntity;
-import com.dangbun.domain.membercleaning.entity.MemberCleaningId;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 

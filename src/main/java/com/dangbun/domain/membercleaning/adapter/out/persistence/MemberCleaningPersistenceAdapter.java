@@ -1,4 +1,4 @@
-package com.dangbun.domain.membercleaning.refactor;
+package com.dangbun.domain.membercleaning.adapter.out.persistence;
 
 import com.dangbun.common.hexagonal.PersistenceAdapter;
 import com.dangbun.domain.cleaning.adapter.out.persistence.CleaningJpaEntity;
@@ -7,9 +7,9 @@ import com.dangbun.domain.duty.refactor.adapter.out.persistence.DutyJpaEntity;
 import com.dangbun.domain.duty.refactor.domain.Duty;
 import com.dangbun.domain.member.original.entity.MemberJpaEntity;
 import com.dangbun.domain.member.original.repository.MemberRepository;
-import com.dangbun.domain.membercleaning.entity.MemberCleaningJpaEntity;
-import com.dangbun.domain.membercleaning.refactor.domain.MemberCleaning;
-import com.dangbun.domain.membercleaning.repository.MemberCleaningRepository;
+import com.dangbun.domain.membercleaning.application.port.out.MemberCleaningCommandPort;
+import com.dangbun.domain.membercleaning.application.port.out.MemberCleaningQueryPort;
+import com.dangbun.domain.membercleaning.domain.MemberCleaning;
 import lombok.RequiredArgsConstructor;
 
 import java.util.ArrayList;

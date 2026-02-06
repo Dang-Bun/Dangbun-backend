@@ -1,9 +1,8 @@
-package com.dangbun.domain.membercleaning.entity;
+package com.dangbun.domain.membercleaning.adapter.out.persistence;
 
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -29,7 +28,7 @@ public class MemberCleaningId implements Serializable {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof com.dangbun.domain.membercleaning.entity.MemberCleaningId that)) return false;
+        if (!(o instanceof MemberCleaningId that)) return false;
         return Objects.equals(cleaningId, that.cleaningId) && Objects.equals(memberId, that.memberId);
     }
 

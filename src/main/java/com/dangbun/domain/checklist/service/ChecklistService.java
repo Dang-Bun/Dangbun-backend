@@ -10,7 +10,7 @@ import com.dangbun.domain.cleaning.adapter.out.persistence.CleaningJpaEntity;
 import com.dangbun.domain.cleaningImage.service.CleaningImageService;
 import com.dangbun.global.context.MemberContext;
 import com.dangbun.domain.member.original.entity.MemberJpaEntity;
-import com.dangbun.domain.membercleaning.repository.MemberCleaningRepository;
+import com.dangbun.domain.membercleaning.adapter.out.persistence.MemberCleaningRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;

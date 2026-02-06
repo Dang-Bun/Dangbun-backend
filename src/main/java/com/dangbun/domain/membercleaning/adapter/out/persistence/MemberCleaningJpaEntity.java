@@ -1,4 +1,4 @@
-package com.dangbun.domain.membercleaning.entity;
+package com.dangbun.domain.membercleaning.adapter.out.persistence;
 
 
 import com.dangbun.domain.cleaning.adapter.out.persistence.CleaningJpaEntity;
