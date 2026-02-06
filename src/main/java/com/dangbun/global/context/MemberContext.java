@@ -1,6 +1,6 @@
 package com.dangbun.global.context;
 
-import com.dangbun.domain.member.original.entity.MemberJpaEntity;
+import com.dangbun.domain.member.adapter.out.persistence.MemberJpaEntity;
 
 public class MemberContext {
     private static final ThreadLocal<MemberJpaEntity> currentMember = new ThreadLocal<>();

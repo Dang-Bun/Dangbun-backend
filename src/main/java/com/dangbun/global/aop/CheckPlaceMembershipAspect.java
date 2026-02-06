@@ -2,9 +2,9 @@ package com.dangbun.global.aop;
 
 import com.dangbun.global.aop.support.*;
 import com.dangbun.global.context.MemberContext;
-import com.dangbun.domain.member.original.entity.MemberJpaEntity;
-import com.dangbun.domain.member.original.exception.custom.PlaceAccessDeniedException;
-import com.dangbun.domain.member.original.repository.MemberRepository;
+import com.dangbun.domain.member.adapter.out.persistence.MemberJpaEntity;
+import com.dangbun.domain.member.exception.custom.PlaceAccessDeniedException;
+import com.dangbun.domain.member.adapter.out.persistence.MemberRepository;
 import com.dangbun.domain.user.entity.CustomUserDetails;
 import com.dangbun.global.exception.RequiredParamMissingException;
 
@@ -18,7 +18,7 @@ import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 
-import static com.dangbun.domain.member.original.response.status.MemberExceptionResponse.PLACE_ACCESS_DENIED;
+import static com.dangbun.domain.member.exception.status.MemberExceptionResponse.PLACE_ACCESS_DENIED;
 import static com.dangbun.global.response.status.BaseExceptionResponse.*;
 
 @Aspect

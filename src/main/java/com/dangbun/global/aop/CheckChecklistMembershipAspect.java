@@ -1,6 +1,6 @@
 package com.dangbun.global.aop;
 
-import com.dangbun.domain.member.original.entity.MemberRole;
+import com.dangbun.domain.member.adapter.out.persistence.MemberRole;
 import com.dangbun.global.aop.support.AnnotationResolver;
 import com.dangbun.global.aop.support.RequestParamResolver;
 import com.dangbun.global.aop.support.SecuritySupport;
@@ -9,7 +9,7 @@ import com.dangbun.domain.checklist.entity.Checklist;
 import com.dangbun.domain.checklist.exception.custom.ChecklistAccessDeniedException;
 import com.dangbun.domain.checklist.repository.ChecklistRepository;
 import com.dangbun.global.context.MemberContext;
-import com.dangbun.domain.member.original.entity.MemberJpaEntity;
+import com.dangbun.domain.member.adapter.out.persistence.MemberJpaEntity;
 import com.dangbun.global.exception.RequiredParamMissingException;
 import lombok.RequiredArgsConstructor;
 import org.aspectj.lang.ProceedingJoinPoint;

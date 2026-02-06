@@ -1,6 +1,6 @@
 package com.dangbun.domain.notificationreceiver.entity;
 
-import com.dangbun.domain.member.original.entity.MemberJpaEntity;
+import com.dangbun.domain.member.adapter.out.persistence.MemberJpaEntity;
 import com.dangbun.domain.notification.entity.Notification;
 import com.dangbun.global.entity.BaseEntity;
 import jakarta.persistence.*;

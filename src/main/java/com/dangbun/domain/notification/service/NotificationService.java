@@ -1,8 +1,8 @@
 package com.dangbun.domain.notification.service;
 
 import com.dangbun.global.context.MemberContext;
-import com.dangbun.domain.member.original.entity.MemberJpaEntity;
-import com.dangbun.domain.member.original.repository.MemberRepository;
+import com.dangbun.domain.member.adapter.out.persistence.MemberJpaEntity;
+import com.dangbun.domain.member.adapter.out.persistence.MemberRepository;
 import com.dangbun.domain.notification.dto.request.*;
 import com.dangbun.domain.notification.dto.response.*;
 import com.dangbun.domain.notification.dto.response.GetNotificationListResponse.NotificationDto;

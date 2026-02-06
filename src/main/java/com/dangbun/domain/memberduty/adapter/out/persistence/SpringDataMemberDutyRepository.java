@@ -1,7 +1,7 @@
 package com.dangbun.domain.memberduty.adapter.out.persistence;
 
 import com.dangbun.domain.duty.refactor.adapter.out.persistence.DutyJpaEntity;
-import com.dangbun.domain.member.original.entity.MemberJpaEntity;
+import com.dangbun.domain.member.adapter.out.persistence.MemberJpaEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;

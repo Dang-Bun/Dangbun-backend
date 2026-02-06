@@ -4,7 +4,7 @@ import com.dangbun.common.hexagonal.WebAdapter;
 import com.dangbun.domain.duty.refactor.adapter.in.web.dto.response.*;
 import com.dangbun.domain.duty.refactor.application.port.in.query.*;
 import com.dangbun.domain.duty.refactor.exception.status.DutyExceptionResponse;
-import com.dangbun.domain.member.original.response.status.MemberExceptionResponse;
+import com.dangbun.domain.member.exception.status.MemberExceptionResponse;
 import com.dangbun.global.aop.CheckDutyInPlace;
 import com.dangbun.global.aop.CheckPlaceMembership;
 import com.dangbun.global.docs.DocumentedApiErrors;

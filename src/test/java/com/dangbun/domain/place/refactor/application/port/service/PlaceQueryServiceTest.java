@@ -6,9 +6,9 @@
 //import com.dangbun.domain.cleaning.adapter.out.persistence.CleaningRepository;
 //import com.dangbun.domain.duty.original.entity.Duty;
 //import com.dangbun.domain.duty.original.repository.DutyRepository;
-//import com.dangbun.domain.member.original.entity.MemberJpaEntity;
-//import com.dangbun.domain.member.original.entity.MemberRole;
-//import com.dangbun.domain.member.original.repository.MemberRepository;
+//import com.dangbun.domain.member.refactor.adapter.out.persistence.MemberJpaEntity;
+//import com.dangbun.domain.member.refactor.adapter.out.persistence.MemberRole;
+//import com.dangbun.domain.member.refactor.adapter.out.persistence.MemberRepository;
 //import com.dangbun.domain.membercleaning.adapter.out.persistence.MemberCleaningJpaEntity;
 //import com.dangbun.domain.membercleaning.adapter.out.persistence.MemberCleaningRepository;
 //import com.dangbun.domain.memberduty.refactor.adapter.out.MemberDutyJpaEntity;

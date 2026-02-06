@@ -1,6 +1,6 @@
 package com.dangbun.domain.notification.dto.response;
 
-import com.dangbun.domain.member.original.entity.MemberJpaEntity;
+import com.dangbun.domain.member.adapter.out.persistence.MemberJpaEntity;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.util.List;

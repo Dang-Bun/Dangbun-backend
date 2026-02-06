@@ -8,7 +8,7 @@ import com.dangbun.domain.duty.refactor.application.port.in.query.AddCleaningsRe
 import com.dangbun.domain.duty.refactor.application.port.in.query.AddMembersResult;
 import com.dangbun.domain.duty.refactor.application.port.in.query.UpdateDutyResult;
 import com.dangbun.domain.duty.refactor.exception.status.DutyExceptionResponse;
-import com.dangbun.domain.member.original.response.status.MemberExceptionResponse;
+import com.dangbun.domain.member.exception.status.MemberExceptionResponse;
 import com.dangbun.global.aop.CheckDutyInPlace;
 import com.dangbun.global.aop.CheckManagerAuthority;
 import com.dangbun.global.aop.CheckPlaceMembership;

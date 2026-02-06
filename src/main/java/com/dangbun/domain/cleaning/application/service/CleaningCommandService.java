@@ -19,8 +19,8 @@ import com.dangbun.domain.cleaningdate.application.port.out.CleaningDateCommandP
 import com.dangbun.domain.cleaningdate.domain.CleaningDate;
 import com.dangbun.domain.duty.refactor.application.port.out.DutyQueryPort;
 import com.dangbun.domain.duty.refactor.domain.Duty;
-import com.dangbun.domain.member.refactor.application.port.out.MemberQueryPort;
-import com.dangbun.domain.member.refactor.domain.Member;
+import com.dangbun.domain.member.application.port.out.MemberQueryPort;
+import com.dangbun.domain.member.domain.Member;
 import com.dangbun.domain.membercleaning.application.port.out.MemberCleaningCommandPort;
 import com.dangbun.domain.membercleaning.domain.MemberCleaning;
 import com.dangbun.domain.place.adapter.out.persistence.PlaceJpaEntity;

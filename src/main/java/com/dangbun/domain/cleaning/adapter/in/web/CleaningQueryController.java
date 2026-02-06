@@ -7,7 +7,7 @@ import com.dangbun.domain.cleaning.adapter.in.web.dto.response.GetCleaningListRe
 import com.dangbun.domain.cleaning.adapter.in.web.dto.response.GetCleaningUnassignedResponse;
 import com.dangbun.domain.cleaning.application.port.in.query.CleaningQuery;
 import com.dangbun.domain.duty.original.response.status.DutyExceptionResponse;
-import com.dangbun.domain.member.original.response.status.MemberExceptionResponse;
+import com.dangbun.domain.member.exception.status.MemberExceptionResponse;
 import com.dangbun.global.aop.CheckDutyInPlace;
 import com.dangbun.global.aop.CheckPlaceMembership;
 import com.dangbun.global.docs.DocumentedApiErrors;

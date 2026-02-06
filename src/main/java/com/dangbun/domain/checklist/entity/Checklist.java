@@ -2,7 +2,7 @@ package com.dangbun.domain.checklist.entity;
 
 import com.dangbun.domain.checklist.exception.custom.ChecklistStatusConflictException;
 import com.dangbun.domain.cleaning.adapter.out.persistence.CleaningJpaEntity;
-import com.dangbun.domain.member.original.entity.MemberJpaEntity;
+import com.dangbun.domain.member.adapter.out.persistence.MemberJpaEntity;
 import com.dangbun.global.entity.BaseEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;

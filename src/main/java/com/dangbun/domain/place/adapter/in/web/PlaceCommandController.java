@@ -1,6 +1,6 @@
 package com.dangbun.domain.place.adapter.in.web;
 
-import com.dangbun.domain.member.original.response.status.MemberExceptionResponse;
+import com.dangbun.domain.member.exception.status.MemberExceptionResponse;
 import com.dangbun.domain.place.adapter.in.web.dto.request.DeletePlaceRequest;
 import com.dangbun.domain.place.adapter.in.web.dto.request.PatchUpdateTimeRequest;
 import com.dangbun.domain.place.adapter.in.web.dto.request.PostRegisterPlaceRequest;

@@ -1,10 +1,10 @@
 package com.dangbun.domain.place.application.port.service;
 
-import com.dangbun.domain.member.refactor.application.port.out.MemberCommandPort;
-import com.dangbun.domain.member.refactor.application.port.out.GetMemberByInviteCodePort;
-import com.dangbun.domain.member.refactor.domain.Member;
-import com.dangbun.domain.member.refactor.domain.MemberRole;
-import com.dangbun.domain.member.original.entity.MemberJpaEntity;
+import com.dangbun.domain.member.application.port.out.MemberCommandPort;
+import com.dangbun.domain.member.application.port.out.GetMemberByInviteCodePort;
+import com.dangbun.domain.member.domain.Member;
+import com.dangbun.domain.member.domain.MemberRole;
+import com.dangbun.domain.member.adapter.out.persistence.MemberJpaEntity;
 import com.dangbun.domain.place.adapter.out.persistence.PlaceJpaEntity;
 import com.dangbun.domain.place.application.port.in.command.*;
 import com.dangbun.domain.place.application.port.out.PlaceQueryPort;
@@ -12,7 +12,6 @@ import com.dangbun.domain.place.domain.PlaceCategory;
 import com.dangbun.domain.place.exception.custom.InvalidInformationException;
 import com.dangbun.domain.place.exception.custom.InvalidPlaceNameException;
 import com.dangbun.domain.place.exception.custom.InvalidTimeException;
-import com.dangbun.domain.place.application.port.in.command.*;
 import com.dangbun.domain.place.application.port.out.PlaceCommandPort;
 import com.dangbun.domain.place.application.port.out.UpdatePlaceTimeCommand;
 import com.dangbun.domain.place.domain.Place;

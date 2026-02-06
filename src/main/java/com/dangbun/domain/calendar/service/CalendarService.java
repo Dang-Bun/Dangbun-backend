@@ -13,9 +13,9 @@ import com.dangbun.domain.cleaningImage.application.port.in.query.CleaningImageQ
 import com.dangbun.domain.cleaningdate.adapter.out.persistence.CleaningDateJpaEntity;
 import com.dangbun.domain.cleaningdate.adapter.out.persistence.CleaningDateRepository;
 import com.dangbun.domain.duty.refactor.adapter.out.persistence.DutyJpaEntity;
-import com.dangbun.domain.member.original.entity.MemberJpaEntity;
-import com.dangbun.domain.member.original.entity.MemberRole;
-import com.dangbun.domain.member.original.repository.MemberRepository;
+import com.dangbun.domain.member.adapter.out.persistence.MemberJpaEntity;
+import com.dangbun.domain.member.adapter.out.persistence.MemberRole;
+import com.dangbun.domain.member.adapter.out.persistence.MemberRepository;
 import com.dangbun.domain.membercleaning.adapter.out.persistence.MemberCleaningJpaEntity;
 import com.dangbun.domain.membercleaning.adapter.out.persistence.MemberCleaningRepository;
 import com.dangbun.global.context.MemberContext;

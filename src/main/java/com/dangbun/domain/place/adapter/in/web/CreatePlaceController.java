@@ -1,8 +1,8 @@
 package com.dangbun.domain.place.adapter.in.web;
 
-import com.dangbun.domain.member.original.entity.MemberJpaEntity;
-import com.dangbun.domain.member.original.entity.MemberRole;
-import com.dangbun.domain.member.original.repository.MemberRepository;
+import com.dangbun.domain.member.adapter.out.persistence.MemberJpaEntity;
+import com.dangbun.domain.member.adapter.out.persistence.MemberRole;
+import com.dangbun.domain.member.adapter.out.persistence.MemberRepository;
 /*
  * TODO: Place 도메인 헥사고날 아키텍처 전환 완료 후 수정 필요
  * - PlaceRepository 의존성 제거

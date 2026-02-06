@@ -7,7 +7,7 @@ import com.dangbun.domain.cleaning.adapter.in.web.dto.request.PutCleaningUpdateR
 import com.dangbun.domain.cleaning.adapter.in.web.dto.response.PostCleaningResponse;
 import com.dangbun.domain.cleaning.application.port.in.command.CleaningCommandUseCase;
 import com.dangbun.domain.cleaning.exception.status.CleaningExceptionResponse;
-import com.dangbun.domain.member.original.response.status.MemberExceptionResponse;
+import com.dangbun.domain.member.exception.status.MemberExceptionResponse;
 import com.dangbun.global.aop.CheckManagerAuthority;
 import com.dangbun.global.aop.CheckPlaceMembership;
 import com.dangbun.global.docs.DocumentedApiErrors;
