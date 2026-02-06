@@ -8,8 +8,8 @@ import com.dangbun.domain.checklist.entity.Checklist;
 import com.dangbun.domain.checklist.repository.ChecklistRepository;
 import com.dangbun.domain.cleaning.adapter.out.persistence.CleaningJpaEntity;
 import com.dangbun.domain.cleaning.domain.CleaningRepeatType;
-import com.dangbun.domain.cleaningImage.repository.CleaningImageRepository;
-import com.dangbun.domain.cleaningImage.service.CleaningImageService;
+import com.dangbun.domain.cleaningImage.application.port.in.command.CleaningImageCommandUseCase;
+import com.dangbun.domain.cleaningImage.application.port.in.query.CleaningImageQuery;
 import com.dangbun.domain.cleaningdate.adapter.out.persistence.CleaningDateJpaEntity;
 import com.dangbun.domain.cleaningdate.adapter.out.persistence.CleaningDateRepository;
 import com.dangbun.domain.duty.refactor.adapter.out.persistence.DutyJpaEntity;
@@ -19,7 +19,6 @@ import com.dangbun.domain.member.original.repository.MemberRepository;
 import com.dangbun.domain.membercleaning.adapter.out.persistence.MemberCleaningJpaEntity;
 import com.dangbun.domain.membercleaning.adapter.out.persistence.MemberCleaningRepository;
 import com.dangbun.global.context.MemberContext;
-import com.dangbun.global.s3.S3Service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -37,13 +36,14 @@ import static com.dangbun.domain.calendar.response.status.CalendarExceptionRespo
 public class CalendarService {
 
 
+    private final CleaningImageQuery cleaningImageQuery;
+
+
     private final ChecklistRepository checklistRepository;
     private final MemberCleaningRepository memberCleaningRepository;
     private final MemberRepository memberRepository;
-    private final CleaningImageService cleaningImageService;
-    private final CleaningImageRepository cleaningImageRepository;
     private final CleaningDateRepository cleaningDateRepository;
-    private final S3Service s3Service;
+    private final CleaningImageCommandUseCase cleaningImageCommandUseCase;
 
 
     @Transactional(readOnly = true)
@@ -147,7 +147,7 @@ public class CalendarService {
             throw new NoPhotoException(NO_PHOTO);
         }
 
-        String imageUrl = cleaningImageService.getImageUrl(checklistId);
+        String imageUrl = cleaningImageQuery.getImageUrl(checklistId);
         return GetImageUrlResponse.of(imageUrl);
     }
 
@@ -190,8 +190,8 @@ public class CalendarService {
     public void deleteChecklist(Long checklistId) {
         MemberJpaEntity me = MemberContext.get();
 
-        cleaningImageRepository.findByChecklist_ChecklistId(checklistId)
-                .ifPresent(img -> s3Service.deleteFile(img.getS3Key()));
+        cleaningImageCommandUseCase.deleteS3File(checklistId);
+
 
         checklistRepository.deleteById(checklistId);
     }

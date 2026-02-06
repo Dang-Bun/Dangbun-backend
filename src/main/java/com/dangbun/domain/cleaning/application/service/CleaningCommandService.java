@@ -14,7 +14,7 @@ import com.dangbun.domain.cleaning.exception.custom.CleaningAlreadyExistsExcepti
 import com.dangbun.domain.cleaning.exception.custom.CleaningNotFoundException;
 import com.dangbun.domain.cleaning.exception.custom.DutyNotFoundException;
 import com.dangbun.domain.cleaning.exception.custom.InvalidDateFormatException;
-import com.dangbun.domain.cleaningImage.repository.CleaningImageRepository;
+import com.dangbun.domain.cleaningImage.application.port.in.command.CleaningImageCommandUseCase;
 import com.dangbun.domain.cleaningdate.application.port.out.CleaningDateCommandPort;
 import com.dangbun.domain.cleaningdate.domain.CleaningDate;
 import com.dangbun.domain.duty.refactor.application.port.out.DutyQueryPort;
@@ -25,7 +25,6 @@ import com.dangbun.domain.membercleaning.application.port.out.MemberCleaningComm
 import com.dangbun.domain.membercleaning.domain.MemberCleaning;
 import com.dangbun.domain.place.adapter.out.persistence.PlaceJpaEntity;
 import com.dangbun.global.context.MemberContext;
-import com.dangbun.global.s3.S3Service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -58,8 +57,7 @@ public class CleaningCommandService implements CleaningCommandUseCase {
      * CleaningImageRepository -> CleaningImageQueryPort
      */
     private final ChecklistRepository checklistRepository;
-    private final CleaningImageRepository cleaningImageRepository;
-    private final S3Service s3Service;
+    private final CleaningImageCommandUseCase cleaningImageCommandUseCase;
 
     @Override
     public PostCleaningResponse createCleaning(PostCleaningCreateRequest request) {
@@ -197,8 +195,7 @@ public class CleaningCommandService implements CleaningCommandUseCase {
          */
         List<Checklist> checklists = checklistRepository.findByCleaningJpaEntity_CleaningId(cleaningId);
         for (Checklist checklist : checklists) {
-            cleaningImageRepository.findByChecklist_ChecklistId(checklist.getChecklistId())
-                    .ifPresent(img -> s3Service.deleteFile(img.getS3Key()));
+            cleaningImageCommandUseCase.deleteS3File(checklist.getChecklistId());
         }
 
         cleaningCommandPort.deleteById(cleaningId);

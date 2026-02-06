@@ -1,8 +1,9 @@
-package com.dangbun.domain.cleaningImage.entity;
+package com.dangbun.domain.cleaningImage.adapter.out.persistence;
 
 import com.dangbun.domain.checklist.entity.Checklist;
 import com.dangbun.global.entity.BaseEntity;
 import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -10,32 +11,36 @@ import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 @Entity
-@NoArgsConstructor
-public class CleaningImage extends BaseEntity {
+@Table(name = "cleaning_image")
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class CleaningImageJpaEntity extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "cleaning_image_id")
-    Long id;
+    private Long cleaningImageId;
 
-    @Getter
     @Column(name = "s3_key")
-    String s3Key;
+    private String s3Key;
 
-    String uploader;
+    @Column(name = "uploader")
+    private String uploader;
 
+    /*
+     * TODO: Checklist 도메인 헥사고날 아키텍처 전환 시 수정
+     * Checklist -> ChecklistJpaEntity
+     */
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "checklist_id")
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Checklist checklist;
 
     @Builder
-    public CleaningImage(Long id, String s3Key, String uploader, Checklist checklist) {
-        this.id = id;
+    public CleaningImageJpaEntity(Long cleaningImageId, String s3Key, String uploader, Checklist checklist) {
+        this.cleaningImageId = cleaningImageId;
         this.s3Key = s3Key;
         this.uploader = uploader;
         this.checklist = checklist;
     }
-
-
 }

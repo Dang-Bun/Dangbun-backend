@@ -2,12 +2,13 @@ package com.dangbun.domain.checklist.service;
 
 import com.dangbun.domain.checklist.dto.response.*;
 import com.dangbun.domain.checklist.exception.custom.ChecklistRequireImageException;
+import com.dangbun.domain.cleaningImage.application.port.in.command.CleaningImageCommandUseCase;
+import com.dangbun.domain.cleaningImage.application.port.in.query.CleaningImageQuery;
 import com.dangbun.global.context.ChecklistContext;
 import com.dangbun.domain.checklist.dto.request.PostGetPresignedUrlRequest;
 import com.dangbun.domain.checklist.dto.request.PostSaveUploadResultRequest;
 import com.dangbun.domain.checklist.entity.Checklist;
 import com.dangbun.domain.cleaning.adapter.out.persistence.CleaningJpaEntity;
-import com.dangbun.domain.cleaningImage.service.CleaningImageService;
 import com.dangbun.global.context.MemberContext;
 import com.dangbun.domain.member.original.entity.MemberJpaEntity;
 import com.dangbun.domain.membercleaning.adapter.out.persistence.MemberCleaningRepository;
@@ -28,7 +29,9 @@ import static com.dangbun.domain.checklist.response.status.ChecklistExceptionRes
 @Service
 public class ChecklistService {
 
-    private final CleaningImageService cleaningImageService;
+    private final CleaningImageCommandUseCase cleaningImageCommandUseCase;
+    private final CleaningImageQuery cleaningImageQuery;
+
     private final MemberCleaningRepository memberCleaningRepository;
     private final ChecklistGenerateService checklistGenerateService;
 
@@ -59,8 +62,8 @@ public class ChecklistService {
 
     public PostGetPresignedUrlResponse generateImageUrl(PostGetPresignedUrlRequest request) {
         Checklist checklist = ChecklistContext.get();
-        Map<String, String> uploadUrlAndKey = cleaningImageService
-                .generateUrl(request.originalFileName(), request.contentType(), checklist.getChecklistId());
+        Map<String, String> uploadUrlAndKey = cleaningImageCommandUseCase
+                .generateUploadUrl(request.originalFileName(), request.contentType(), checklist.getChecklistId());
 
 
         return new PostGetPresignedUrlResponse(uploadUrlAndKey.get("uploadUrl"), uploadUrlAndKey.get("s3Key"));
@@ -68,17 +71,17 @@ public class ChecklistService {
 
     public void saveUploadResult(PostSaveUploadResultRequest request) {
         Checklist checklist = ChecklistContext.get();
-        cleaningImageService.saveImage(checklist, request.s3Key());
+        cleaningImageCommandUseCase.saveImage(checklist.getChecklistId(), request.s3Key());
     }
 
     public GetImageUrlResponse getImageUrl(Long checklistId) {
-        String accessUrl = cleaningImageService.getImageUrl(checklistId);
+        String accessUrl = cleaningImageQuery.getImageUrl(checklistId);
         return new GetImageUrlResponse(accessUrl);
     }
 
     public void deleteS3Key(Long checklistId) {
-        if(cleaningImageService.isImagePresent(checklistId)){
-            cleaningImageService.deleteByChecklistId(checklistId);
+        if(cleaningImageQuery.isImagePresent(checklistId)){
+            cleaningImageCommandUseCase.deleteByChecklistId(checklistId);
         }
     }
 
@@ -94,7 +97,7 @@ public class ChecklistService {
     }
 
     private void checkIsImageRegistered(Checklist checklist){
-        if(!cleaningImageService.isImagePresent(checklist.getChecklistId())){
+        if(!cleaningImageQuery.isImagePresent(checklist.getChecklistId())){
             throw new ChecklistRequireImageException(REQUIRE_IMAGE);
         }
     }
