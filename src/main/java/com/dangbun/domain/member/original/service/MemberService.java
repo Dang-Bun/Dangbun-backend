@@ -11,8 +11,8 @@ import com.dangbun.global.context.MemberContext;
 import com.dangbun.domain.member.original.entity.MemberJpaEntity;
 import com.dangbun.domain.member.original.entity.MemberRole;
 import com.dangbun.domain.member.original.repository.MemberRepository;
-import com.dangbun.domain.memberduty.refactor.adapter.out.MemberDutyJpaEntity;
-import com.dangbun.domain.memberduty.repository.MemberDutyRepository;
+import com.dangbun.domain.memberduty.adapter.out.persistence.MemberDutyJpaEntity;
+import com.dangbun.domain.memberduty.adapter.out.persistence.SpringDataMemberDutyRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,7 +27,7 @@ import static com.dangbun.domain.member.original.response.status.MemberException
 public class MemberService {
 
     private final MemberRepository memberRepository;
-    private final MemberDutyRepository memberDutyRepository;
+    private final SpringDataMemberDutyRepository memberDutyRepository;
     private final DutyRepository dutyRepository;
 
     @Transactional(readOnly = true)

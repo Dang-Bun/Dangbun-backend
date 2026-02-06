@@ -13,7 +13,7 @@ import com.dangbun.domain.member.original.repository.MemberRepository;
 import com.dangbun.domain.membercleaning.adapter.out.persistence.MemberCleaningJpaEntity;
 import com.dangbun.domain.membercleaning.adapter.out.persistence.MemberCleaningRepository;
 import com.dangbun.domain.memberduty.refactor.adapter.out.MemberDutyJpaEntity;
-import com.dangbun.domain.memberduty.repository.MemberDutyRepository;
+import com.dangbun.domain.memberduty.refactor.adapter.out.MemberDutyRepository;
 import com.dangbun.domain.place.original.entity.Place;
 import com.dangbun.global.context.DutyContext;
 import com.dangbun.global.context.MemberContext;

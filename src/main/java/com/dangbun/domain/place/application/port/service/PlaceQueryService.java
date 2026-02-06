@@ -13,10 +13,10 @@ import com.dangbun.domain.member.original.entity.MemberRole;
 import com.dangbun.domain.member.original.repository.MemberRepository;
 import com.dangbun.domain.membercleaning.adapter.out.persistence.MemberCleaningJpaEntity;
 import com.dangbun.domain.membercleaning.adapter.out.persistence.MemberCleaningRepository;
-import com.dangbun.domain.memberduty.refactor.MemberDuty;
-import com.dangbun.domain.memberduty.refactor.MemberDutyCommandPort;
-import com.dangbun.domain.memberduty.refactor.MemberDutyQueryPort;
-import com.dangbun.domain.memberduty.repository.MemberDutyRepository;
+import com.dangbun.domain.memberduty.domain.MemberDuty;
+import com.dangbun.domain.memberduty.application.port.out.MemberDutyCommandPort;
+import com.dangbun.domain.memberduty.application.port.out.MemberDutyQueryPort;
+import com.dangbun.domain.memberduty.adapter.out.persistence.SpringDataMemberDutyRepository;
 import com.dangbun.domain.notificationreceiver.repository.NotificationReceiverRepository;
 import com.dangbun.domain.place.adapter.out.persistence.PlaceJpaEntity;
 import com.dangbun.domain.place.application.port.out.PlaceQueryPort;
@@ -74,7 +74,7 @@ public class PlaceQueryService implements PlaceQuery {
     private final ChecklistRepository checklistRepository;
     private final CleaningRepository cleaningRepository;
     private final MemberCleaningRepository memberCleaningRepository;
-    private final MemberDutyRepository memberDutyRepository;
+    private final SpringDataMemberDutyRepository memberDutyRepository;
     private final NotificationReceiverRepository notificationReceiverRepository;
     private final DutyCommandPort dutyCommandPort;
     private final MemberDutyCommandPort memberDutyCommandPort;
@@ -191,11 +191,11 @@ public class PlaceQueryService implements PlaceQuery {
             );
         }
 
-        List<MemberDuty> memberDuties = memberDutyQueryPort.findAllWithMemberAndPlaceByPlaceId(placeId);
+        List<MemberDuty> memberDuties = memberDutyQueryPort.findAllByPlaceId(placeId);
 //        List<MemberDutyJpaEntity> memberDuties = memberDutyRepository.findAllWithMemberAndPlaceByPlaceId(placeId);
 
         List<MemberCleaningJpaEntity> memberCleaningJpaEntities = memberDuties.stream()
-                .flatMap(md -> memberCleaningRepository.findAllByMember_MemberId(md.getMemberId().value()).stream())
+                .flatMap(md -> memberCleaningRepository.findAllByMember_MemberId(md.getMemberId()).stream())
                 .distinct()
                 .toList();
 
@@ -224,7 +224,10 @@ public class PlaceQueryService implements PlaceQuery {
             );
         }
 
-        List<DutyId> duties = memberDuties.stream().map(MemberDuty::getDutyId).distinct().toList();
+        List<DutyId> duties = memberDuties.stream()
+                .map(md -> new DutyId(md.getDutyId()))
+                .distinct()
+                .toList();
 
         Map<DutyId, List<Checklist>> checklistMap = duties.stream()
                 .collect(Collectors.toMap(

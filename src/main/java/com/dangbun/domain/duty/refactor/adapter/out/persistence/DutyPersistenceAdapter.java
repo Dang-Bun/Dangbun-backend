@@ -4,7 +4,7 @@ import com.dangbun.common.hexagonal.PersistenceAdapter;
 import com.dangbun.domain.duty.refactor.application.port.out.DutyCommandPort;
 import com.dangbun.domain.duty.refactor.application.port.out.DutyQueryPort;
 import com.dangbun.domain.duty.refactor.domain.Duty;
-import com.dangbun.domain.memberduty.repository.MemberDutyRepository;
+import com.dangbun.domain.memberduty.adapter.out.persistence.SpringDataMemberDutyRepository;
 import lombok.RequiredArgsConstructor;
 
 import java.util.ArrayList;
@@ -17,7 +17,7 @@ import java.util.Optional;
 class DutyPersistenceAdapter implements DutyCommandPort, DutyQueryPort {
 
     private final SpringDataDutyRepository dutyRepository;
-    private final MemberDutyRepository memberDutyRepository;
+    private final SpringDataMemberDutyRepository memberDutyRepository;
     private final DutyMapper dutyMapper;
 
     @Override

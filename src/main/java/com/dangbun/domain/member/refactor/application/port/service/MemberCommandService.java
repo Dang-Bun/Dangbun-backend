@@ -8,9 +8,9 @@ import com.dangbun.domain.member.refactor.application.port.in.command.*;
 import com.dangbun.domain.member.refactor.application.port.out.MemberCommandPort;
 import com.dangbun.domain.member.refactor.application.port.out.MemberQueryPort;
 import com.dangbun.domain.member.refactor.domain.Member;
-import com.dangbun.domain.memberduty.refactor.MemberDuty;
-import com.dangbun.domain.memberduty.refactor.MemberDutyCommandPort;
-import com.dangbun.domain.memberduty.repository.MemberDutyRepository;
+import com.dangbun.domain.memberduty.domain.MemberDuty;
+import com.dangbun.domain.memberduty.application.port.out.MemberDutyCommandPort;
+import com.dangbun.domain.memberduty.adapter.out.persistence.SpringDataMemberDutyRepository;
 import com.dangbun.global.context.MemberContext;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -34,7 +34,7 @@ public class MemberCommandService implements MemberCommandUseCase {
     private final MemberDutyCommandPort memberDutyCommandPort;
     private final DutyQueryPort dutyQueryPort;
 
-    private final MemberDutyRepository memberDutyRepository;
+    private final SpringDataMemberDutyRepository memberDutyRepository;
 
     @Override
     public void registerMember(Long memberId) {
@@ -109,10 +109,7 @@ public class MemberCommandService implements MemberCommandUseCase {
             throw new MemberDutyAlreadyAssignedException(MEMBER_DUTY_ALREADY_ASSIGNED);
         }
 
-        MemberDuty md = MemberDuty.withIdsBuilder()
-                .memberId(targetMember.getMemberId())
-                .dutyId(duty.getDutyId().value())
-                .build();
+        MemberDuty md = MemberDuty.of(targetMember.getMemberId(), duty.getDutyId().value());
 
         memberDutyCommandPort.save(md);
     }

@@ -1,8 +1,7 @@
-package com.dangbun.domain.memberduty.refactor.adapter.out;
+package com.dangbun.domain.memberduty.adapter.out.persistence;
 
 import com.dangbun.domain.duty.refactor.adapter.out.persistence.DutyJpaEntity;
 import com.dangbun.domain.member.original.entity.MemberJpaEntity;
-import com.dangbun.domain.memberduty.entity.MemberDutyId;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -11,15 +10,19 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
-
 @Entity
-@Table(name="member_duty")
+@Table(name = "member_duty")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class MemberDutyJpaEntity {
-    @EmbeddedId
-    private MemberDutyId id;
 
+    @EmbeddedId
+    private MemberDutyJpaEntityId id;
+
+    /*
+     * TODO: Member 도메인 헥사고날 아키텍처 전환 완료 후 수정
+     * MemberJpaEntity -> refactor 패키지의 MemberJpaEntity
+     */
     @MapsId("memberId")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id", nullable = false)
@@ -32,16 +35,10 @@ public class MemberDutyJpaEntity {
     @OnDelete(action = OnDeleteAction.CASCADE)
     private DutyJpaEntity duty;
 
-
     @Builder
     public MemberDutyJpaEntity(MemberJpaEntity member, DutyJpaEntity duty) {
         this.member = member;
         this.duty = duty;
-        this.id = new MemberDutyId(member.getMemberId(), duty.getDutyId());
-    }
-
-    @Builder(builderMethodName = "withIdsBuilder")
-    public MemberDutyJpaEntity(Long memberId, Long dutyId) {
-        this.id = new MemberDutyId(memberId, dutyId);
+        this.id = new MemberDutyJpaEntityId(member.getMemberId(), duty.getDutyId());
     }
 }

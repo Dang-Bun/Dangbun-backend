@@ -1,19 +1,22 @@
-package com.dangbun.domain.memberduty.refactor;
+package com.dangbun.domain.memberduty.adapter.out.persistence;
 
+import jakarta.persistence.Embeddable;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 import java.util.Objects;
 
-public class MemberDutyId implements Serializable {
+@Embeddable
+@Getter
+@NoArgsConstructor
+public class MemberDutyJpaEntityId implements Serializable {
 
-    @Getter
     private Long memberId;
 
-    @Getter
     private Long dutyId;
 
-    public MemberDutyId(Long memberId, Long dutyId) {
+    public MemberDutyJpaEntityId(Long memberId, Long dutyId) {
         this.memberId = memberId;
         this.dutyId = dutyId;
     }
@@ -21,7 +24,7 @@ public class MemberDutyId implements Serializable {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof MemberDutyId that)) return false;
+        if (!(o instanceof MemberDutyJpaEntityId that)) return false;
         return Objects.equals(dutyId, that.dutyId) && Objects.equals(memberId, that.memberId);
     }
 

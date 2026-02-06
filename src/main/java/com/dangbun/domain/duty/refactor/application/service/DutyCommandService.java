@@ -15,9 +15,9 @@ import com.dangbun.domain.member.original.entity.MemberJpaEntity;
 import com.dangbun.domain.member.original.repository.MemberRepository;
 import com.dangbun.domain.membercleaning.adapter.out.persistence.MemberCleaningJpaEntity;
 import com.dangbun.domain.membercleaning.adapter.out.persistence.MemberCleaningRepository;
-import com.dangbun.domain.memberduty.refactor.MemberDutyCommandPort;
-import com.dangbun.domain.memberduty.refactor.adapter.out.MemberDutyJpaEntity;
-import com.dangbun.domain.memberduty.repository.MemberDutyRepository;
+import com.dangbun.domain.memberduty.application.port.out.MemberDutyCommandPort;
+import com.dangbun.domain.memberduty.adapter.out.persistence.MemberDutyJpaEntity;
+import com.dangbun.domain.memberduty.adapter.out.persistence.SpringDataMemberDutyRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -43,9 +43,9 @@ public class DutyCommandService implements DutyCommandUseCase {
 
     /*
      * TODO: MemberDuty 도메인 헥사고날 아키텍처 전환 시 수정
-     * MemberDutyRepository -> MemberDutyQueryPort/CommandPort
+     * SpringDataMemberDutyRepository -> MemberDutyQueryPort
      */
-    private final MemberDutyRepository memberDutyRepository;
+    private final SpringDataMemberDutyRepository memberDutyRepository;
 
     /*
      * TODO: Cleaning 도메인 헥사고날 아키텍처 전환 시 수정

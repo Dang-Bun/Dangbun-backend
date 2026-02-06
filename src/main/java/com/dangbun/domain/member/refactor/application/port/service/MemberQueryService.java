@@ -6,8 +6,8 @@ import com.dangbun.domain.member.refactor.application.port.in.query.*;
 import com.dangbun.domain.member.refactor.application.port.out.MemberQueryPort;
 import com.dangbun.domain.member.refactor.domain.Member;
 import com.dangbun.domain.member.refactor.domain.MemberRole;
-import com.dangbun.domain.memberduty.refactor.adapter.out.MemberDutyJpaEntity;
-import com.dangbun.domain.memberduty.repository.MemberDutyRepository;
+import com.dangbun.domain.memberduty.adapter.out.persistence.MemberDutyJpaEntity;
+import com.dangbun.domain.memberduty.adapter.out.persistence.SpringDataMemberDutyRepository;
 import com.dangbun.global.context.MemberContext;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -28,7 +28,7 @@ import static com.dangbun.domain.member.original.response.status.MemberException
 public class MemberQueryService implements MemberQuery {
 
     private final MemberQueryPort memberQueryPort;
-    private final MemberDutyRepository memberDutyRepository;
+    private final SpringDataMemberDutyRepository memberDutyRepository;
 
     @Override
     public MembersResult getMembers() {
