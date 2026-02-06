@@ -1,7 +1,7 @@
 package com.dangbun.domain.checklist.repository;
 
 import com.dangbun.domain.checklist.entity.Checklist;
-import com.dangbun.domain.cleaning.refactor.adapter.out.CleaningJpaEntity;
+import com.dangbun.domain.cleaning.adapter.out.persistence.CleaningJpaEntity;
 import io.lettuce.core.dynamic.annotation.Param;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.data.jpa.repository.JpaRepository;

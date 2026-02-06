@@ -1,8 +1,8 @@
 package com.dangbun.domain.membercleaning.refactor;
 
 import com.dangbun.common.hexagonal.PersistenceAdapter;
-import com.dangbun.domain.cleaning.refactor.adapter.out.CleaningJpaEntity;
-import com.dangbun.domain.cleaning.repository.CleaningRepository;
+import com.dangbun.domain.cleaning.adapter.out.persistence.CleaningJpaEntity;
+import com.dangbun.domain.cleaning.adapter.out.persistence.CleaningRepository;
 import com.dangbun.domain.duty.refactor.adapter.out.persistence.DutyJpaEntity;
 import com.dangbun.domain.duty.refactor.domain.Duty;
 import com.dangbun.domain.member.original.entity.MemberJpaEntity;
@@ -42,5 +42,17 @@ public class MemberCleaningPersistenceAdapter implements MemberCleaningQueryPort
             memberCleaningJpaEntities.add(new MemberCleaningJpaEntity(m, c));
         }
         memberCleaningRepository.saveAll(memberCleaningJpaEntities);
+    }
+
+    @Override
+    public void deleteAllByCleaningId(Long cleaningId) {
+        memberCleaningRepository.deleteAllByCleaningJpaEntity_CleaningId(cleaningId);
+    }
+
+    @Override
+    public List<String> findMemberNamesByCleaningId(Long cleaningId) {
+        return memberCleaningRepository.findMembersByCleaningId(cleaningId).stream()
+                .map(MemberJpaEntity::getName)
+                .toList();
     }
 }

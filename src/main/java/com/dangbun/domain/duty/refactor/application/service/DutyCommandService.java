@@ -1,8 +1,8 @@
 package com.dangbun.domain.duty.refactor.application.service;
 
 import com.dangbun.common.hexagonal.UseCase;
-import com.dangbun.domain.cleaning.refactor.adapter.out.CleaningJpaEntity;
-import com.dangbun.domain.cleaning.repository.CleaningRepository;
+import com.dangbun.domain.cleaning.adapter.out.persistence.CleaningJpaEntity;
+import com.dangbun.domain.cleaning.adapter.out.persistence.CleaningRepository;
 import com.dangbun.domain.duty.refactor.application.port.in.command.*;
 import com.dangbun.domain.duty.refactor.application.port.in.query.AddCleaningsResult;
 import com.dangbun.domain.duty.refactor.application.port.in.query.AddMembersResult;

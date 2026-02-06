@@ -6,7 +6,7 @@ import com.dangbun.global.context.ChecklistContext;
 import com.dangbun.domain.checklist.dto.request.PostGetPresignedUrlRequest;
 import com.dangbun.domain.checklist.dto.request.PostSaveUploadResultRequest;
 import com.dangbun.domain.checklist.entity.Checklist;
-import com.dangbun.domain.cleaning.refactor.adapter.out.CleaningJpaEntity;
+import com.dangbun.domain.cleaning.adapter.out.persistence.CleaningJpaEntity;
 import com.dangbun.domain.cleaningImage.service.CleaningImageService;
 import com.dangbun.global.context.MemberContext;
 import com.dangbun.domain.member.original.entity.MemberJpaEntity;

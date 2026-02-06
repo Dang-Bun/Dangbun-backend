@@ -8,4 +8,6 @@ import java.util.List;
 @Component
 public interface MemberCleaningQueryPort {
     List<Duty> findDistinctDutiesByMemberIds(List<Long> memberIds);
+
+    List<String> findMemberNamesByCleaningId(Long cleaningId);
 }

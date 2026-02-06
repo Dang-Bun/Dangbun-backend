@@ -1,6 +1,6 @@
 package com.dangbun.domain.calendar.dto;
 
-import com.dangbun.domain.cleaning.entity.CleaningRepeatType;
+import com.dangbun.domain.cleaning.domain.CleaningRepeatType;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.time.DayOfWeek;

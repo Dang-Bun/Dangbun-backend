@@ -2,8 +2,8 @@ package com.dangbun.domain.checklist.service;
 
 import com.dangbun.domain.checklist.entity.Checklist;
 import com.dangbun.domain.checklist.repository.ChecklistRepository;
-import com.dangbun.domain.cleaning.refactor.adapter.out.CleaningJpaEntity;
-import com.dangbun.domain.cleaning.refactor.domain.CleaningRepeatType;
+import com.dangbun.domain.cleaning.adapter.out.persistence.CleaningJpaEntity;
+import com.dangbun.domain.cleaning.domain.CleaningRepeatType;
 import com.dangbun.domain.cleaningdate.entity.CleaningDateJpaEntity;
 import com.dangbun.domain.place.original.entity.Place;
 import lombok.RequiredArgsConstructor;

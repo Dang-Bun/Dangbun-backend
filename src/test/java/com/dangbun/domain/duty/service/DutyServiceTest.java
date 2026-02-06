@@ -1,7 +1,7 @@
 package com.dangbun.domain.duty.service;
 
-import com.dangbun.domain.cleaning.refactor.adapter.out.CleaningJpaEntity;
-import com.dangbun.domain.cleaning.repository.CleaningRepository;
+import com.dangbun.domain.cleaning.adapter.out.persistence.CleaningJpaEntity;
+import com.dangbun.domain.cleaning.adapter.out.persistence.CleaningRepository;
 import com.dangbun.domain.duty.original.dto.request.*;
 import com.dangbun.domain.duty.original.dto.response.*;
 import com.dangbun.domain.duty.original.entity.Duty;

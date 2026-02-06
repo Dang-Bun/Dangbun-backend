@@ -7,4 +7,5 @@ import java.util.List;
 public interface CleaningDateCommandPort {
     void saveAll(List<CleaningDate> cleaningDates);
 
+    void deleteAllByCleaningId(Long cleaningId);
 }

@@ -1,6 +1,6 @@
 package com.dangbun.domain.duty.original.dto.response;
 
-import com.dangbun.domain.cleaning.refactor.adapter.out.CleaningJpaEntity;
+import com.dangbun.domain.cleaning.adapter.out.persistence.CleaningJpaEntity;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 public record GetDutyCleaningNameListResponse(

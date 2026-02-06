@@ -1,6 +1,6 @@
 package com.dangbun.domain.cleaningdate.repository;
 
-import com.dangbun.domain.cleaning.refactor.adapter.out.CleaningJpaEntity;
+import com.dangbun.domain.cleaning.adapter.out.persistence.CleaningJpaEntity;
 import com.dangbun.domain.cleaningdate.entity.CleaningDateJpaEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 

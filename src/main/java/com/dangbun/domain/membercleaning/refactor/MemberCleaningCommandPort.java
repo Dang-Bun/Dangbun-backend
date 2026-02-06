@@ -6,4 +6,6 @@ import java.util.List;
 
 public interface MemberCleaningCommandPort {
     void saveAll(List<MemberCleaning> memberCleanings);
+
+    void deleteAllByCleaningId(Long cleaningId);
 }

@@ -2,8 +2,8 @@ package com.dangbun.domain.checklist.service;
 
 import com.dangbun.domain.checklist.entity.Checklist;
 import com.dangbun.domain.checklist.repository.ChecklistRepository;
-import com.dangbun.domain.cleaning.refactor.adapter.out.CleaningJpaEntity;
-import com.dangbun.domain.cleaning.repository.CleaningRepository;
+import com.dangbun.domain.cleaning.adapter.out.persistence.CleaningJpaEntity;
+import com.dangbun.domain.cleaning.adapter.out.persistence.CleaningRepository;
 import com.dangbun.domain.cleaningdate.entity.CleaningDateJpaEntity;
 import com.dangbun.domain.cleaningdate.repository.CleaningDateRepository;
 import lombok.RequiredArgsConstructor;
@@ -16,7 +16,7 @@ import java.time.temporal.TemporalAdjusters;
 import java.util.Arrays;
 import java.util.List;
 
-import static com.dangbun.domain.cleaning.refactor.domain.CleaningRepeatType.*;
+import static com.dangbun.domain.cleaning.domain.CleaningRepeatType.*;
 
 @RequiredArgsConstructor
 @Service

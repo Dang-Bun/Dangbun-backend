@@ -1,6 +1,6 @@
 package com.dangbun.domain.cleaningdate.entity;
 
-import com.dangbun.domain.cleaning.refactor.adapter.out.CleaningJpaEntity;
+import com.dangbun.domain.cleaning.adapter.out.persistence.CleaningJpaEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;

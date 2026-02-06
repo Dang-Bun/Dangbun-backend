@@ -25,4 +25,9 @@ public class CleaningDatePersistenceAdapter implements CleaningDateCommandPort {
         cleaningDateRepository.saveAll(jpaEntities);
 
     }
+
+    @Override
+    public void deleteAllByCleaningId(Long cleaningId) {
+        cleaningDateRepository.deleteAllByCleaningJpaEntity_CleaningId(cleaningId);
+    }
 }

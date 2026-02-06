@@ -1,6 +1,6 @@
 package com.dangbun.domain.membercleaning.repository;
 
-import com.dangbun.domain.cleaning.refactor.adapter.out.CleaningJpaEntity;
+import com.dangbun.domain.cleaning.adapter.out.persistence.CleaningJpaEntity;
 import com.dangbun.domain.duty.refactor.adapter.out.persistence.DutyJpaEntity;
 import com.dangbun.domain.member.original.entity.MemberJpaEntity;
 import com.dangbun.domain.membercleaning.entity.MemberCleaningJpaEntity;

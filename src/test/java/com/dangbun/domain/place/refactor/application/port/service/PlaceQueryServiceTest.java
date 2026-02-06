@@ -2,8 +2,8 @@ package com.dangbun.domain.place.refactor.application.port.service;
 
 import com.dangbun.domain.checklist.entity.Checklist;
 import com.dangbun.domain.checklist.repository.ChecklistRepository;
-import com.dangbun.domain.cleaning.refactor.adapter.out.CleaningJpaEntity;
-import com.dangbun.domain.cleaning.repository.CleaningRepository;
+import com.dangbun.domain.cleaning.adapter.out.persistence.CleaningJpaEntity;
+import com.dangbun.domain.cleaning.adapter.out.persistence.CleaningRepository;
 import com.dangbun.domain.duty.original.entity.Duty;
 import com.dangbun.domain.duty.original.repository.DutyRepository;
 import com.dangbun.domain.member.original.entity.MemberJpaEntity;
