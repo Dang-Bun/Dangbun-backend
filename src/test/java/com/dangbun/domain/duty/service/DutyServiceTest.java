@@ -29,7 +29,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 import java.util.List;
 import java.util.Optional;
 
-import static com.dangbun.domain.place.refactor.domain.PlaceCategory.CAFE;
+import static com.dangbun.domain.place.domain.PlaceCategory.CAFE;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;

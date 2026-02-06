@@ -11,7 +11,7 @@ package com.dangbun.domain.cleaning.adapter.out.persistence;
  * - 또는 placeId 기반 쿼리로 변경하여 엔티티 의존성 제거 고려
  */
 import com.dangbun.domain.duty.refactor.adapter.out.persistence.DutyJpaEntity;
-import com.dangbun.domain.place.original.entity.Place;
+import com.dangbun.domain.place.adapter.out.persistence.PlaceJpaEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -49,7 +49,7 @@ public interface CleaningRepository extends JpaRepository<CleaningJpaEntity, Lon
     """)
     List<CleaningJpaEntity> findUnassignedCleaningsByPlaceId(Long placeId);
 
-    List<CleaningJpaEntity> findByPlace(Place place);
+    List<CleaningJpaEntity> findByPlace(PlaceJpaEntity place);
 
-    boolean existsByNameAndDuty_DutyIdAndPlace(String name, Long dutyDutyId, Place place);
+    boolean existsByNameAndDuty_DutyIdAndPlace(String name, Long dutyDutyId, PlaceJpaEntity place);
 }

@@ -9,7 +9,7 @@ package com.dangbun.domain.member.original.entity;
  * - Builder 파라미터 타입도 함께 변경
  * - MemberRole을 refactor.domain.MemberRole로 변경
  */
-import com.dangbun.domain.place.original.entity.Place;
+import com.dangbun.domain.place.adapter.out.persistence.PlaceJpaEntity;
 import com.dangbun.domain.user.entity.User;
 import com.dangbun.global.entity.BaseEntity;
 import com.dangbun.global.converter.MapToJsonConverter;
@@ -49,7 +49,7 @@ public class MemberJpaEntity extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "place_id", nullable = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
-    private Place place;
+    private PlaceJpaEntity place;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
@@ -57,7 +57,7 @@ public class MemberJpaEntity extends BaseEntity {
     private User user;
 
     @Builder
-    public MemberJpaEntity(MemberRole role, String name, Boolean status, Map information, Place place, User user) {
+    public MemberJpaEntity(MemberRole role, String name, Boolean status, Map information, PlaceJpaEntity place, User user) {
        this.role = role;
        this.name = name;
        this.status = status;

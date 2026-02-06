@@ -1,7 +1,7 @@
 package com.dangbun.domain.duty.original.repository;
 
 import com.dangbun.domain.duty.refactor.adapter.out.persistence.DutyJpaEntity;
-import com.dangbun.domain.place.refactor.adapter.in.web.dto.response.DutyProgressDto;
+import com.dangbun.domain.place.adapter.in.web.dto.response.DutyProgressDto;
 import io.lettuce.core.dynamic.annotation.Param;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

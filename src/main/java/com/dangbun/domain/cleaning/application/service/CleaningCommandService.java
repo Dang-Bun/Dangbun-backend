@@ -23,7 +23,7 @@ import com.dangbun.domain.member.refactor.application.port.out.MemberQueryPort;
 import com.dangbun.domain.member.refactor.domain.Member;
 import com.dangbun.domain.membercleaning.application.port.out.MemberCleaningCommandPort;
 import com.dangbun.domain.membercleaning.domain.MemberCleaning;
-import com.dangbun.domain.place.original.entity.Place;
+import com.dangbun.domain.place.adapter.out.persistence.PlaceJpaEntity;
 import com.dangbun.global.context.MemberContext;
 import com.dangbun.global.s3.S3Service;
 import lombok.RequiredArgsConstructor;
@@ -63,7 +63,7 @@ public class CleaningCommandService implements CleaningCommandUseCase {
 
     @Override
     public PostCleaningResponse createCleaning(PostCleaningCreateRequest request) {
-        Place place = MemberContext.get().getPlace();
+        PlaceJpaEntity place = MemberContext.get().getPlace();
 
         Duty duty = null;
         if (request.dutyId() != null) {
@@ -123,7 +123,7 @@ public class CleaningCommandService implements CleaningCommandUseCase {
 
     @Override
     public void updateCleaning(Long cleaningId, PutCleaningUpdateRequest request) {
-        Place place = MemberContext.get().getPlace();
+        PlaceJpaEntity place = MemberContext.get().getPlace();
 
         Cleaning cleaning = cleaningQueryPort.findWithDutyNullableById(cleaningId)
                 .orElseThrow(() -> new CleaningNotFoundException(CLEANING_NOT_FOUND));

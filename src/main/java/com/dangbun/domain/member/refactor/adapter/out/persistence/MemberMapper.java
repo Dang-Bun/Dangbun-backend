@@ -14,7 +14,7 @@ import com.dangbun.domain.member.refactor.domain.MemberRole;
  *   Place 의존성을 완전히 분리하는 것을 권장
  * - MemberRole 변환 로직은 original.entity.MemberRole 제거 후 삭제
  */
-import com.dangbun.domain.place.original.repository.PlaceRepository;
+import com.dangbun.domain.place.adapter.out.persistence.SpringDataPlaceRepository;
 import com.dangbun.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -23,7 +23,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 class MemberMapper {
 
-    private final PlaceRepository placeRepository;
+    private final SpringDataPlaceRepository placeRepository;
     private final UserRepository userRepository;
 
     public MemberJpaEntity mapToJpaEntity(Member member) {

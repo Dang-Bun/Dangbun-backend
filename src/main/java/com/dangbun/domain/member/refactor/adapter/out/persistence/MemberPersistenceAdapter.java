@@ -7,13 +7,13 @@ import com.dangbun.domain.member.refactor.application.port.out.GetMemberByInvite
 import com.dangbun.domain.member.refactor.application.port.out.MemberCommandPort;
 import com.dangbun.domain.member.refactor.application.port.out.MemberQueryPort;
 import com.dangbun.domain.member.refactor.domain.Member;
-import com.dangbun.domain.place.refactor.exception.custom.InvalidInviteCodeException;
+import com.dangbun.domain.place.exception.custom.InvalidInviteCodeException;
 import lombok.RequiredArgsConstructor;
 
 import java.util.List;
 import java.util.Optional;
 
-import static com.dangbun.domain.place.refactor.exception.status.PlaceExceptionResponse.INVALID_INVITE_CODE;
+import static com.dangbun.domain.place.exception.status.PlaceExceptionResponse.INVALID_INVITE_CODE;
 
 @PersistenceAdapter
 @RequiredArgsConstructor

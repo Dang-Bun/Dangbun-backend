@@ -10,7 +10,7 @@ package com.dangbun.domain.member.original.repository;
  * - 또는 placeId 기반 쿼리로 변경하여 엔티티 의존성 제거 고려
  */
 import com.dangbun.domain.member.original.entity.MemberJpaEntity;
-import com.dangbun.domain.place.original.entity.Place;
+import com.dangbun.domain.place.adapter.out.persistence.PlaceJpaEntity;
 import com.dangbun.domain.user.entity.User;
 import io.lettuce.core.dynamic.annotation.Param;
 import org.springframework.data.domain.Page;
@@ -29,9 +29,9 @@ public interface MemberRepository extends JpaRepository<MemberJpaEntity, Long> {
     @Query("select m from MemberJpaEntity m join fetch m.place where m.user.userId = :userId and m.place.placeId = :placeId")
     Optional<MemberJpaEntity> findWithPlaceByUserIdAndPlaceId(Long userId, Long placeId);
 
-    Optional<MemberJpaEntity> findByPlaceAndUser(Place place, User user);
+    Optional<MemberJpaEntity> findByPlaceAndUser(PlaceJpaEntity place, User user);
 
-    MemberJpaEntity findFirstByPlace(Place place);
+    MemberJpaEntity findFirstByPlace(PlaceJpaEntity place);
 
     @Query("select m from MemberJpaEntity m join fetch m.place p where p.inviteCode = :inviteCode")
     List<MemberJpaEntity> findWithPlaceByInviteCode(@Param("inviteCode") String inviteCode);

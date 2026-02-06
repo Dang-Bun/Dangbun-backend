@@ -4,8 +4,8 @@ import com.dangbun.domain.cleaning.domain.CleaningRepeatType;
 import com.dangbun.domain.cleaning.domain.Cleaning;
 import com.dangbun.domain.duty.refactor.adapter.out.persistence.DutyJpaEntity;
 import com.dangbun.domain.duty.refactor.adapter.out.persistence.SpringDataDutyRepository;
-import com.dangbun.domain.place.original.entity.Place;
-import com.dangbun.domain.place.original.repository.PlaceRepository;
+import com.dangbun.domain.place.adapter.out.persistence.PlaceJpaEntity;
+import com.dangbun.domain.place.adapter.out.persistence.SpringDataPlaceRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -19,7 +19,7 @@ public class CleaningMapper {
      * TODO: Place 도메인 헥사고날 아키텍처 전환 시 수정
      * PlaceRepository -> PlaceQueryPort 또는 SpringDataPlaceRepository
      */
-    private final PlaceRepository placeRepository;
+    private final SpringDataPlaceRepository placeRepository;
 
     public CleaningJpaEntity mapToJpaEntity(Cleaning cleaning) {
         DutyJpaEntity duty = null;
@@ -27,7 +27,7 @@ public class CleaningMapper {
             duty = dutyRepository.findById(cleaning.getDutyId()).orElse(null);
         }
 
-        Place place = placeRepository.findById(cleaning.getPlaceId())
+        PlaceJpaEntity place = placeRepository.findById(cleaning.getPlaceId())
                 .orElseThrow(() -> new IllegalArgumentException("Place not found: " + cleaning.getPlaceId()));
 
         CleaningJpaEntity.CleaningJpaEntityBuilder builder = CleaningJpaEntity.builder()

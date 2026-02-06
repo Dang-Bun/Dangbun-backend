@@ -10,7 +10,7 @@ import com.dangbun.domain.duty.refactor.adapter.out.persistence.DutyJpaEntity;
  * - @ManyToOne 관계 유지, JoinColumn 동일
  * - Builder 파라미터 타입도 함께 변경
  */
-import com.dangbun.domain.place.original.entity.Place;
+import com.dangbun.domain.place.adapter.out.persistence.PlaceJpaEntity;
 import com.dangbun.global.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -49,10 +49,10 @@ public class CleaningJpaEntity extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "place_id", nullable = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
-    private Place place;
+    private PlaceJpaEntity place;
 
     @Builder
-    public CleaningJpaEntity(Long cleaningId, String name, CleaningRepeatType repeatType, String repeatDays, DutyJpaEntity duty, Boolean needPhoto, Place place) {
+    public CleaningJpaEntity(Long cleaningId, String name, CleaningRepeatType repeatType, String repeatDays, DutyJpaEntity duty, Boolean needPhoto, PlaceJpaEntity place) {
         this.cleaningId = cleaningId;
         this.name = name;
         this.repeatType = repeatType;

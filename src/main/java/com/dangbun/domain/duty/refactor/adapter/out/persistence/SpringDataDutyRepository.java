@@ -1,6 +1,6 @@
 package com.dangbun.domain.duty.refactor.adapter.out.persistence;
 
-import com.dangbun.domain.place.refactor.adapter.in.web.dto.response.DutyProgressDto;
+import com.dangbun.domain.place.adapter.in.web.dto.response.DutyProgressDto;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

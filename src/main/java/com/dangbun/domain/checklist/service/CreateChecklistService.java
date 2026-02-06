@@ -5,7 +5,7 @@ import com.dangbun.domain.checklist.repository.ChecklistRepository;
 import com.dangbun.domain.cleaning.adapter.out.persistence.CleaningJpaEntity;
 import com.dangbun.domain.cleaning.domain.CleaningRepeatType;
 import com.dangbun.domain.cleaningdate.entity.CleaningDateJpaEntity;
-import com.dangbun.domain.place.original.entity.Place;
+import com.dangbun.domain.place.adapter.out.persistence.PlaceJpaEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,7 +26,7 @@ public class CreateChecklistService {
     private final ChecklistRepository checklistRepository;
 
     @Transactional
-    public void createChecklistByDateAndTime(CleaningJpaEntity cleaningJpaEntity, List<CleaningDateJpaEntity> cleaningDateJpaEntities, Place place) {
+    public void createChecklistByDateAndTime(CleaningJpaEntity cleaningJpaEntity, List<CleaningDateJpaEntity> cleaningDateJpaEntities, PlaceJpaEntity place) {
 
 
         LocalDateTime now = LocalDateTime.now();
@@ -78,7 +78,7 @@ public class CreateChecklistService {
         }
     }
 
-    private static boolean checkDateState(LocalTime nowTime, Place place) {
+    private static boolean checkDateState(LocalTime nowTime, PlaceJpaEntity place) {
         LocalTime startTime = place.getStartTime();
         LocalTime endTime = place.getEndTime();
         Boolean isToday = place.getIsToday();

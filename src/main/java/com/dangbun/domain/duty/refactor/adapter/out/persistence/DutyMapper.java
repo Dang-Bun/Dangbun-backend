@@ -1,8 +1,8 @@
 package com.dangbun.domain.duty.refactor.adapter.out.persistence;
 
 import com.dangbun.domain.duty.refactor.domain.Duty;
-import com.dangbun.domain.place.refactor.adapter.out.persistence.PlaceJpaEntity;
-import com.dangbun.domain.place.refactor.adapter.out.persistence.SpringDataPlaceRepository;
+import com.dangbun.domain.place.adapter.out.persistence.PlaceJpaEntity;
+import com.dangbun.domain.place.adapter.out.persistence.SpringDataPlaceRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 

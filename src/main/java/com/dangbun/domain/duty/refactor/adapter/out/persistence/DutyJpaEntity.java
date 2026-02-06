@@ -1,7 +1,7 @@
 package com.dangbun.domain.duty.refactor.adapter.out.persistence;
 
 import com.dangbun.domain.duty.refactor.domain.DutyIcon;
-import com.dangbun.domain.place.refactor.adapter.out.persistence.PlaceJpaEntity;
+import com.dangbun.domain.place.adapter.out.persistence.PlaceJpaEntity;
 import com.dangbun.global.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
