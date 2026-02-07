@@ -7,6 +7,8 @@ import com.dangbun.domain.member.application.port.out.MemberQueryPort;
 import com.dangbun.domain.member.domain.Member;
 import com.dangbun.domain.place.exception.custom.InvalidInviteCodeException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.Optional;
@@ -65,6 +67,34 @@ public class MemberPersistenceAdapter implements MemberCommandPort, MemberQueryP
         List<MemberJpaEntity> memberJpaEntities = memberRepository.findAllByNameIn(members);
 
         return memberJpaEntities.stream().map(memberMapper::mapToDomainEntity).toList();
+    }
+
+    @Override
+    public List<Member> findAllByIds(List<Long> memberIds) {
+        List<MemberJpaEntity> memberJpaEntities = memberRepository.findAllById(memberIds);
+
+        return memberJpaEntities.stream().map(memberMapper::mapToDomainEntity).toList();
+    }
+
+    @Override
+    public Page<Member> findByPlaceIdWithPageable(Long placeId, Pageable pageable) {
+        Page<MemberJpaEntity> memberJpaEntityPage = memberRepository.findByPlace_PlaceId(placeId, pageable);
+
+        return memberJpaEntityPage.map(memberMapper::mapToDomainEntity);
+    }
+
+    @Override
+    public Page<Member> findByPlaceIdAndNameContaining(Long placeId, String searchName, Pageable pageable) {
+        Page<MemberJpaEntity> memberJpaEntityPage = memberRepository.findByPlace_PlaceIdAndNameContaining(placeId, searchName, pageable);
+
+        return memberJpaEntityPage.map(memberMapper::mapToDomainEntity);
+    }
+
+    @Override
+    public Member findById(Long memberId) {
+        MemberJpaEntity memberJpaEntity = memberRepository.findById(memberId).get();
+
+        return memberMapper.mapToDomainEntity(memberJpaEntity);
     }
 
     // ===== GetMemberByInviteCodePort =====
