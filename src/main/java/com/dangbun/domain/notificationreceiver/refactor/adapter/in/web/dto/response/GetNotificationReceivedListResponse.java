@@ -1,8 +1,10 @@
 package com.dangbun.domain.notificationreceiver.refactor.adapter.in.web.dto.response;
 
 import com.dangbun.domain.notification.adapter.out.persistence.NotificationJpaEntity;
+import com.dangbun.domain.notification.domain.Notification;
 import com.dangbun.domain.notificationreceiver.refactor.adapter.out.persistence.NotificationReceiverJpaEntity;
 import com.dangbun.domain.notificationreceiver.refactor.adapter.out.persistence.NotificationReceiverId;
+import com.dangbun.domain.notificationreceiver.refactor.domain.NotificationReceiver;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.time.Duration;
@@ -23,7 +25,7 @@ public record GetNotificationReceivedListResponse(
 
     public record NotificationReceiverDto(
             @Schema(description = "알림 수신 ID (복합키 : 수신자 id, 알림 id)", example = "{ \"receiverId\": 5, \"notificationId\": 12 }")
-            NotificationReceiverId notificationReceiverId,
+            NotificationReceiver.NotificationReceiverId notificationReceiverId,
 
             @Schema(description = "발송자 이름", example = "지윤")
             String senderName,
@@ -40,14 +42,14 @@ public record GetNotificationReceivedListResponse(
             @Schema(description = "알림 읽음 여부", example = "true")
             Boolean isRead
     ) {
-        public static NotificationReceiverDto of(NotificationReceiverJpaEntity receiver) {
-            NotificationJpaEntity notificationJpaEntity = receiver.getNotificationJpaEntity();
+        public static NotificationReceiverDto of(NotificationReceiver receiver, Notification notification) {
+//            NotificationJpaEntity notificationJpaEntity = receiver.getNotificationJpaEntity();
             return new NotificationReceiverDto(
-                    receiver.getId(),
-                    notificationJpaEntity.getSender().getName(),
-                    notificationJpaEntity.getTitle(),
-                    shortenContent(notificationJpaEntity.getContent()),
-                    formatCreatedAt(notificationJpaEntity.getCreatedAt()),
+                    receiver.getNotificationReceiverId(),
+                    notification.getSenderName(),
+                    notification.getTitle(),
+                    shortenContent(notification.getContent()),
+                    formatCreatedAt(notification.getCreatedAt()),
                     receiver.isRead()
             );
         }

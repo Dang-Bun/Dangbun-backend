@@ -2,6 +2,7 @@ package com.dangbun.domain.notificationreceiver.refactor.application.service;
 
 import com.dangbun.common.hexagonal.UseCase;
 import com.dangbun.domain.member.domain.Member;
+import com.dangbun.domain.notification.application.port.in.query.GetNotificationQuery;
 import com.dangbun.domain.notification.domain.Notification;
 import com.dangbun.domain.notificationreceiver.refactor.adapter.in.web.dto.response.GetNotificationReceivedListResponse;
 import com.dangbun.domain.notificationreceiver.refactor.adapter.in.web.dto.response.GetNotificationReceivedListResponse.NotificationReceiverDto;
@@ -27,20 +28,20 @@ public class NotificationReceiverReceiverQueryService implements NotificationRec
 
     private final NotificationReceiverQueryPort notificationReceiverQueryPort;
 
-    /*
-     * TODO: JpaEntity 직접 사용 (DTO 변환에 연관 엔티티 정보 필요)
-     * 도메인 모델 확장 또는 조회 전용 DTO 사용 검토 필요
-     */
-    private final SpringDataNotificationReceiverRepository notificationReceiverRepository;
+    private final GetNotificationQuery getNotificationQuery;
+
 
     @Override
     public GetNotificationReceivedListResponse getReceivedNotifications(Pageable pageable) {
         Long receiverId = MemberContext.get().getMemberId();
 
-        Page<NotificationReceiverJpaEntity> resultPage = notificationReceiverRepository.findByReceiver_MemberId(receiverId, pageable);
+        Page<NotificationReceiver> resultPage = notificationReceiverQueryPort.findByReceiverId(receiverId, pageable);
 
         List<NotificationReceiverDto> notifications = resultPage.getContent().stream()
-                .map(NotificationReceiverDto::of)
+                .map(rec -> {
+                    Notification notification = getNotificationQuery.getNotification(rec.getNotificationId());
+                    return NotificationReceiverDto.of(rec, notification);
+                })
                 .toList();
 
         return GetNotificationReceivedListResponse.of(notifications, resultPage.hasNext());

@@ -11,6 +11,7 @@ import com.dangbun.domain.notification.adapter.in.web.dto.response.GetNotificati
 import com.dangbun.domain.notification.adapter.in.web.dto.response.GetNotificationListResponse;
 import com.dangbun.domain.notification.adapter.in.web.dto.response.GetNotificationListResponse.NotificationDto;
 import com.dangbun.domain.notification.adapter.in.web.dto.response.GetRecentSearchResponse;
+import com.dangbun.domain.notification.application.port.in.query.GetNotificationQuery;
 import com.dangbun.domain.notification.application.port.in.query.NotificationQuery;
 import com.dangbun.domain.notification.application.port.out.NotificationQueryPort;
 import com.dangbun.domain.notification.domain.Notification;
@@ -33,7 +34,7 @@ import static com.dangbun.domain.notification.response.status.NotificationExcept
 @UseCase
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
-public class NotificationQueryService implements NotificationQuery {
+public class NotificationQueryService implements NotificationQuery, GetNotificationQuery {
 
     private final RedisService redisService;
 
@@ -120,5 +121,10 @@ public class NotificationQueryService implements NotificationQuery {
                 .toList();
 
         return GetNotificationInfoResponse.of(notification, receiverNames);
+    }
+
+    @Override
+    public Notification getNotification(Long notificationId) {
+        return notificationQueryPort.findById(notificationId).get();
     }
 }

@@ -98,4 +98,6 @@ class NotificationReceiverPersistenceAdapter implements NotificationReceiverQuer
             notificationReceiverRepository.deleteAll(receivers);
         }
     }
+
+
 }
