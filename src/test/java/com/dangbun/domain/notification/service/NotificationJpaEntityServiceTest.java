@@ -11,8 +11,8 @@ import com.dangbun.domain.notification.exception.custom.NotificationAccessForbid
 import com.dangbun.domain.notification.exception.custom.NotificationNotFoundException;
 import com.dangbun.domain.notification.adapter.out.persistence.SpringDataNotificationRepository;
 import com.dangbun.domain.notification.original.service.NotificationService;
-import com.dangbun.domain.notificationreceiver.refactor.adapter.out.persistence.NotificationReceiverJpaEntity;
-import com.dangbun.domain.notificationreceiver.refactor.adapter.out.persistence.SpringDataNotificationReceiverRepository;
+import com.dangbun.domain.notificationreceiver.adapter.out.persistence.NotificationReceiverJpaEntity;
+import com.dangbun.domain.notificationreceiver.adapter.out.persistence.SpringDataNotificationReceiverRepository;
 import com.dangbun.domain.place.original.entity.Place;
 import com.dangbun.global.context.MemberContext;
 import com.dangbun.global.redis.RedisService;

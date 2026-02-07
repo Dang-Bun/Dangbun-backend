@@ -17,7 +17,7 @@ import com.dangbun.domain.memberduty.domain.MemberDuty;
 import com.dangbun.domain.memberduty.application.port.out.MemberDutyCommandPort;
 import com.dangbun.domain.memberduty.application.port.out.MemberDutyQueryPort;
 import com.dangbun.domain.memberduty.adapter.out.persistence.SpringDataMemberDutyRepository;
-import com.dangbun.domain.notificationreceiver.refactor.adapter.out.persistence.SpringDataNotificationReceiverRepository;
+import com.dangbun.domain.notificationreceiver.adapter.out.persistence.SpringDataNotificationReceiverRepository;
 import com.dangbun.domain.place.adapter.out.persistence.PlaceJpaEntity;
 import com.dangbun.domain.place.application.port.out.PlaceQueryPort;
 import com.dangbun.domain.place.adapter.in.web.dto.response.DutyProgressDto;

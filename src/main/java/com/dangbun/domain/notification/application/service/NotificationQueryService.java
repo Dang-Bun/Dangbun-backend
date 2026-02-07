@@ -17,8 +17,8 @@ import com.dangbun.domain.notification.application.port.out.NotificationQueryPor
 import com.dangbun.domain.notification.domain.Notification;
 import com.dangbun.domain.notification.exception.custom.NotificationAccessForbiddenException;
 import com.dangbun.domain.notification.exception.custom.NotificationNotFoundException;
-import com.dangbun.domain.notificationreceiver.refactor.application.port.in.query.CheckNotificationReceiverQuery;
-import com.dangbun.domain.notificationreceiver.refactor.application.port.in.query.GetNotificationReceiverQuery;
+import com.dangbun.domain.notificationreceiver.application.port.in.query.CheckNotificationReceiverQuery;
+import com.dangbun.domain.notificationreceiver.application.port.in.query.GetNotificationReceiverQuery;
 import com.dangbun.global.context.MemberContext;
 import com.dangbun.global.redis.RedisService;
 import lombok.RequiredArgsConstructor;

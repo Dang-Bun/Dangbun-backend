@@ -11,8 +11,8 @@ import com.dangbun.domain.notification.application.port.out.NotificationCommandP
 import com.dangbun.domain.notification.domain.Notification;
 import com.dangbun.domain.notification.domain.NotificationTemplate;
 import com.dangbun.domain.notification.exception.custom.MemberNotFoundException;
-import com.dangbun.domain.notificationreceiver.refactor.application.port.in.command.NotificationReceiverCommandUseCase;
-import com.dangbun.domain.notificationreceiver.refactor.domain.NotificationReceiver;
+import com.dangbun.domain.notificationreceiver.application.port.in.command.NotificationReceiverCommandUseCase;
+import com.dangbun.domain.notificationreceiver.domain.NotificationReceiver;
 import com.dangbun.global.context.MemberContext;
 import lombok.RequiredArgsConstructor;
 import org.springframework.transaction.annotation.Transactional;

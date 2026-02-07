@@ -2,12 +2,12 @@ package com.dangbun.domain.notificationreceiver.service;
 
 import com.dangbun.domain.member.adapter.out.persistence.MemberJpaEntity;
 import com.dangbun.domain.notification.adapter.out.persistence.NotificationJpaEntity;
-import com.dangbun.domain.notificationreceiver.refactor.adapter.in.web.dto.response.GetNotificationReceivedListResponse;
-import com.dangbun.domain.notificationreceiver.refactor.adapter.out.persistence.NotificationReceiverJpaEntity;
-import com.dangbun.domain.notificationreceiver.refactor.adapter.out.persistence.NotificationReceiverId;
+import com.dangbun.domain.notificationreceiver.adapter.in.web.dto.response.GetNotificationReceivedListResponse;
+import com.dangbun.domain.notificationreceiver.adapter.out.persistence.NotificationReceiverJpaEntity;
+import com.dangbun.domain.notificationreceiver.adapter.out.persistence.NotificationReceiverId;
 import com.dangbun.domain.notificationreceiver.refactor.application.service.NotificationReceiverService;
-import com.dangbun.domain.notificationreceiver.refactor.exception.custom.NotificationReceiverNotFoundException;
-import com.dangbun.domain.notificationreceiver.refactor.adapter.out.persistence.SpringDataNotificationReceiverRepository;
+import com.dangbun.domain.notificationreceiver.exception.custom.NotificationReceiverNotFoundException;
+import com.dangbun.domain.notificationreceiver.adapter.out.persistence.SpringDataNotificationReceiverRepository;
 import com.dangbun.global.context.MemberContext;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
