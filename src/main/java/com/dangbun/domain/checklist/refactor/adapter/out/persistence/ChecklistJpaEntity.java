@@ -1,6 +1,6 @@
 package com.dangbun.domain.checklist.refactor.adapter.out.persistence;
 
-import com.dangbun.domain.checklist.exception.custom.ChecklistStatusConflictException;
+import com.dangbun.domain.checklist.refactor.exception.custom.ChecklistStatusConflictException;
 import com.dangbun.domain.cleaning.adapter.out.persistence.CleaningJpaEntity;
 import com.dangbun.domain.member.adapter.out.persistence.MemberJpaEntity;
 import com.dangbun.global.entity.BaseEntity;
