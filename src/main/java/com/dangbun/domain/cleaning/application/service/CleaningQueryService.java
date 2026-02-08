@@ -4,15 +4,11 @@ import com.dangbun.common.hexagonal.UseCase;
 import com.dangbun.domain.cleaning.adapter.in.web.dto.response.GetCleaningDetailListResponse;
 import com.dangbun.domain.cleaning.adapter.in.web.dto.response.GetCleaningListResponse;
 import com.dangbun.domain.cleaning.adapter.in.web.dto.response.GetCleaningUnassignedResponse;
-import com.dangbun.domain.cleaning.adapter.out.persistence.CleaningJpaEntity;
-import com.dangbun.domain.cleaning.adapter.out.persistence.CleaningMapper;
-import com.dangbun.domain.cleaning.adapter.out.persistence.CleaningRepository;
 import com.dangbun.domain.cleaning.application.port.out.CleaningQueryPort;
 import com.dangbun.domain.cleaning.domain.Cleaning;
 import com.dangbun.domain.duty.adapter.out.persistence.DutyJpaEntity;
-import com.dangbun.domain.duty.application.port.out.DutyQueryPort;
-import com.dangbun.domain.duty.domain.Duty;
-import com.dangbun.domain.membercleaning.application.port.out.MemberCleaningQueryPort;
+import com.dangbun.domain.duty.application.port.in.query.GetDutyForCleaningQuery;
+import com.dangbun.domain.membercleaning.application.port.in.query.GetMemberCleaningForCleaningQuery;
 import com.dangbun.global.context.DutyContext;
 import com.dangbun.global.context.MemberContext;
 import lombok.RequiredArgsConstructor;
@@ -31,17 +27,15 @@ import java.util.Optional;
 @Transactional(readOnly = true)
 public class CleaningQueryService implements CleaningQuery, GetCleaningsByPlaceQuery, GetCleaningForDutyQuery {
 
-    private final DutyQueryPort dutyQueryPort;
+    private final GetDutyForCleaningQuery getDutyForCleaningQuery;
     private final CleaningQueryPort cleaningQueryPort;
-    private final MemberCleaningQueryPort memberCleaningQueryPort;
-    private final CleaningRepository cleaningRepository;
-    private final CleaningMapper cleaningMapper;
+    private final GetMemberCleaningForCleaningQuery getMemberCleaningForCleaningQuery;
 
     @Override
     public List<GetCleaningListResponse> getCleaningList(List<Long> memberIds) {
-        List<Duty> duties = (memberIds == null || memberIds.isEmpty())
-                ? dutyQueryPort.findAll()
-                : dutyQueryPort.findDistinctDutiesByMemberIds(memberIds);
+        List<GetDutyForCleaningQuery.DutyInfo> duties = (memberIds == null || memberIds.isEmpty())
+                ? getDutyForCleaningQuery.findAll()
+                : getDutyForCleaningQuery.findDistinctDutiesByMemberIds(memberIds);
 
         return duties.stream()
                 .map(GetCleaningListResponse::of)
@@ -63,7 +57,7 @@ public class CleaningQueryService implements CleaningQuery, GetCleaningsByPlaceQ
 
         return cleanings.stream()
                 .map(cleaning -> {
-                    List<String> names = memberCleaningQueryPort.findMemberNamesByCleaningId(cleaning.getCleaningId().value());
+                    List<String> names = getMemberCleaningForCleaningQuery.findMemberNamesByCleaningId(cleaning.getCleaningId().value());
 
                     List<String> displayed = names.stream().limit(2).toList();
                     return GetCleaningDetailListResponse.of(cleaning.getName(), displayed, names.size());
@@ -84,9 +78,8 @@ public class CleaningQueryService implements CleaningQuery, GetCleaningsByPlaceQ
 
     @Override
     public Cleaning getCleaning(Long cleaningId) {
-        CleaningJpaEntity cleaningJpaEntity = cleaningRepository.findById(cleaningId).get();
-
-        return cleaningMapper.mapToDomainEntity(cleaningJpaEntity);
+        return cleaningQueryPort.findById(cleaningId)
+                .orElseThrow(() -> new IllegalArgumentException("Cleaning not found: " + cleaningId));
     }
 
     @Override

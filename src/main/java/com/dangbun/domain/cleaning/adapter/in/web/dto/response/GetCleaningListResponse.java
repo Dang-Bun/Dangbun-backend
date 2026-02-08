@@ -1,5 +1,6 @@
 package com.dangbun.domain.cleaning.adapter.in.web.dto.response;
 
+import com.dangbun.domain.duty.application.port.in.query.GetDutyForCleaningQuery;
 import com.dangbun.domain.duty.domain.Duty;
 import com.dangbun.domain.duty.domain.DutyIcon;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -17,6 +18,14 @@ public record GetCleaningListResponse(
                 duty.getDutyId().value(),
                 duty.getName(),
                 duty.getIcon()
+        );
+    }
+
+    public static GetCleaningListResponse of(GetDutyForCleaningQuery.DutyInfo dutyInfo) {
+        return new GetCleaningListResponse(
+                dutyInfo.dutyId(),
+                dutyInfo.name(),
+                dutyInfo.icon() != null ? DutyIcon.valueOf(dutyInfo.icon()) : null
         );
     }
 }

@@ -4,8 +4,10 @@ import com.dangbun.common.hexagonal.UseCase;
 import com.dangbun.domain.checklist.adapter.in.web.dto.response.GetImageUrlResponse;
 import com.dangbun.domain.checklist.application.port.in.query.ChecklistQuery;
 import com.dangbun.domain.checklist.application.port.in.query.GetChecklistForCalendarQuery;
+import com.dangbun.domain.checklist.application.port.in.query.GetChecklistForCleaningQuery;
 import com.dangbun.domain.checklist.application.port.in.query.GetCompletedChecklistQuery;
 import com.dangbun.domain.checklist.application.port.out.ChecklistQueryPort;
+import com.dangbun.domain.checklist.domain.Checklist;
 import com.dangbun.domain.cleaningImage.application.port.in.query.CleaningImageQuery;
 import lombok.RequiredArgsConstructor;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,7 +19,7 @@ import java.util.Optional;
 @UseCase
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
-public class ChecklistQueryService implements ChecklistQuery, GetCompletedChecklistQuery, GetChecklistForCalendarQuery {
+public class ChecklistQueryService implements ChecklistQuery, GetCompletedChecklistQuery, GetChecklistForCalendarQuery, GetChecklistForCleaningQuery {
 
     private final CleaningImageQuery cleaningImageQuery;
     private final ChecklistQueryPort checklistQueryPort;
@@ -90,5 +92,13 @@ public class ChecklistQueryService implements ChecklistQuery, GetCompletedCheckl
                         dto.repeatType(),
                         dto.repeatDays()
                 ));
+    }
+
+    // GetChecklistForCleaningQuery 구현
+    @Override
+    public List<Long> findChecklistIdsByCleaningId(Long cleaningId) {
+        return checklistQueryPort.findByCleaningId(cleaningId).stream()
+                .map(checklist -> checklist.getChecklistId().value())
+                .toList();
     }
 }

@@ -1,9 +1,8 @@
 package com.dangbun.domain.cleaning.application.service;
 
 import com.dangbun.common.hexagonal.UseCase;
-import com.dangbun.domain.checklist.adapter.out.persistence.ChecklistJpaEntity;
-import com.dangbun.domain.checklist.adapter.out.persistence.SpringDataChecklistRepository;
 import com.dangbun.domain.checklist.application.port.in.command.CreateChecklistByDateAndTimeUseCase;
+import com.dangbun.domain.checklist.application.port.in.query.GetChecklistForCleaningQuery;
 import com.dangbun.domain.cleaning.adapter.in.web.dto.request.PostCleaningCreateRequest;
 import com.dangbun.domain.cleaning.adapter.in.web.dto.request.PutCleaningUpdateRequest;
 import com.dangbun.domain.cleaning.adapter.in.web.dto.response.PostCleaningResponse;
@@ -15,14 +14,11 @@ import com.dangbun.domain.cleaning.exception.custom.CleaningNotFoundException;
 import com.dangbun.domain.cleaning.exception.custom.DutyNotFoundException;
 import com.dangbun.domain.cleaning.exception.custom.InvalidDateFormatException;
 import com.dangbun.domain.cleaningImage.application.port.in.command.CleaningImageCommandUseCase;
-import com.dangbun.domain.cleaningdate.application.port.out.CleaningDateCommandPort;
+import com.dangbun.domain.cleaningdate.application.port.in.command.CleaningDateForCleaningUseCase;
 import com.dangbun.domain.cleaningdate.domain.CleaningDate;
-import com.dangbun.domain.duty.application.port.out.DutyQueryPort;
-import com.dangbun.domain.duty.domain.Duty;
-import com.dangbun.domain.member.application.port.out.MemberQueryPort;
-import com.dangbun.domain.member.domain.Member;
-import com.dangbun.domain.membercleaning.application.port.out.MemberCleaningCommandPort;
-import com.dangbun.domain.membercleaning.domain.MemberCleaning;
+import com.dangbun.domain.duty.application.port.in.query.GetDutyForCleaningQuery;
+import com.dangbun.domain.member.application.port.in.query.GetMemberForCleaningQuery;
+import com.dangbun.domain.membercleaning.application.port.in.command.MemberCleaningForCleaningUseCase;
 import com.dangbun.domain.place.adapter.out.persistence.PlaceJpaEntity;
 import com.dangbun.global.context.MemberContext;
 import lombok.RequiredArgsConstructor;
@@ -44,33 +40,28 @@ import com.dangbun.domain.cleaning.application.port.in.command.CleaningForDutyUs
 @Transactional
 public class CleaningCommandService implements CleaningCommandUseCase, CleaningForDutyUseCase {
 
-    private final DutyQueryPort dutyQueryPort;
+    private final GetDutyForCleaningQuery getDutyForCleaningQuery;
     private final CleaningQueryPort cleaningQueryPort;
     private final CleaningCommandPort cleaningCommandPort;
-    private final MemberQueryPort memberQueryPort;
-    private final CleaningDateCommandPort cleaningDateCommandPort;
-    private final MemberCleaningCommandPort memberCleaningCommandPort;
+    private final GetMemberForCleaningQuery getMemberForCleaningQuery;
+    private final CleaningDateForCleaningUseCase cleaningDateForCleaningUseCase;
+    private final MemberCleaningForCleaningUseCase memberCleaningForCleaningUseCase;
     private final CreateChecklistByDateAndTimeUseCase createChecklistByDateAndTimeUseCase;
 
-    /*
-     * TODO: Checklist/CleaningImage 도메인 헥사고날 아키텍처 전환 시 수정
-     * ChecklistRepository -> ChecklistQueryPort
-     * CleaningImageRepository -> CleaningImageQueryPort
-     */
-    private final SpringDataChecklistRepository checklistRepository;
+    private final GetChecklistForCleaningQuery getChecklistForCleaningQuery;
     private final CleaningImageCommandUseCase cleaningImageCommandUseCase;
 
     @Override
     public PostCleaningResponse createCleaning(PostCleaningCreateRequest request) {
         PlaceJpaEntity place = MemberContext.get().getPlace();
 
-        Duty duty = null;
+        GetDutyForCleaningQuery.DutyInfo dutyInfo = null;
         if (request.dutyId() != null) {
-            duty = dutyQueryPort.findById(request.dutyId())
+            dutyInfo = getDutyForCleaningQuery.findById(request.dutyId())
                     .orElseThrow(() -> new DutyNotFoundException(DUTY_NOT_FOUND));
         }
 
-        if (cleaningQueryPort.existsByNameAndDutyIdAndPlaceId(request.cleaningName(), duty.getDutyId().value(), place.getPlaceId())) {
+        if (cleaningQueryPort.existsByNameAndDutyIdAndPlaceId(request.cleaningName(), dutyInfo.dutyId(), place.getPlaceId())) {
             throw new CleaningAlreadyExistsException(CLEANING_ALREADY_EXISTS);
         }
 
@@ -89,14 +80,13 @@ public class CleaningCommandService implements CleaningCommandUseCase, CleaningF
         Cleaning savedCleaning = cleaningCommandPort.save(cleaning);
 
         if (request.members() != null && !request.members().isEmpty()) {
-            List<Member> members = memberQueryPort.findAllByNameIn(request.members());
-            List<MemberCleaning> memberCleanings = members.stream()
-                    .map(m -> MemberCleaning.of(m.getMemberId(), savedCleaning.getCleaningId().value()))
+            List<GetMemberForCleaningQuery.MemberInfo> members = getMemberForCleaningQuery.findAllByNameIn(request.members());
+            List<Long> memberIds = members.stream()
+                    .map(GetMemberForCleaningQuery.MemberInfo::memberId)
                     .toList();
 
-            memberCleaningCommandPort.saveAll(memberCleanings);
+            memberCleaningForCleaningUseCase.saveAllByCleaningIdAndMemberIds(savedCleaning.getCleaningId().value(), memberIds);
         }
-
 
         List<LocalDate> parsedDates = request.detailDates().stream()
                 .map(dateStr -> {
@@ -112,10 +102,8 @@ public class CleaningCommandService implements CleaningCommandUseCase, CleaningF
                 .map(date -> CleaningDate.withoutId(date, savedCleaning.getCleaningId().value()))
                 .toList();
 
-
         createChecklistByDateAndTimeUseCase.createChecklistByDateAndTime(savedCleaning.getCleaningId().value(), cleaningDates, place.getPlaceId());
-        cleaningDateCommandPort.saveAll(cleaningDates);
-
+        cleaningDateForCleaningUseCase.saveAllByCleaningId(savedCleaning.getCleaningId().value(), parsedDates);
 
         return PostCleaningResponse.of(savedCleaning.getCleaningId().value());
     }
@@ -127,17 +115,16 @@ public class CleaningCommandService implements CleaningCommandUseCase, CleaningF
         Cleaning cleaning = cleaningQueryPort.findWithDutyNullableById(cleaningId)
                 .orElseThrow(() -> new CleaningNotFoundException(CLEANING_NOT_FOUND));
 
-        Duty duty = null;
+        GetDutyForCleaningQuery.DutyInfo dutyInfo = null;
 
         if (request.dutyId() != null) {
-            duty = dutyQueryPort.findById(request.dutyId())
+            dutyInfo = getDutyForCleaningQuery.findById(request.dutyId())
                     .orElseThrow(() -> new DutyNotFoundException(DUTY_NOT_FOUND));
         }
 
-
         if (cleaningQueryPort.existsByNameAndDutyIdAndCleaningIdNotAndPlaceId(
                 request.cleaningName(),
-                duty.getDutyId().value(),
+                dutyInfo.dutyId(),
                 cleaningId,
                 place.getPlaceId())) {
             throw new CleaningAlreadyExistsException(CLEANING_ALREADY_EXISTS);
@@ -150,20 +137,19 @@ public class CleaningCommandService implements CleaningCommandUseCase, CleaningF
                         ? request.repeatDays().stream()
                         .map(Enum::name).collect(Collectors.joining(","))
                         : null,
-                duty.getDutyId().value()
+                dutyInfo.dutyId()
         );
 
+        cleaningCommandPort.save(cleaning);
 
-        Cleaning savedCleaning = cleaningCommandPort.save(cleaning);
-
-        memberCleaningCommandPort.deleteAllByCleaningId(cleaningId);
-        List<Member> newMembers = memberQueryPort.findAllByNameIn(request.members());
-        List<MemberCleaning> newMemberCleanings = newMembers.stream()
-                .map(m -> MemberCleaning.of(m.getMemberId(), cleaningId))
+        memberCleaningForCleaningUseCase.deleteAllByCleaningId(cleaningId);
+        List<GetMemberForCleaningQuery.MemberInfo> newMembers = getMemberForCleaningQuery.findAllByNameIn(request.members());
+        List<Long> newMemberIds = newMembers.stream()
+                .map(GetMemberForCleaningQuery.MemberInfo::memberId)
                 .toList();
-        memberCleaningCommandPort.saveAll(newMemberCleanings);
+        memberCleaningForCleaningUseCase.saveAllByCleaningIdAndMemberIds(cleaningId, newMemberIds);
 
-        cleaningDateCommandPort.deleteAllByCleaningId(cleaningId);
+        cleaningDateForCleaningUseCase.deleteAllByCleaningId(cleaningId);
 
         List<LocalDate> parsedDates = request.detailDates().stream()
                 .map(dateStr -> {
@@ -175,12 +161,7 @@ public class CleaningCommandService implements CleaningCommandUseCase, CleaningF
                 })
                 .toList();
 
-        List<CleaningDate> cleaningDates = parsedDates.stream()
-                .map(date -> CleaningDate.withoutId(date, savedCleaning.getCleaningId().value()))
-                .toList();
-
-        cleaningDateCommandPort.saveAll(cleaningDates);
-
+        cleaningDateForCleaningUseCase.saveAllByCleaningId(cleaningId, parsedDates);
     }
 
 
@@ -189,14 +170,9 @@ public class CleaningCommandService implements CleaningCommandUseCase, CleaningF
         Cleaning cleaning = cleaningQueryPort.findById(cleaningId)
                 .orElseThrow(() -> new CleaningNotFoundException(CLEANING_NOT_FOUND));
 
-        /*
-         * TODO: Checklist/CleaningImage 도메인 헥사고날 아키텍처 전환 시 수정
-         * checklistRepository -> ChecklistQueryPort
-         * cleaningImageRepository -> CleaningImageQueryPort
-         */
-        List<ChecklistJpaEntity> checklistJpaEntities = checklistRepository.findByCleaningJpaEntity_CleaningId(cleaningId);
-        for (ChecklistJpaEntity checklistJpaEntity : checklistJpaEntities) {
-            cleaningImageCommandUseCase.deleteS3File(checklistJpaEntity.getChecklistId());
+        List<Long> checklistIds = getChecklistForCleaningQuery.findChecklistIdsByCleaningId(cleaningId);
+        for (Long checklistId : checklistIds) {
+            cleaningImageCommandUseCase.deleteS3File(checklistId);
         }
 
         cleaningCommandPort.deleteById(cleaningId);

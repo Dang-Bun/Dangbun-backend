@@ -2,6 +2,7 @@ package com.dangbun.domain.member.application.port.service;
 
 import com.dangbun.common.hexagonal.UseCase;
 import com.dangbun.domain.member.application.port.in.query.GetMemberForCalendarQuery;
+import com.dangbun.domain.member.application.port.in.query.GetMemberForCleaningQuery;
 import com.dangbun.domain.member.application.port.in.query.GetMembersByUserIdQuery;
 import com.dangbun.domain.member.application.port.in.query.GetMembersForDutyQuery;
 import com.dangbun.domain.member.application.port.out.MemberQueryPort;
@@ -15,7 +16,7 @@ import java.util.Optional;
 @UseCase
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
-public class MemberQueryService implements GetMembersByUserIdQuery, GetMembersForDutyQuery, GetMemberForCalendarQuery {
+public class MemberQueryService implements GetMembersByUserIdQuery, GetMembersForDutyQuery, GetMemberForCalendarQuery, GetMemberForCleaningQuery {
 
     private final MemberQueryPort memberQueryPort;
 
@@ -35,9 +36,9 @@ public class MemberQueryService implements GetMembersByUserIdQuery, GetMembersFo
     }
 
     @Override
-    public List<MemberInfo> findAllByIds(List<Long> memberIds) {
+    public List<GetMembersForDutyQuery.MemberInfo> findAllByIds(List<Long> memberIds) {
         return memberQueryPort.findAllByIds(memberIds).stream()
-                .map(m -> new MemberInfo(m.getMemberId(), m.getName()))
+                .map(m -> new GetMembersForDutyQuery.MemberInfo(m.getMemberId(), m.getName()))
                 .toList();
     }
 
@@ -47,5 +48,13 @@ public class MemberQueryService implements GetMembersByUserIdQuery, GetMembersFo
         return memberQueryPort.findById(memberId) != null
                 ? Optional.of(memberQueryPort.findById(memberId).getName())
                 : Optional.empty();
+    }
+
+    // GetMemberForCleaningQuery 구현
+    @Override
+    public List<GetMemberForCleaningQuery.MemberInfo> findAllByNameIn(List<String> names) {
+        return memberQueryPort.findAllByNameIn(names).stream()
+                .map(m -> new GetMemberForCleaningQuery.MemberInfo(m.getMemberId(), m.getName()))
+                .toList();
     }
 }

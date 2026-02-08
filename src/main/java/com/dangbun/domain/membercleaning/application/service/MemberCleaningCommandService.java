@@ -1,6 +1,7 @@
 package com.dangbun.domain.membercleaning.application.service;
 
 import com.dangbun.common.hexagonal.UseCase;
+import com.dangbun.domain.membercleaning.application.port.in.command.MemberCleaningForCleaningUseCase;
 import com.dangbun.domain.membercleaning.application.port.in.command.MemberCleaningForDutyUseCase;
 import com.dangbun.domain.membercleaning.application.port.out.MemberCleaningCommandPort;
 import com.dangbun.domain.membercleaning.domain.MemberCleaning;
@@ -12,7 +13,7 @@ import java.util.List;
 @UseCase
 @RequiredArgsConstructor
 @Transactional
-public class MemberCleaningCommandService implements MemberCleaningForDutyUseCase {
+public class MemberCleaningCommandService implements MemberCleaningForDutyUseCase, MemberCleaningForCleaningUseCase {
 
     private final MemberCleaningCommandPort memberCleaningCommandPort;
 
