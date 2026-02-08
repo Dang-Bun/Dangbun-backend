@@ -23,7 +23,7 @@ public class FakeMemberRepository implements MemberCommandPort, MemberQueryPort 
     private final AtomicLong idGenerator = new AtomicLong(1);
 
     @Override
-    public Member save(Member member) {
+    public void save(Member member) {
         if (member.getMemberId() == null) {
             Long newId = idGenerator.getAndIncrement();
             Member saved = Member.withId(
@@ -37,10 +37,8 @@ public class FakeMemberRepository implements MemberCommandPort, MemberQueryPort 
                     LocalDateTime.now()
             );
             storage.put(newId, saved);
-            return saved;
         } else {
             storage.put(member.getMemberId(), member);
-            return member;
         }
     }
 
