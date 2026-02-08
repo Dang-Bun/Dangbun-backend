@@ -6,7 +6,6 @@ import com.dangbun.domain.cleaning.adapter.out.persistence.CleaningRepository;
 import com.dangbun.domain.duty.adapter.out.persistence.DutyJpaEntity;
 import com.dangbun.domain.duty.adapter.out.persistence.SpringDataDutyRepository;
 import com.dangbun.domain.duty.application.port.in.query.*;
-import com.dangbun.domain.duty.refactor.application.port.in.query.*;
 import com.dangbun.domain.duty.application.port.out.DutyQueryPort;
 import com.dangbun.domain.duty.domain.Duty;
 import com.dangbun.domain.duty.exception.custom.DutyNotFoundException;

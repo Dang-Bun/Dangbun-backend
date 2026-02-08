@@ -1,7 +1,6 @@
 package com.dangbun.domain.duty.exception.handler;
 
 import com.dangbun.domain.duty.exception.custom.*;
-import com.dangbun.domain.duty.refactor.exception.custom.*;
 import com.dangbun.global.response.BaseErrorResponse;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
@@ -13,7 +12,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import static com.dangbun.domain.duty.exception.status.DutyExceptionResponse.*;
 
 @Order(Ordered.HIGHEST_PRECEDENCE)
-@RestControllerAdvice(basePackages = "com.dangbun.domain.duty.refactor")
+@RestControllerAdvice(basePackages = "com.dangbun.domain.duty")
 public class DutyControllerAdvice {
 
     @ExceptionHandler(DutyAlreadyExistsException.class)

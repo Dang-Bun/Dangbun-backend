@@ -7,9 +7,6 @@ import com.dangbun.domain.duty.adapter.in.web.dto.response.PostDutyCreateRespons
 import com.dangbun.domain.duty.adapter.in.web.dto.response.PutAddMembersResponse;
 import com.dangbun.domain.duty.adapter.in.web.dto.response.PutDutyUpdateResponse;
 import com.dangbun.domain.duty.application.port.in.command.*;
-import com.dangbun.domain.duty.refactor.adapter.in.web.dto.request.*;
-import com.dangbun.domain.duty.refactor.adapter.in.web.dto.response.*;
-import com.dangbun.domain.duty.refactor.application.port.in.command.*;
 import com.dangbun.domain.duty.application.port.in.query.AddCleaningsResult;
 import com.dangbun.domain.duty.application.port.in.query.AddMembersResult;
 import com.dangbun.domain.duty.application.port.in.query.UpdateDutyResult;

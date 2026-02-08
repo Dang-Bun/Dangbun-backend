@@ -6,8 +6,6 @@ import com.dangbun.domain.duty.adapter.in.web.dto.response.GetDutyCleaningNameLi
 import com.dangbun.domain.duty.adapter.in.web.dto.response.GetDutyListResponse;
 import com.dangbun.domain.duty.adapter.in.web.dto.response.GetDutyMemberNameListResponse;
 import com.dangbun.domain.duty.application.port.in.query.*;
-import com.dangbun.domain.duty.refactor.adapter.in.web.dto.response.*;
-import com.dangbun.domain.duty.refactor.application.port.in.query.*;
 import com.dangbun.domain.duty.exception.status.DutyExceptionResponse;
 import com.dangbun.domain.member.exception.status.MemberExceptionResponse;
 import com.dangbun.global.aop.CheckDutyInPlace;
