@@ -4,6 +4,8 @@ import com.dangbun.common.hexagonal.UseCase;
 import com.dangbun.domain.cleaning.adapter.in.web.dto.response.GetCleaningDetailListResponse;
 import com.dangbun.domain.cleaning.adapter.in.web.dto.response.GetCleaningListResponse;
 import com.dangbun.domain.cleaning.adapter.in.web.dto.response.GetCleaningUnassignedResponse;
+import com.dangbun.domain.cleaning.application.port.in.query.CleaningQuery;
+import com.dangbun.domain.cleaning.application.port.in.query.GetCleaningsByPlaceQuery;
 import com.dangbun.domain.cleaning.application.port.out.CleaningQueryPort;
 import com.dangbun.domain.cleaning.domain.Cleaning;
 import com.dangbun.domain.duty.adapter.out.persistence.DutyJpaEntity;
@@ -16,16 +18,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-import com.dangbun.domain.cleaning.application.port.in.query.CleaningQuery;
-import com.dangbun.domain.cleaning.application.port.in.query.GetCleaningForDutyQuery;
-import com.dangbun.domain.cleaning.application.port.in.query.GetCleaningsByPlaceQuery;
-
-import java.util.Optional;
-
 @UseCase
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
-public class CleaningQueryService implements CleaningQuery, GetCleaningsByPlaceQuery, GetCleaningForDutyQuery {
+public class CleaningQueryService implements CleaningQuery, GetCleaningsByPlaceQuery {
 
     private final GetDutyForCleaningQuery getDutyForCleaningQuery;
     private final CleaningQueryPort cleaningQueryPort;
@@ -85,32 +81,5 @@ public class CleaningQueryService implements CleaningQuery, GetCleaningsByPlaceQ
     @Override
     public List<Cleaning> getCleaningsByPlaceId(Long placeId) {
         return cleaningQueryPort.findByPlaceId(placeId);
-    }
-
-    // GetCleaningForDutyQuery 구현
-    @Override
-    public List<CleaningInfo> findAllByDutyId(Long dutyId) {
-        return cleaningQueryPort.findAllByDutyId(dutyId).stream()
-                .map(c -> new CleaningInfo(c.getCleaningId().value(), c.getName(), c.getDutyId()))
-                .toList();
-    }
-
-    @Override
-    public List<CleaningInfo> findAllByIds(List<Long> cleaningIds) {
-        return cleaningQueryPort.findAllByIds(cleaningIds).stream()
-                .map(c -> new CleaningInfo(c.getCleaningId().value(), c.getName(), c.getDutyId()))
-                .toList();
-    }
-
-    @Override
-    public Optional<CleaningInfo> findById(Long cleaningId) {
-        return cleaningQueryPort.findById(cleaningId)
-                .map(c -> new CleaningInfo(c.getCleaningId().value(), c.getName(), c.getDutyId()));
-    }
-
-    @Override
-    public Optional<CleaningInfo> findByCleaningIdAndDutyId(Long cleaningId, Long dutyId) {
-        return cleaningQueryPort.findByCleaningIdAndDutyId(cleaningId, dutyId)
-                .map(c -> new CleaningInfo(c.getCleaningId().value(), c.getName(), c.getDutyId()));
     }
 }

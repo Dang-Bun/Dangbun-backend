@@ -23,7 +23,7 @@ import static com.dangbun.domain.duty.exception.status.DutyExceptionResponse.DUT
 @UseCase
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
-public class DutyQueryService implements DutyQuery, GetDutyForMemberQuery, GetDutyForCleaningQuery {
+public class DutyQueryService implements DutyQuery, GetDutyForMemberQuery {
 
     private final DutyQueryPort dutyQueryPort;
     private final GetMemberDutyForDutyQuery getMemberDutyForDutyQuery;
@@ -112,38 +112,5 @@ public class DutyQueryService implements DutyQuery, GetDutyForMemberQuery, GetDu
     public Optional<GetDutyForMemberQuery.DutyInfo> findByIdAndPlaceId(Long dutyId, Long placeId) {
         return dutyQueryPort.findByIdAndPlaceId(dutyId, placeId)
                 .map(duty -> new GetDutyForMemberQuery.DutyInfo(duty.getDutyId().value(), duty.getName()));
-    }
-
-    // GetDutyForCleaningQuery 구현
-    @Override
-    public Optional<GetDutyForCleaningQuery.DutyInfo> findById(Long dutyId) {
-        return dutyQueryPort.findById(dutyId)
-                .map(duty -> new GetDutyForCleaningQuery.DutyInfo(
-                        duty.getDutyId().value(),
-                        duty.getName(),
-                        duty.getIcon() != null ? duty.getIcon().name() : null
-                ));
-    }
-
-    @Override
-    public List<GetDutyForCleaningQuery.DutyInfo> findAll() {
-        return dutyQueryPort.findAll().stream()
-                .map(duty -> new GetDutyForCleaningQuery.DutyInfo(
-                        duty.getDutyId().value(),
-                        duty.getName(),
-                        duty.getIcon() != null ? duty.getIcon().name() : null
-                ))
-                .toList();
-    }
-
-    @Override
-    public List<GetDutyForCleaningQuery.DutyInfo> findDistinctDutiesByMemberIds(List<Long> memberIds) {
-        return dutyQueryPort.findDistinctDutiesByMemberIds(memberIds).stream()
-                .map(duty -> new GetDutyForCleaningQuery.DutyInfo(
-                        duty.getDutyId().value(),
-                        duty.getName(),
-                        duty.getIcon() != null ? duty.getIcon().name() : null
-                ))
-                .toList();
     }
 }
