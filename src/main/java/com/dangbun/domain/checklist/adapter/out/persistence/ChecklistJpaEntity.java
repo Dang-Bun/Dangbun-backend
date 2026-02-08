@@ -20,6 +20,7 @@ import static com.dangbun.domain.checklist.response.status.ChecklistExceptionRes
 @Getter
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Table(name = "checklist")
 public class ChecklistJpaEntity extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

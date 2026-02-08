@@ -74,13 +74,14 @@ public class AuthService implements AuthUseCase {
     }
 
     private User registerKakaoUser(KakaoUserInfo userInfo) {
-        User newUser = User.withoutIdBuilder()
-                .name(userInfo.nickname())
-                .email(userInfo.email())
-                .loginType(LoginType.KAKAO)
-                .socialId(userInfo.socialId())
-                .enabled(true)
-                .build();
+        User newUser = User.withoutId(
+                userInfo.nickname(),
+                userInfo.email(),
+                null,
+                LoginType.KAKAO,
+                userInfo.socialId(),
+                true
+        );
 
         return userCommandPort.save(newUser);
     }

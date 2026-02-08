@@ -13,9 +13,8 @@ import java.lang.annotation.*;
 @RequestMapping
 public @interface WebAdapter {
 
-    @AliasFor(annotation = RestController.class)
-    String value() default "";
 
     @AliasFor(annotation = RequestMapping.class, attribute = "path")
     String path() default "";
+
 }

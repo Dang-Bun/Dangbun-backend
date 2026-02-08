@@ -40,7 +40,7 @@ import static com.dangbun.domain.user.response.status.UserExceptionResponse.NO_S
 @Validated
 @RequiredArgsConstructor
 @Tag(name = "Place", description = "PlaceController - 플레이스 관련 API")
-@WebAdapter("/places")
+@WebAdapter(path = "/places")
 public class CreatePlaceController {
 
     private final CreatePlaceUseCase createPlaceUsecase;

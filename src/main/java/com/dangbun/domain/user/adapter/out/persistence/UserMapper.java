@@ -10,17 +10,19 @@ public class UserMapper {
         if (jpaEntity == null) {
             return null;
         }
+        System.out.println(">>> jpaEntity.getUserId() = " + jpaEntity.getUserId());
 
-        return User.withIdBuilder()
-                .userId(new User.UserId(jpaEntity.getUserId()))
-                .name(jpaEntity.getName())
-                .email(jpaEntity.getEmail())
-                .password(jpaEntity.getPassword())
-                .loginType(jpaEntity.getLoginType())
-                .socialId(jpaEntity.getSocialId())
-                .enabled(jpaEntity.getEnabled())
-                .createdAt(jpaEntity.getCreatedAt())
-                .build();
+        return User.withId(
+                new User.UserId(jpaEntity.getUserId()),
+                jpaEntity.getName(),
+                jpaEntity.getEmail(),
+                jpaEntity.getPassword(),
+                jpaEntity.getLoginType(),
+                jpaEntity.getSocialId(),
+                jpaEntity.getEnabled(),
+                jpaEntity.getCreatedAt()
+        );
+
     }
 
     public UserJpaEntity mapToJpaEntity(User domainEntity) {

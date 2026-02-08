@@ -37,16 +37,16 @@ class MemberMapper {
     }
 
     public Member mapToDomainEntity(MemberJpaEntity member) {
-        return  Member.withIdBuilder()
-                .memberId(member.getMemberId())
-                .role(toDomainRole(member.getRole()))
-                .name(member.getName())
-                .status(member.getStatus())
-                .information(member.getInformation())
-                .placeId(member.getPlace().getPlaceId())
-                .userId(member.getUserJpaEntity().getUserId())
-                .createdAt(member.getCreatedAt())
-                .build();
+        return Member.withId(
+                member.getMemberId(),
+                toDomainRole(member.getRole()),
+                member.getName(),
+                member.getStatus(),
+                member.getInformation(),
+                member.getPlace().getPlaceId(),
+                member.getUserJpaEntity().getUserId(),
+                member.getCreatedAt()
+        );
     }
 
     private com.dangbun.domain.member.adapter.out.persistence.MemberRole toJpaRole(MemberRole role) {

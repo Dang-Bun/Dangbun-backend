@@ -4,6 +4,7 @@ import com.dangbun.domain.place.domain.PlaceCategory;
 import com.dangbun.common.hexagonal.SelfValidating;
 import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Value;
 
 import java.util.Map;
@@ -11,13 +12,13 @@ import java.util.Map;
 @Value
 public class CreatePlaceCommand extends SelfValidating<CreatePlaceCommand> {
 
-    @NotBlank
+    @NotNull
     Long userId;
 
     @NotBlank
     String placeName;
 
-    @NotBlank
+    @NotNull
     PlaceCategory category;
 
     String categoryName;

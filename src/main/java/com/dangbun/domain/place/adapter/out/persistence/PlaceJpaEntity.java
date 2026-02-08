@@ -51,6 +51,9 @@ public class PlaceJpaEntity extends BaseEntity {
         this.name = name;
         this.category = category;
         this.categoryName = categoryName;
+        this.startTime = LocalTime.MIDNIGHT;
+        this.endTime = LocalTime.of(23, 59);
+        this.isToday = true;
     }
 
     public String createCode(String code){

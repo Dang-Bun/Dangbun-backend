@@ -1,5 +1,7 @@
 package com.dangbun.domain.place.application.port.service;
 
+import com.dangbun.domain.checklist.application.port.in.query.GetChecklistForCalendarQuery;
+import com.dangbun.domain.checklist.application.port.in.query.GetChecklistForCalendarQuery.ChecklistCalendarInfo;
 import com.dangbun.domain.checklist.application.port.in.query.GetCompletedChecklistQuery;
 import com.dangbun.domain.cleaning.application.port.in.query.GetCleaningsByPlaceQuery;
 import com.dangbun.domain.cleaning.domain.Cleaning;
@@ -9,6 +11,7 @@ import com.dangbun.domain.member.application.port.in.query.GetMembersByUserIdQue
 import com.dangbun.domain.member.domain.Member;
 import com.dangbun.domain.member.domain.MemberRole;
 import com.dangbun.domain.membercleaning.application.port.in.query.GetCleaningInfoByMemberQuery;
+import com.dangbun.domain.membercleaning.application.port.in.query.GetMembersByCleaningQuery;
 import com.dangbun.domain.memberduty.application.port.out.MemberDutyQueryPort;
 import com.dangbun.domain.memberduty.domain.MemberDuty;
 import com.dangbun.domain.notificationreceiver.application.port.in.query.GetUnreadNotificationCountQuery;
@@ -55,6 +58,8 @@ public class PlaceQueryService implements PlaceQuery, GetPlaceEndTimeQuery {
     private final GetCompletedChecklistQuery getCompletedChecklistQuery;
     private final GetUnreadNotificationCountQuery getUnreadNotificationCountQuery;
     private final GetCleaningsByPlaceQuery getCleaningsByPlaceQuery;
+    private final GetChecklistForCalendarQuery getChecklistForCalendarQuery;
+    private final GetMembersByCleaningQuery getMembersByCleaningQuery;
 
     @Override
     public PlaceListResult getPlaceList(Long userId) {
@@ -163,13 +168,33 @@ public class PlaceQueryService implements PlaceQuery, GetPlaceEndTimeQuery {
             );
         }
 
-        List<MemberDuty> memberDuties = memberDutyQueryPort.findAllByPlaceId(placeId);
+        // 오늘 날짜의 체크리스트 조회
+        LocalDate today = LocalDate.now();
+        LocalDateTime start = today.atStartOfDay();
+        LocalDateTime end = today.plusDays(1).atStartOfDay();
 
-        // TODO: 추후 체크리스트/청소 관련 복잡한 로직 리팩토링 필요
-        // 현재는 단순화된 응답 반환
+        List<ChecklistCalendarInfo> todayChecklists = getChecklistForCalendarQuery
+                .findAllByCreatedDateAndPlaceId(start, end, placeId);
+
+        PlaceResult.DutyDto dutyDto = null;
+
         if (role == MemberRole.MANAGER) {
+            // MANAGER: 첫 번째 duty의 체크리스트 반환
             List<Duty> duties = dutyQueryPort.findByPlaceId(placeId);
-            // 복잡한 체크리스트 맵 로직은 추후 전용 서비스로 분리 필요
+            if (!duties.isEmpty()) {
+                Duty firstDuty = duties.get(0);
+                dutyDto = buildDutyDto(firstDuty, todayChecklists);
+            }
+        } else {
+            // MEMBER: 해당 멤버가 속한 첫 번째 duty의 체크리스트 반환
+            List<MemberDuty> memberDuties = memberDutyQueryPort.findAllByMemberId(memberId);
+            if (!memberDuties.isEmpty()) {
+                Long dutyId = memberDuties.get(0).getDutyId();
+                Duty duty = dutyQueryPort.findById(dutyId).orElse(null);
+                if (duty != null) {
+                    dutyDto = buildDutyDto(duty, todayChecklists);
+                }
+            }
         }
 
         return new PlaceResult(
@@ -179,7 +204,42 @@ public class PlaceQueryService implements PlaceQuery, GetPlaceEndTimeQuery {
                 place.getCategory(),
                 place.getCategoryName(),
                 place.getEndTime(),
-                null // TODO: DutyDto 생성 로직 별도 서비스로 분리
+                dutyDto
+        );
+    }
+
+    private PlaceResult.DutyDto buildDutyDto(Duty duty, List<ChecklistCalendarInfo> allChecklists) {
+        // 해당 duty의 체크리스트만 필터링
+        List<ChecklistCalendarInfo> dutyChecklists = allChecklists.stream()
+                .filter(cl -> duty.getName().equals(cl.dutyName()))
+                .toList();
+
+        List<PlaceResult.CheckListDto> checkListDtos = dutyChecklists.stream()
+                .map(cl -> {
+                    List<Member> members = getMembersByCleaningQuery.getMembersByCleaningId(cl.cleaningId());
+                    List<PlaceResult.MemberDto> memberDtos = members.stream()
+                            .map(m -> new PlaceResult.MemberDto(m.getMemberId(), m.getName()))
+                            .toList();
+                    return new PlaceResult.CheckListDto(
+                            cl.checklistId(),
+                            memberDtos,
+                            cl.cleaningName(),
+                            cl.getCompleteLocalTime(),
+                            cl.needPhoto()
+                    );
+                })
+                .toList();
+
+        int endCleaning = (int) dutyChecklists.stream()
+                .filter(ChecklistCalendarInfo::isComplete)
+                .count();
+
+        return new PlaceResult.DutyDto(
+                duty.getDutyId().value(),
+                duty.getName(),
+                dutyChecklists.size(),
+                endCleaning,
+                checkListDtos
         );
     }
 

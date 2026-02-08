@@ -32,11 +32,11 @@ public class MemberPageQueryService implements MemberQuery, GetAllMemberQuery, G
         MemberJpaEntity me = MemberContext.get();
         Long placeId = me.getPlace().getPlaceId();
 
-        List<Member> members = memberQueryPort.findByPlaceId(placeId);
-
-        members.sort(Comparator
-                .comparing((Member m) -> m.getRole() != com.dangbun.domain.member.domain.MemberRole.MANAGER)
-                .thenComparing(Member::getName, Comparator.nullsLast(String::compareTo)));
+        List<Member> members = memberQueryPort.findByPlaceId(placeId).stream()
+                .sorted(Comparator
+                        .comparing((Member m) -> m.getRole() != com.dangbun.domain.member.domain.MemberRole.MANAGER)
+                        .thenComparing(Member::getName, Comparator.nullsLast(String::compareTo)))
+                .toList();
 
         Map<Member, List<String>> memberMap = new LinkedHashMap<>();
         Integer waitingMemberNumber = 0;

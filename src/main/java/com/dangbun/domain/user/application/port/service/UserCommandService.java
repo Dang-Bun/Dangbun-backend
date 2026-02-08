@@ -78,13 +78,14 @@ public class UserCommandService implements UserCommandUseCase {
 
         String encodedPassword = passwordEncoder.encode(command.getPassword());
 
-        User user = User.withoutIdBuilder()
-                .name(command.getName())
-                .email(command.getEmail())
-                .password(encodedPassword)
-                .loginType(LoginType.EMAIL)
-                .enabled(true)
-                .build();
+        User user = User.withoutId(
+                command.getName(),
+                command.getEmail(),
+                encodedPassword,
+                LoginType.EMAIL,
+                null,
+                true
+        );
 
         userCommandPort.save(user);
     }
