@@ -10,7 +10,7 @@ package com.dangbun.domain.member.adapter.out.persistence;
  * - MemberRole을 refactor.domain.MemberRole로 변경
  */
 import com.dangbun.domain.place.adapter.out.persistence.PlaceJpaEntity;
-import com.dangbun.domain.user.entity.User;
+import com.dangbun.domain.user.adapter.out.persistence.UserJpaEntity;
 import com.dangbun.global.entity.BaseEntity;
 import com.dangbun.global.converter.MapToJsonConverter;
 import jakarta.persistence.*;
@@ -54,16 +54,16 @@ public class MemberJpaEntity extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
-    private User user;
+    private UserJpaEntity userJpaEntity;
 
     @Builder
-    public MemberJpaEntity(MemberRole role, String name, Boolean status, Map information, PlaceJpaEntity place, User user) {
+    public MemberJpaEntity(MemberRole role, String name, Boolean status, Map information, PlaceJpaEntity place, UserJpaEntity userJpaEntity) {
        this.role = role;
        this.name = name;
        this.status = status;
        this.information = information;
        this.place = place;
-       this.user = user;
+       this.userJpaEntity = userJpaEntity;
     }
 
     public void activate(){

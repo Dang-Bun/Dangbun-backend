@@ -6,7 +6,7 @@ import com.dangbun.domain.cleaningImage.application.port.out.CleaningImageComman
 import com.dangbun.domain.cleaningImage.application.port.out.CleaningImageQueryPort;
 import com.dangbun.domain.cleaningImage.domain.CleaningImage;
 import com.dangbun.domain.cleaningImage.exception.custom.CleaningImageAlreadyExistsException;
-import com.dangbun.domain.user.entity.CustomUserDetails;
+import com.dangbun.domain.user.detail.CustomUserDetails;
 import com.dangbun.global.s3.S3Service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;

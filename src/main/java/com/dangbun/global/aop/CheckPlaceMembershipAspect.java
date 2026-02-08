@@ -5,7 +5,7 @@ import com.dangbun.global.context.MemberContext;
 import com.dangbun.domain.member.adapter.out.persistence.MemberJpaEntity;
 import com.dangbun.domain.member.exception.custom.PlaceAccessDeniedException;
 import com.dangbun.domain.member.adapter.out.persistence.MemberRepository;
-import com.dangbun.domain.user.entity.CustomUserDetails;
+import com.dangbun.domain.user.detail.CustomUserDetails;
 import com.dangbun.global.exception.RequiredParamMissingException;
 
 import lombok.RequiredArgsConstructor;

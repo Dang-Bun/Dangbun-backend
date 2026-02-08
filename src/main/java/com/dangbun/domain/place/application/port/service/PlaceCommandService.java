@@ -145,8 +145,8 @@ public class PlaceCommandService implements PlaceCommandUseCase {
                 jpaMember.getStatus(),
                 jpaMember.getInformation(),
                 jpaMember.getPlace().getPlaceId(),
-                jpaMember.getUser().getUserId(),
-                jpaMember.getUser().getCreatedAt()
+                jpaMember.getUserJpaEntity().getUserId(),
+                jpaMember.getUserJpaEntity().getCreatedAt()
         );
 
         memberCommandPort.delete(member);

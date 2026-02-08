@@ -18,9 +18,9 @@ import com.dangbun.common.hexagonal.WebAdapter;
 import com.dangbun.domain.place.adapter.out.persistence.SpringDataPlaceRepository;
 import com.dangbun.domain.place.application.port.in.command.CreatePlaceCommand;
 import com.dangbun.domain.place.application.port.in.command.CreatePlaceUseCase;
-import com.dangbun.domain.user.entity.CustomUserDetails;
+import com.dangbun.domain.user.detail.CustomUserDetails;
+import com.dangbun.domain.user.adapter.out.persistence.SpringDataUserRepository;
 import com.dangbun.domain.user.exception.custom.NoSuchUserException;
-import com.dangbun.domain.user.repository.UserRepository;
 import com.dangbun.domain.user.response.status.UserExceptionResponse;
 import com.dangbun.global.docs.DocumentedApiErrors;
 import com.dangbun.global.response.BaseResponse;
@@ -48,7 +48,7 @@ public class CreatePlaceController {
     /*
       Todo Member 컨텍스트 아키텍처 전환 시 수정
      */
-    private final UserRepository userRepository;
+    private final SpringDataUserRepository userRepository;
     private final MemberRepository memberRepository;
     private final SpringDataPlaceRepository placeRepository;
 
@@ -83,7 +83,7 @@ public class CreatePlaceController {
                 .information(request.information())
                 .role(MemberRole.MANAGER)
                 .status(true)
-                .user(userRepository.findById(userDetails.getUser().getUserId()).orElseThrow(() -> new NoSuchUserException(NO_SUCH_USER)))
+                .userJpaEntity(userRepository.findById(userDetails.getUser().getUserId()).orElseThrow(() -> new NoSuchUserException(NO_SUCH_USER)))
                 .build();
 
         memberRepository.save(member);

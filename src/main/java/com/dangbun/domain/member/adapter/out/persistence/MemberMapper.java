@@ -14,7 +14,7 @@ import com.dangbun.domain.member.domain.MemberRole;
  * - MemberRole 변환 로직은 original.entity.MemberRole 제거 후 삭제
  */
 import com.dangbun.domain.place.adapter.out.persistence.SpringDataPlaceRepository;
-import com.dangbun.domain.user.repository.UserRepository;
+import com.dangbun.domain.user.adapter.out.persistence.SpringDataUserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -23,7 +23,7 @@ import org.springframework.stereotype.Component;
 class MemberMapper {
 
     private final SpringDataPlaceRepository placeRepository;
-    private final UserRepository userRepository;
+    private final SpringDataUserRepository userRepository;
 
     public MemberJpaEntity mapToJpaEntity(Member member) {
         return new MemberJpaEntity(
@@ -44,7 +44,7 @@ class MemberMapper {
                 .status(member.getStatus())
                 .information(member.getInformation())
                 .placeId(member.getPlace().getPlaceId())
-                .userId(member.getUser().getUserId())
+                .userId(member.getUserJpaEntity().getUserId())
                 .createdAt(member.getCreatedAt())
                 .build();
     }

@@ -1,6 +1,6 @@
 package com.dangbun.global.aop.support;
 
-import com.dangbun.domain.user.entity.CustomUserDetails;
+import com.dangbun.domain.user.detail.CustomUserDetails;
 import com.dangbun.global.exception.UnautheniticatedException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;

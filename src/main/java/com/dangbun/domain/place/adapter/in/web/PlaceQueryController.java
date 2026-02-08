@@ -7,7 +7,7 @@ import com.dangbun.domain.place.application.port.in.query.*;
 import com.dangbun.domain.place.exception.status.PlaceExceptionResponse;
 import com.dangbun.common.hexagonal.WebAdapter;
 import com.dangbun.domain.place.domain.Information;
-import com.dangbun.domain.user.entity.CustomUserDetails;
+import com.dangbun.domain.user.detail.CustomUserDetails;
 import com.dangbun.global.aop.CheckManagerAuthority;
 import com.dangbun.global.aop.CheckPlaceMembership;
 import com.dangbun.global.docs.DocumentedApiErrors;

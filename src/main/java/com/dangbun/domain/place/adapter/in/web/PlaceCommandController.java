@@ -13,7 +13,7 @@ import com.dangbun.domain.place.application.port.in.command.JoinPlaceCommand;
 import com.dangbun.domain.place.application.port.in.command.PlaceCommandUseCase;
 import com.dangbun.domain.place.application.port.in.command.UpdateTimeCommand;
 import com.dangbun.domain.place.application.port.in.command.UpdateTimeResult;
-import com.dangbun.domain.user.entity.CustomUserDetails;
+import com.dangbun.domain.user.detail.CustomUserDetails;
 import com.dangbun.global.aop.CheckManagerAuthority;
 import com.dangbun.global.aop.CheckPlaceMembership;
 import com.dangbun.global.docs.DocumentedApiErrors;

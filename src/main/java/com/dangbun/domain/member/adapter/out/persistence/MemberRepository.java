@@ -10,7 +10,7 @@ package com.dangbun.domain.member.adapter.out.persistence;
  * - 또는 placeId 기반 쿼리로 변경하여 엔티티 의존성 제거 고려
  */
 import com.dangbun.domain.place.adapter.out.persistence.PlaceJpaEntity;
-import com.dangbun.domain.user.entity.User;
+import com.dangbun.domain.user.adapter.out.persistence.UserJpaEntity;
 import io.lettuce.core.dynamic.annotation.Param;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -22,13 +22,13 @@ import java.util.Optional;
 
 public interface MemberRepository extends JpaRepository<MemberJpaEntity, Long> {
 
-    @Query("SELECT m FROM MemberJpaEntity m JOIN FETCH m.place WHERE m.user.userId = :userId")
+    @Query("SELECT m FROM MemberJpaEntity m JOIN FETCH m.place WHERE m.userJpaEntity.userId = :userId")
     List<MemberJpaEntity> findWithPlaceByUserId(Long userId);
 
-    @Query("select m from MemberJpaEntity m join fetch m.place where m.user.userId = :userId and m.place.placeId = :placeId")
+    @Query("select m from MemberJpaEntity m join fetch m.place where m.userJpaEntity.userId = :userId and m.place.placeId = :placeId")
     Optional<MemberJpaEntity> findWithPlaceByUserIdAndPlaceId(Long userId, Long placeId);
 
-    Optional<MemberJpaEntity> findByPlaceAndUser(PlaceJpaEntity place, User user);
+    Optional<MemberJpaEntity> findByPlaceAndUserJpaEntity(PlaceJpaEntity place, UserJpaEntity userJpaEntity);
 
     MemberJpaEntity findFirstByPlace(PlaceJpaEntity place);
 
@@ -49,6 +49,6 @@ public interface MemberRepository extends JpaRepository<MemberJpaEntity, Long> {
 
     Page<MemberJpaEntity> findByPlace_PlaceIdAndNameContaining(Long placeId, String name, Pageable pageable);
 
-    List<MemberJpaEntity> findALLByUser(User user);
+    List<MemberJpaEntity> findALLByUserJpaEntity(UserJpaEntity userJpaEntity);
 
 }
