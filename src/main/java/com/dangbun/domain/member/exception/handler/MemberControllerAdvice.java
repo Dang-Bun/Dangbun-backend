@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import static com.dangbun.domain.member.response.status.MemberExceptionResponse.*;
+import static com.dangbun.domain.member.exception.status.MemberExceptionResponse.*;
 
 
 @Order(Ordered.HIGHEST_PRECEDENCE)

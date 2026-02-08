@@ -1,9 +1,9 @@
 package com.dangbun.global.aop;
 
 
-import com.dangbun.domain.duty.entity.Duty;
 import com.dangbun.domain.duty.exception.custom.DutyNotInPlaceFoundException;
-import com.dangbun.domain.duty.repository.DutyRepository;
+import com.dangbun.domain.duty.adapter.out.persistence.SpringDataDutyRepository;
+import com.dangbun.domain.duty.adapter.out.persistence.DutyJpaEntity;
 import com.dangbun.global.aop.support.AnnotationResolver;
 import com.dangbun.global.aop.support.RequestParamResolver;
 import com.dangbun.global.context.DutyContext;
@@ -15,7 +15,7 @@ import org.aspectj.lang.annotation.Aspect;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
-import static com.dangbun.domain.duty.response.status.DutyExceptionResponse.DUTY_NOT_IN_PLACE;
+import static com.dangbun.domain.duty.exception.status.DutyExceptionResponse.DUTY_NOT_IN_PLACE;
 import static com.dangbun.global.response.status.BaseExceptionResponse.REQUIRED_PARAM_MISSING;
 
 @Aspect
@@ -23,7 +23,7 @@ import static com.dangbun.global.response.status.BaseExceptionResponse.REQUIRED_
 @Order(2)
 @RequiredArgsConstructor
 public class CheckDutyInPlaceAspect {
-    private final DutyRepository dutyRepository;
+    private final SpringDataDutyRepository dutyRepository;
     private final AnnotationResolver annotationResolver;
     private final RequestParamResolver requestParamResolver;
 
@@ -42,7 +42,7 @@ public class CheckDutyInPlaceAspect {
             throw new RequiredParamMissingException(REQUIRED_PARAM_MISSING);
         }
 
-        Duty duty = dutyRepository.findByDutyIdAndPlace_PlaceId(dutyId, placeId)
+        DutyJpaEntity duty = dutyRepository.findByDutyIdAndPlace_PlaceId(dutyId, placeId)
                 .orElseThrow(() -> new DutyNotInPlaceFoundException(DUTY_NOT_IN_PLACE));
 
         try {

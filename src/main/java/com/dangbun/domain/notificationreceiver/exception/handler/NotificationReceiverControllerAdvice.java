@@ -1,6 +1,5 @@
 package com.dangbun.domain.notificationreceiver.exception.handler;
 
-import com.dangbun.domain.notification.exception.custom.MemberNotFoundException;
 import com.dangbun.domain.notificationreceiver.exception.custom.NotificationReceiverNotFoundException;
 import com.dangbun.global.response.BaseErrorResponse;
 import org.springframework.core.Ordered;

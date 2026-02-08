@@ -1,8 +1,8 @@
 package com.dangbun.domain.cleaningImage.exception.handler;
 
-import com.dangbun.domain.cleaningImage.exception.custom.CleaningImageAlreadyExistsExcepetion;
 import com.dangbun.domain.cleaningImage.exception.custom.InvalidS3KeyException;
 import com.dangbun.domain.cleaningImage.exception.custom.NoSuchImageException;
+import com.dangbun.domain.cleaningImage.exception.custom.CleaningImageAlreadyExistsException;
 import com.dangbun.global.response.BaseErrorResponse;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
@@ -26,9 +26,9 @@ public class CleaningImageControllerAdvice {
         return new BaseErrorResponse(e.getExceptionStatus());
     }
 
-    @ExceptionHandler(CleaningImageAlreadyExistsExcepetion.class)
+    @ExceptionHandler(CleaningImageAlreadyExistsException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public BaseErrorResponse handleCleaningImageAlreadyExistsException(CleaningImageAlreadyExistsExcepetion e) {
+    public BaseErrorResponse handleCleaningImageAlreadyExistsException(CleaningImageAlreadyExistsException e) {
         return new BaseErrorResponse(e.getExceptionStatus());
     }
 }

@@ -1,15 +1,15 @@
 package com.dangbun.global.context;
 
-import com.dangbun.domain.duty.entity.Duty;
+import com.dangbun.domain.duty.adapter.out.persistence.DutyJpaEntity;
 
 public class DutyContext {
-    private static final ThreadLocal<Duty> currentDuty = new ThreadLocal<>();
+    private static final ThreadLocal<DutyJpaEntity> currentDuty = new ThreadLocal<>();
 
-    public static void set(Duty duty) {
+    public static void set(DutyJpaEntity duty) {
         currentDuty.set(duty);
     }
 
-    public static Duty get() {
+    public static DutyJpaEntity get() {
         return currentDuty.get();
     }
 

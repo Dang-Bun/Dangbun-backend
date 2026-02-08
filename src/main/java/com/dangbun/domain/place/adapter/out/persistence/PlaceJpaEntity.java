@@ -1,0 +1,72 @@
+package com.dangbun.domain.place.adapter.out.persistence;
+
+
+import com.dangbun.domain.place.domain.PlaceCategory;
+import com.dangbun.global.entity.BaseEntity;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
+import lombok.*;
+
+import java.time.LocalTime;
+
+@Entity
+@Table(name = "place")
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
+public class PlaceJpaEntity extends BaseEntity {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "place_id")
+    private Long placeId;
+
+    @Column(nullable = false, length = 50)
+    @NotEmpty
+    private String name;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "category", nullable = false, length = 100)
+    @NotNull
+    private PlaceCategory category;
+
+    @Column(name="category_name", length = 10)
+    private String categoryName;
+
+    @Column(name = "invite_code")
+    private String inviteCode;
+
+    @Column(name = "start_time")
+    private LocalTime startTime = LocalTime.MIDNIGHT;
+
+    @Column(name = "end_time")
+    private LocalTime endTime = LocalTime.of(23,59);
+
+    @Column(name = "is_today")
+    private Boolean isToday = true;
+
+    @Builder
+    public PlaceJpaEntity(String name, PlaceCategory category, String categoryName) {
+        this.name = name;
+        this.category = category;
+        this.categoryName = categoryName;
+        this.startTime = LocalTime.MIDNIGHT;
+        this.endTime = LocalTime.of(23, 59);
+        this.isToday = true;
+    }
+
+    public String createCode(String code){
+        if(this.inviteCode != null)
+            return this.inviteCode;
+
+        this.inviteCode = code;
+        return this.inviteCode;
+    }
+
+    public void setTime(LocalTime startTime, LocalTime endTime, Boolean isToday){
+        this.startTime = startTime;
+        this.endTime = endTime;
+        this.isToday = isToday;
+    }
+}

@@ -1,0 +1,31 @@
+package com.dangbun.domain.cleaning.adapter.in.web.dto.response;
+
+import com.dangbun.domain.duty.application.port.in.query.GetDutyForCleaningQuery;
+import com.dangbun.domain.duty.domain.Duty;
+import com.dangbun.domain.duty.domain.DutyIcon;
+import io.swagger.v3.oas.annotations.media.Schema;
+
+public record GetCleaningListResponse(
+        @Schema(description = "당번 ID", example = "1")
+        Long dutyId,
+        @Schema(description = "당번 이름", example = "탕비실 청소 당번")
+        String name,
+        @Schema(description = "당번 아이콘", example = "BUCKET_PINK")
+        DutyIcon icon
+) {
+    public static GetCleaningListResponse of(Duty duty) {
+        return new GetCleaningListResponse(
+                duty.getDutyId().value(),
+                duty.getName(),
+                duty.getIcon()
+        );
+    }
+
+    public static GetCleaningListResponse of(GetDutyForCleaningQuery.DutyInfo dutyInfo) {
+        return new GetCleaningListResponse(
+                dutyInfo.dutyId(),
+                dutyInfo.name(),
+                dutyInfo.icon() != null ? DutyIcon.valueOf(dutyInfo.icon()) : null
+        );
+    }
+}
