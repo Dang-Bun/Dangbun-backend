@@ -9,19 +9,17 @@ import com.dangbun.domain.calendar.adapter.in.web.dto.response.GetProgressBarsRe
 import com.dangbun.domain.calendar.application.port.in.query.CalendarQuery;
 import com.dangbun.domain.calendar.exception.custom.InvalidDateException;
 import com.dangbun.domain.calendar.exception.custom.NoPhotoException;
-import com.dangbun.domain.checklist.adapter.out.persistence.ChecklistJpaEntity;
-import com.dangbun.domain.checklist.adapter.out.persistence.SpringDataChecklistRepository;
-import com.dangbun.domain.cleaning.adapter.out.persistence.CleaningJpaEntity;
+import com.dangbun.domain.checklist.application.port.in.query.GetChecklistForCalendarQuery;
+import com.dangbun.domain.checklist.application.port.in.query.GetChecklistForCalendarQuery.ChecklistCalendarInfo;
+import com.dangbun.domain.checklist.application.port.in.query.GetChecklistForCalendarQuery.ChecklistWithCleaningAndDutyInfo;
+import com.dangbun.domain.checklist.application.port.in.query.GetChecklistForCalendarQuery.ChecklistWithCleaningInfo;
 import com.dangbun.domain.cleaning.domain.CleaningRepeatType;
 import com.dangbun.domain.cleaningImage.application.port.in.query.CleaningImageQuery;
-import com.dangbun.domain.cleaningdate.adapter.out.persistence.CleaningDateJpaEntity;
-import com.dangbun.domain.cleaningdate.adapter.out.persistence.CleaningDateRepository;
-import com.dangbun.domain.duty.adapter.out.persistence.DutyJpaEntity;
+import com.dangbun.domain.cleaningdate.application.port.in.query.GetCleaningDateForCalendarQuery;
 import com.dangbun.domain.member.adapter.out.persistence.MemberJpaEntity;
-import com.dangbun.domain.member.adapter.out.persistence.MemberRepository;
 import com.dangbun.domain.member.adapter.out.persistence.MemberRole;
-import com.dangbun.domain.membercleaning.adapter.out.persistence.MemberCleaningJpaEntity;
-import com.dangbun.domain.membercleaning.adapter.out.persistence.MemberCleaningRepository;
+import com.dangbun.domain.member.application.port.in.query.GetMemberForCalendarQuery;
+import com.dangbun.domain.membercleaning.application.port.in.query.GetMemberCleaningForCalendarQuery;
 import com.dangbun.global.context.MemberContext;
 import lombok.RequiredArgsConstructor;
 import org.springframework.transaction.annotation.Transactional;
@@ -39,18 +37,10 @@ import static com.dangbun.domain.calendar.response.status.CalendarExceptionRespo
 public class CalendarQueryService implements CalendarQuery {
 
     private final CleaningImageQuery cleaningImageQuery;
-
-    /*
-     * TODO: Checklist/MemberCleaning/CleaningDate 도메인 헥사고날 아키텍처 전환 시 수정
-     * ChecklistRepository -> ChecklistQueryPort
-     * MemberCleaningRepository -> MemberCleaningQueryPort
-     * CleaningDateRepository -> CleaningDateQueryPort
-     * MemberRepository -> MemberQueryPort
-     */
-    private final SpringDataChecklistRepository checklistRepository;
-    private final MemberCleaningRepository memberCleaningRepository;
-    private final MemberRepository memberRepository;
-    private final CleaningDateRepository cleaningDateRepository;
+    private final GetChecklistForCalendarQuery getChecklistForCalendarQuery;
+    private final GetMemberForCalendarQuery getMemberForCalendarQuery;
+    private final GetMemberCleaningForCalendarQuery getMemberCleaningForCalendarQuery;
+    private final GetCleaningDateForCalendarQuery getCleaningDateForCalendarQuery;
 
     @Override
     public GetChecklistsResponse getChecklists(LocalDate date) {
@@ -63,25 +53,25 @@ public class CalendarQueryService implements CalendarQuery {
         LocalDateTime start = date.atStartOfDay();
         LocalDateTime end = date.plusDays(1).atStartOfDay();
 
-        List<ChecklistJpaEntity> checklistJpaEntities = checklistRepository.findAllByCreatedDateAndPlaceId(start, end, placeId);
+        List<ChecklistCalendarInfo> checklists = getChecklistForCalendarQuery.findAllByCreatedDateAndPlaceId(start, end, placeId);
 
-        filterMyChecklists(me, checklistJpaEntities);
+        List<ChecklistCalendarInfo> filteredChecklists = filterMyChecklists(me, checklists);
 
         List<ChecklistDto> checklistDtos = new ArrayList<>();
 
-        for (ChecklistJpaEntity checklistJpaEntity : checklistJpaEntities) {
-            Long checklistId = checklistJpaEntity.getChecklistId();
-            String cleaningName = checklistJpaEntity.getCleaningJpaEntity().getName();
-            String dutyName = checklistJpaEntity.getCleaningJpaEntity().getDuty().getName();
-            Boolean isComplete = checklistJpaEntity.getIsComplete();
+        for (ChecklistCalendarInfo checklist : filteredChecklists) {
+            Long checklistId = checklist.checklistId();
+            String cleaningName = checklist.cleaningName();
+            String dutyName = checklist.dutyName();
+            Boolean isComplete = checklist.isComplete();
 
             String memberName = null;
             LocalTime localTime = null;
-            if (checklistJpaEntity.getCompleteMemberId() != null) {
-                memberName = memberRepository.findById(checklistJpaEntity.getCompleteMemberId()).map(MemberJpaEntity::getName).orElse(null);
-                localTime = checklistJpaEntity.getCompleteTime().toLocalTime();
+            if (checklist.completeMemberId() != null) {
+                memberName = getMemberForCalendarQuery.findMemberNameById(checklist.completeMemberId()).orElse(null);
+                localTime = checklist.getCompleteLocalTime();
             }
-            Boolean needPhoto = checklistJpaEntity.getCleaningJpaEntity().getNeedPhoto();
+            Boolean needPhoto = checklist.needPhoto();
 
             checklistDtos.add(ChecklistDto.of(checklistId, cleaningName, dutyName, isComplete, memberName, localTime, needPhoto));
         }
@@ -97,23 +87,28 @@ public class CalendarQueryService implements CalendarQuery {
         LocalDateTime start = current.minusMonths(1).atDay(1).atStartOfDay();
         LocalDateTime end = current.plusMonths(1).atDay(1).atStartOfDay();
 
-        List<ChecklistJpaEntity> checklistJpaEntities = checklistRepository.findByPlaceAndMonth(placeId, start, end);
+        List<ChecklistCalendarInfo> checklists = getChecklistForCalendarQuery.findByPlaceAndMonth(placeId, start, end);
 
+        List<ChecklistCalendarInfo> filteredChecklists = checklists;
         if (me.getRole().equals(MemberRole.MEMBER)) {
-            filterMyChecklists(me, checklistJpaEntities);
+            filteredChecklists = filterMyChecklists(me, checklists);
         }
 
-        Map<LocalDate, List<ChecklistJpaEntity>> dailyGrouped = checklistJpaEntities.stream().collect(Collectors.groupingBy(ch -> ch.getCreatedAt().toLocalDate(),
-                TreeMap::new, Collectors.toList()));
+        Map<LocalDate, List<ChecklistCalendarInfo>> dailyGrouped = filteredChecklists.stream()
+                .collect(Collectors.groupingBy(
+                        ch -> ch.createdAt().toLocalDate(),
+                        TreeMap::new,
+                        Collectors.toList()
+                ));
 
         List<GetProgressBarsResponse.DailyProgressDto> result = new ArrayList<>();
 
-        for (Map.Entry<LocalDate, List<ChecklistJpaEntity>> entry : dailyGrouped.entrySet()) {
+        for (Map.Entry<LocalDate, List<ChecklistCalendarInfo>> entry : dailyGrouped.entrySet()) {
             LocalDate entryDate = entry.getKey();
-            List<ChecklistJpaEntity> list = entry.getValue();
+            List<ChecklistCalendarInfo> list = entry.getValue();
 
             int total = list.size();
-            int completed = (int) list.stream().filter(ChecklistJpaEntity::getIsComplete).count();
+            int completed = (int) list.stream().filter(ChecklistCalendarInfo::isComplete).count();
 
             result.add(GetProgressBarsResponse.DailyProgressDto.of(entryDate, total, completed));
         }
@@ -123,9 +118,10 @@ public class CalendarQueryService implements CalendarQuery {
 
     @Override
     public GetImageUrlResponse getPhotoUrl(Long checklistId) {
-        ChecklistJpaEntity checklistJpaEntity = checklistRepository.findWithCleaningById(checklistId).orElseThrow();
+        ChecklistWithCleaningInfo checklist = getChecklistForCalendarQuery.findWithCleaningById(checklistId)
+                .orElseThrow();
 
-        if (!checklistJpaEntity.getCleaningJpaEntity().getNeedPhoto()) {
+        if (!checklist.needPhoto()) {
             throw new NoPhotoException(NO_PHOTO);
         }
 
@@ -135,36 +131,31 @@ public class CalendarQueryService implements CalendarQuery {
 
     @Override
     public GetCleaningInfoResponse getCleaningInfo(Long checklistId) {
-        ChecklistJpaEntity checklistJpaEntity = checklistRepository.findWithCleaningAndDutyById(checklistId).orElseThrow();
+        ChecklistWithCleaningAndDutyInfo checklist = getChecklistForCalendarQuery.findWithCleaningAndDutyById(checklistId)
+                .orElseThrow();
 
-        CleaningJpaEntity cleaningJpaEntity = checklistJpaEntity.getCleaningJpaEntity();
-        DutyJpaEntity duty = cleaningJpaEntity.getDuty();
-        List<MemberCleaningJpaEntity> memberCleaningJpaEntities = memberCleaningRepository.findAllByCleaningJpaEntity(cleaningJpaEntity);
-        List<MemberJpaEntity> members = memberCleaningJpaEntities.stream().map(MemberCleaningJpaEntity::getMember).toList();
-
-        Long cleaningId = cleaningJpaEntity.getCleaningId();
-        String dutyName = duty.getName();
-        List<String> membersName = members.stream().map(MemberJpaEntity::getName).toList();
-        Boolean needPhoto = cleaningJpaEntity.getNeedPhoto();
-        CleaningRepeatType repeatType = cleaningJpaEntity.getRepeatType();
-        List<DayOfWeek> repeatDays = parseRepeatDaysToDayOfWeek(cleaningJpaEntity.getRepeatDays());
-
-        List<CleaningDateJpaEntity> cleaningDateJpaEntities = cleaningDateRepository.findByCleaningJpaEntity(cleaningJpaEntity);
-
-        List<LocalDate> dates = cleaningDateJpaEntities.stream().map(CleaningDateJpaEntity::getDate).toList();
+        Long cleaningId = checklist.cleaningId();
+        String dutyName = checklist.dutyName();
+        List<String> membersName = getMemberCleaningForCalendarQuery.findMemberNamesByCleaningId(cleaningId);
+        Boolean needPhoto = checklist.needPhoto();
+        CleaningRepeatType repeatType = checklist.repeatType() != null
+                ? CleaningRepeatType.valueOf(checklist.repeatType())
+                : null;
+        List<DayOfWeek> repeatDays = parseRepeatDaysToDayOfWeek(checklist.repeatDays());
+        List<LocalDate> dates = getCleaningDateForCalendarQuery.findDatesByCleaningId(cleaningId);
 
         return GetCleaningInfoResponse.of(cleaningId, dutyName, membersName, needPhoto, repeatType, repeatDays, dates);
     }
 
-    private void filterMyChecklists(MemberJpaEntity me, List<ChecklistJpaEntity> checklistJpaEntities) {
+    private List<ChecklistCalendarInfo> filterMyChecklists(MemberJpaEntity me, List<ChecklistCalendarInfo> checklists) {
         if (me.getRole().equals(MemberRole.MEMBER)) {
-            List<CleaningJpaEntity> myCleaningJpaEntities = memberCleaningRepository.findAllByMember(me)
-                    .stream()
-                    .map(MemberCleaningJpaEntity::getCleaningJpaEntity)
-                    .toList();
+            List<Long> myCleaningIds = getMemberCleaningForCalendarQuery.findCleaningIdsByMemberId(me.getMemberId());
 
-            checklistJpaEntities.removeIf(checklist -> !myCleaningJpaEntities.contains(checklist.getCleaningJpaEntity()));
+            return checklists.stream()
+                    .filter(checklist -> myCleaningIds.contains(checklist.cleaningId()))
+                    .toList();
         }
+        return checklists;
     }
 
     private static List<DayOfWeek> parseRepeatDaysToDayOfWeek(String repeatDays) {

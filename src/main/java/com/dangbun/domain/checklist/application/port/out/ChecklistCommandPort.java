@@ -13,4 +13,6 @@ public interface ChecklistCommandPort {
     Checklist incompleteChecklist(Long checklistId);
 
     void createChecklist(Long cleaningId);
+
+    void deleteById(Long checklistId);
 }

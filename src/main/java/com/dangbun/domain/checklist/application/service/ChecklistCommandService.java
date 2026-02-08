@@ -12,6 +12,7 @@ import com.dangbun.domain.checklist.adapter.in.web.dto.response.PostGetPresigned
 import com.dangbun.domain.checklist.adapter.in.web.dto.response.PostIncompleteChecklistResponse;
 import com.dangbun.domain.checklist.adapter.out.persistence.ChecklistJpaEntity;
 import com.dangbun.domain.checklist.application.port.in.command.ChecklistCommandUseCase;
+import com.dangbun.domain.checklist.application.port.in.command.ChecklistForCalendarUseCase;
 import com.dangbun.domain.checklist.application.port.in.command.CreateChecklistByDateAndTimeUseCase;
 import com.dangbun.domain.cleaning.application.port.out.CleaningQueryPort;
 import com.dangbun.domain.cleaning.domain.Cleaning;
@@ -37,7 +38,7 @@ import static com.dangbun.domain.checklist.response.status.ChecklistExceptionRes
 @UseCase
 @RequiredArgsConstructor
 @Transactional
-public class ChecklistCommandService implements ChecklistCommandUseCase, CreateChecklistByDateAndTimeUseCase {
+public class ChecklistCommandService implements ChecklistCommandUseCase, CreateChecklistByDateAndTimeUseCase, ChecklistForCalendarUseCase {
 
     private final CleaningImageCommandUseCase cleaningImageCommandUseCase;
     private final CleaningImageQuery cleaningImageQuery;
@@ -118,5 +119,18 @@ public class ChecklistCommandService implements ChecklistCommandUseCase, CreateC
     @Override
     public void createChecklistByDateAndTime(Long cleaningId, List<CleaningDate> cleaningDates, Long placeId) {
         checklistCommandPort.createChecklistByDateAndTime(cleaningId, cleaningDates, placeId);
+    }
+
+    // ChecklistForCalendarUseCase 구현
+    @Override
+    public CompleteResult completeChecklist(Long checklistId, Long memberId) {
+        Checklist completed = checklistCommandPort.completeChecklist(checklistId, memberId);
+        return new CompleteResult(LocalTime.from(completed.getUpdatedAt()));
+    }
+
+    @Override
+    public void deleteChecklist(Long checklistId) {
+        cleaningImageCommandUseCase.deleteS3File(checklistId);
+        checklistCommandPort.deleteById(checklistId);
     }
 }

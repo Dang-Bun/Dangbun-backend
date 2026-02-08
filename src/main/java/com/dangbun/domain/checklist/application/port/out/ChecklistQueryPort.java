@@ -24,4 +24,41 @@ public interface ChecklistQueryPort {
     Cleaning getCleaningJpaEntity(Long checklistId);
 
     boolean existsByCleaningIdAndCreatedAt(Long cleaningId, LocalDateTime createdAt);
+
+    // Calendar 도메인용 조회 메서드
+    List<ChecklistCalendarDto> findAllWithCleaningAndDutyByCreatedDateAndPlaceId(LocalDateTime start, LocalDateTime end, Long placeId);
+
+    List<ChecklistCalendarDto> findWithCleaningByPlaceAndMonth(Long placeId, LocalDateTime start, LocalDateTime end);
+
+    Optional<ChecklistWithCleaningDto> findWithCleaningInfoById(Long checklistId);
+
+    Optional<ChecklistWithCleaningAndDutyDto> findWithCleaningAndDutyInfoById(Long checklistId);
+
+    record ChecklistCalendarDto(
+            Long checklistId,
+            Long cleaningId,
+            String cleaningName,
+            String dutyName,
+            Boolean isComplete,
+            Long completeMemberId,
+            LocalDateTime completeTime,
+            Boolean needPhoto,
+            LocalDateTime createdAt
+    ) {}
+
+    record ChecklistWithCleaningDto(
+            Long checklistId,
+            Long cleaningId,
+            Boolean needPhoto
+    ) {}
+
+    record ChecklistWithCleaningAndDutyDto(
+            Long checklistId,
+            Long cleaningId,
+            String cleaningName,
+            String dutyName,
+            Boolean needPhoto,
+            String repeatType,
+            String repeatDays
+    ) {}
 }

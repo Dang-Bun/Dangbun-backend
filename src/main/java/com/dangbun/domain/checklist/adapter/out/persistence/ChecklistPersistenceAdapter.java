@@ -170,4 +170,66 @@ class ChecklistPersistenceAdapter implements ChecklistCommandPort, ChecklistQuer
         CleaningJpaEntity cleaningJpaEntity = cleaningRepository.getReferenceById(cleaningId);
         createChecklist(cleaningJpaEntity);
     }
+
+    @Override
+    public void deleteById(Long checklistId) {
+        checklistRepository.deleteById(checklistId);
+    }
+
+    // Calendar 도메인용 조회 메서드 구현
+    @Override
+    public List<ChecklistCalendarDto> findAllWithCleaningAndDutyByCreatedDateAndPlaceId(LocalDateTime start, LocalDateTime end, Long placeId) {
+        return checklistRepository.findAllByCreatedDateAndPlaceId(start, end, placeId).stream()
+                .map(this::toCalendarDto)
+                .toList();
+    }
+
+    @Override
+    public List<ChecklistCalendarDto> findWithCleaningByPlaceAndMonth(Long placeId, LocalDateTime start, LocalDateTime end) {
+        return checklistRepository.findByPlaceAndMonth(placeId, start, end).stream()
+                .map(this::toCalendarDto)
+                .toList();
+    }
+
+    @Override
+    public Optional<ChecklistWithCleaningDto> findWithCleaningInfoById(Long checklistId) {
+        return checklistRepository.findWithCleaningById(checklistId)
+                .map(entity -> new ChecklistWithCleaningDto(
+                        entity.getChecklistId(),
+                        entity.getCleaningJpaEntity().getCleaningId(),
+                        entity.getCleaningJpaEntity().getNeedPhoto()
+                ));
+    }
+
+    @Override
+    public Optional<ChecklistWithCleaningAndDutyDto> findWithCleaningAndDutyInfoById(Long checklistId) {
+        return checklistRepository.findWithCleaningAndDutyById(checklistId)
+                .map(entity -> {
+                    CleaningJpaEntity cleaning = entity.getCleaningJpaEntity();
+                    return new ChecklistWithCleaningAndDutyDto(
+                            entity.getChecklistId(),
+                            cleaning.getCleaningId(),
+                            cleaning.getName(),
+                            cleaning.getDuty() != null ? cleaning.getDuty().getName() : null,
+                            cleaning.getNeedPhoto(),
+                            cleaning.getRepeatType() != null ? cleaning.getRepeatType().name() : null,
+                            cleaning.getRepeatDays()
+                    );
+                });
+    }
+
+    private ChecklistCalendarDto toCalendarDto(ChecklistJpaEntity entity) {
+        CleaningJpaEntity cleaning = entity.getCleaningJpaEntity();
+        return new ChecklistCalendarDto(
+                entity.getChecklistId(),
+                cleaning.getCleaningId(),
+                cleaning.getName(),
+                cleaning.getDuty() != null ? cleaning.getDuty().getName() : null,
+                entity.getIsComplete(),
+                entity.getCompleteMemberId(),
+                entity.getCompleteTime(),
+                cleaning.getNeedPhoto(),
+                entity.getCreatedAt()
+        );
+    }
 }
