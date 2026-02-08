@@ -1,7 +1,7 @@
 package com.dangbun.domain.cleaning.adapter.out.persistence;
 
 import com.dangbun.domain.cleaning.domain.CleaningRepeatType;
-import com.dangbun.domain.duty.refactor.adapter.out.persistence.DutyJpaEntity;
+import com.dangbun.domain.duty.adapter.out.persistence.DutyJpaEntity;
 /*
  * TODO: Place 도메인 헥사고날 아키텍처 전환 완료 후 수정 필요
  * - import 변경: com.dangbun.domain.place.original.entity.Place

@@ -1,6 +1,6 @@
 package com.dangbun.global.context;
 
-import com.dangbun.domain.duty.refactor.adapter.out.persistence.DutyJpaEntity;
+import com.dangbun.domain.duty.adapter.out.persistence.DutyJpaEntity;
 
 public class DutyContext {
     private static final ThreadLocal<DutyJpaEntity> currentDuty = new ThreadLocal<>();

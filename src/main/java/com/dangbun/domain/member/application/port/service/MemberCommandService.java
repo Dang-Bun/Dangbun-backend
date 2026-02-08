@@ -1,7 +1,7 @@
 package com.dangbun.domain.member.application.port.service;
 
-import com.dangbun.domain.duty.refactor.application.port.out.DutyQueryPort;
-import com.dangbun.domain.duty.refactor.domain.Duty;
+import com.dangbun.domain.duty.application.port.out.DutyQueryPort;
+import com.dangbun.domain.duty.domain.Duty;
 import com.dangbun.domain.member.adapter.out.persistence.MemberJpaEntity;
 import com.dangbun.domain.member.adapter.out.persistence.MemberRole;
 import com.dangbun.domain.member.application.port.in.command.AssignDutyCommand;
@@ -9,11 +9,9 @@ import com.dangbun.domain.member.application.port.in.command.ExitPlaceCommand;
 import com.dangbun.domain.member.application.port.in.command.MemberCommandUseCase;
 import com.dangbun.domain.member.application.port.in.command.RemoveMemberCommand;
 import com.dangbun.domain.member.exception.custom.*;
-import com.dangbun.domain.member.application.port.in.command.*;
 import com.dangbun.domain.member.application.port.out.MemberCommandPort;
 import com.dangbun.domain.member.application.port.out.MemberQueryPort;
 import com.dangbun.domain.member.domain.Member;
-import com.dangbun.domain.member.exception.custom.*;
 import com.dangbun.domain.memberduty.domain.MemberDuty;
 import com.dangbun.domain.memberduty.application.port.out.MemberDutyCommandPort;
 import com.dangbun.domain.memberduty.adapter.out.persistence.SpringDataMemberDutyRepository;

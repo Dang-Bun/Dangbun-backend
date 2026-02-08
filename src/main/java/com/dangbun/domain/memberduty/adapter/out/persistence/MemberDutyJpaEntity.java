@@ -1,6 +1,6 @@
 package com.dangbun.domain.memberduty.adapter.out.persistence;
 
-import com.dangbun.domain.duty.refactor.adapter.out.persistence.DutyJpaEntity;
+import com.dangbun.domain.duty.adapter.out.persistence.DutyJpaEntity;
 import com.dangbun.domain.member.adapter.out.persistence.MemberJpaEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;

@@ -1,8 +1,8 @@
 package com.dangbun.domain.memberduty.adapter.out.persistence;
 
-import com.dangbun.domain.duty.refactor.adapter.out.persistence.DutyJpaEntity;
-import com.dangbun.domain.duty.refactor.adapter.out.persistence.SpringDataDutyRepository;
-import com.dangbun.domain.duty.refactor.domain.Duty;
+import com.dangbun.domain.duty.adapter.out.persistence.DutyJpaEntity;
+import com.dangbun.domain.duty.adapter.out.persistence.SpringDataDutyRepository;
+import com.dangbun.domain.duty.domain.Duty;
 import com.dangbun.domain.member.adapter.out.persistence.MemberJpaEntity;
 import com.dangbun.domain.member.adapter.out.persistence.MemberRepository;
 import com.dangbun.domain.memberduty.domain.MemberDuty;

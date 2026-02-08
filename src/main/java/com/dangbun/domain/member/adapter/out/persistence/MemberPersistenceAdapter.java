@@ -97,6 +97,26 @@ public class MemberPersistenceAdapter implements MemberCommandPort, MemberQueryP
         return memberMapper.mapToDomainEntity(memberJpaEntity);
     }
 
+    @Override
+    public List<Member> findByUserId(Long userId) {
+        return memberRepository.findWithPlaceByUserId(userId).stream()
+                .map(memberMapper::mapToDomainEntity)
+                .toList();
+    }
+
+    @Override
+    public Optional<Member> findByUserIdAndPlaceId(Long userId, Long placeId) {
+        return memberRepository.findWithPlaceByUserIdAndPlaceId(userId, placeId)
+                .map(memberMapper::mapToDomainEntity);
+    }
+
+    @Override
+    public Optional<Member> findFirstByPlaceId(Long placeId) {
+        return memberRepository.findByPlace_PlaceId(placeId).stream()
+                .findFirst()
+                .map(memberMapper::mapToDomainEntity);
+    }
+
     // ===== GetMemberByInviteCodePort =====
 
     @Override

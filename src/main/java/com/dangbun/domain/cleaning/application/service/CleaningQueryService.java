@@ -9,9 +9,9 @@ import com.dangbun.domain.cleaning.adapter.out.persistence.CleaningMapper;
 import com.dangbun.domain.cleaning.adapter.out.persistence.CleaningRepository;
 import com.dangbun.domain.cleaning.application.port.out.CleaningQueryPort;
 import com.dangbun.domain.cleaning.domain.Cleaning;
-import com.dangbun.domain.duty.refactor.adapter.out.persistence.DutyJpaEntity;
-import com.dangbun.domain.duty.refactor.application.port.out.DutyQueryPort;
-import com.dangbun.domain.duty.refactor.domain.Duty;
+import com.dangbun.domain.duty.adapter.out.persistence.DutyJpaEntity;
+import com.dangbun.domain.duty.application.port.out.DutyQueryPort;
+import com.dangbun.domain.duty.domain.Duty;
 import com.dangbun.domain.membercleaning.application.port.out.MemberCleaningQueryPort;
 import com.dangbun.global.context.DutyContext;
 import com.dangbun.global.context.MemberContext;
@@ -21,11 +21,12 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 import com.dangbun.domain.cleaning.application.port.in.query.CleaningQuery;
+import com.dangbun.domain.cleaning.application.port.in.query.GetCleaningsByPlaceQuery;
 
 @UseCase
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
-public class CleaningQueryService implements CleaningQuery {
+public class CleaningQueryService implements CleaningQuery, GetCleaningsByPlaceQuery {
 
     private final DutyQueryPort dutyQueryPort;
     private final CleaningQueryPort cleaningQueryPort;
@@ -83,5 +84,10 @@ public class CleaningQueryService implements CleaningQuery {
         CleaningJpaEntity cleaningJpaEntity = cleaningRepository.findById(cleaningId).get();
 
         return cleaningMapper.mapToDomainEntity(cleaningJpaEntity);
+    }
+
+    @Override
+    public List<Cleaning> getCleaningsByPlaceId(Long placeId) {
+        return cleaningQueryPort.findByPlaceId(placeId);
     }
 }

@@ -1,7 +1,7 @@
 package com.dangbun.domain.memberduty.adapter.out.persistence;
 
 import com.dangbun.common.hexagonal.PersistenceAdapter;
-import com.dangbun.domain.duty.refactor.domain.Duty;
+import com.dangbun.domain.duty.domain.Duty;
 import com.dangbun.domain.memberduty.application.port.out.MemberDutyCommandPort;
 import com.dangbun.domain.memberduty.application.port.out.MemberDutyQueryPort;
 import com.dangbun.domain.memberduty.domain.MemberDuty;

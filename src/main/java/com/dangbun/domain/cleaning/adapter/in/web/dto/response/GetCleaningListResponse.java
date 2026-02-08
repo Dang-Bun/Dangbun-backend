@@ -1,7 +1,7 @@
 package com.dangbun.domain.cleaning.adapter.in.web.dto.response;
 
-import com.dangbun.domain.duty.refactor.domain.Duty;
-import com.dangbun.domain.duty.refactor.domain.DutyIcon;
+import com.dangbun.domain.duty.domain.Duty;
+import com.dangbun.domain.duty.domain.DutyIcon;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 public record GetCleaningListResponse(

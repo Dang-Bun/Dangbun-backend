@@ -8,6 +8,7 @@ import com.dangbun.domain.notificationreceiver.adapter.in.web.dto.response.GetNo
 import com.dangbun.domain.notificationreceiver.adapter.in.web.dto.response.GetNotificationReceivedListResponse.NotificationReceiverDto;
 import com.dangbun.domain.notificationreceiver.application.port.in.query.CheckNotificationReceiverQuery;
 import com.dangbun.domain.notificationreceiver.application.port.in.query.GetNotificationReceiverQuery;
+import com.dangbun.domain.notificationreceiver.application.port.in.query.GetUnreadNotificationCountQuery;
 import com.dangbun.domain.notificationreceiver.application.port.in.query.NotificationReceiverQuery;
 import com.dangbun.domain.notificationreceiver.application.port.out.NotificationReceiverQueryPort;
 import com.dangbun.domain.notificationreceiver.domain.NotificationReceiver;
@@ -22,7 +23,7 @@ import java.util.List;
 @UseCase
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
-public class NotificationReceiverReceiverQueryService implements NotificationReceiverQuery, CheckNotificationReceiverQuery, GetNotificationReceiverQuery {
+public class NotificationReceiverReceiverQueryService implements NotificationReceiverQuery, CheckNotificationReceiverQuery, GetNotificationReceiverQuery, GetUnreadNotificationCountQuery {
 
     private final NotificationReceiverQueryPort notificationReceiverQueryPort;
     // 순환참조 문제로 port 직접사용
@@ -59,5 +60,10 @@ public class NotificationReceiverReceiverQueryService implements NotificationRec
     @Override
     public List<NotificationReceiver> findAllByNotificationId(Long notificationId) {
         return notificationReceiverQueryPort.findAllByNotificationId(notificationId);
+    }
+
+    @Override
+    public Integer getUnreadCountByMemberId(Long memberId) {
+        return notificationReceiverQueryPort.countUnreadByMemberId(memberId);
     }
 }

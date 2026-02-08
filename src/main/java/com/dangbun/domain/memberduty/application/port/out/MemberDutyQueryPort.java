@@ -1,6 +1,6 @@
 package com.dangbun.domain.memberduty.application.port.out;
 
-import com.dangbun.domain.duty.refactor.domain.Duty;
+import com.dangbun.domain.duty.domain.Duty;
 import com.dangbun.domain.memberduty.domain.MemberDuty;
 
 import java.util.List;

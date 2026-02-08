@@ -26,4 +26,10 @@ public interface MemberQueryPort {
     Page<Member> findByPlaceIdAndNameContaining(Long placeId, String searchName, Pageable pageable);
 
     Member findById(Long memberId);
+
+    List<Member> findByUserId(Long userId);
+
+    Optional<Member> findByUserIdAndPlaceId(Long userId, Long placeId);
+
+    Optional<Member> findFirstByPlaceId(Long placeId);
 }

@@ -10,7 +10,7 @@ package com.dangbun.domain.cleaning.adapter.out.persistence;
  *   - findByPlace(Place place) -> findByPlace(PlaceJpaEntity place)
  * - 또는 placeId 기반 쿼리로 변경하여 엔티티 의존성 제거 고려
  */
-import com.dangbun.domain.duty.refactor.adapter.out.persistence.DutyJpaEntity;
+import com.dangbun.domain.duty.adapter.out.persistence.DutyJpaEntity;
 import com.dangbun.domain.place.adapter.out.persistence.PlaceJpaEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
