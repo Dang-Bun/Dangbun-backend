@@ -1,8 +1,7 @@
 package com.dangbun.domain.checklist.domain;
 
-import com.dangbun.domain.cleaning.domain.Cleaning;
+import com.dangbun.domain.cleaning.application.port.in.query.GetCleaningForChecklistQuery.CleaningInfo;
 import com.dangbun.domain.cleaning.domain.CleaningRepeatType;
-import com.dangbun.domain.cleaningdate.domain.CleaningDate;
 import org.springframework.stereotype.Component;
 
 import java.time.DayOfWeek;
@@ -14,13 +13,13 @@ import java.util.List;
 @Component
 public class ChecklistDueDateChecker {
 
-    public boolean isDueToday(Cleaning cleaning, List<CleaningDate> cleaningDates) {
-        CleaningRepeatType repeatType = cleaning.getRepeatType();
+    public boolean isDueToday(CleaningInfo cleaning, List<LocalDate> cleaningDates) {
+        CleaningRepeatType repeatType = cleaning.repeatType();
         LocalDate today = LocalDate.now();
 
         if (repeatType == CleaningRepeatType.NONE) {
             return cleaningDates.stream()
-                    .anyMatch(cd -> cd.getDate().isEqual(today));
+                    .anyMatch(date -> date.isEqual(today));
         }
 
         if (repeatType == CleaningRepeatType.DAILY) {
@@ -29,7 +28,7 @@ public class ChecklistDueDateChecker {
 
         if (repeatType == CleaningRepeatType.WEEKLY) {
             DayOfWeek todayDow = today.getDayOfWeek();
-            List<String> days = Arrays.stream(cleaning.getRepeatDays().split(","))
+            List<String> days = Arrays.stream(cleaning.repeatDays().split(","))
                     .toList();
             return days.contains(todayDow.name());
         }

@@ -5,13 +5,13 @@ import com.dangbun.domain.checklist.application.port.in.command.GenerateDailyChe
 import com.dangbun.domain.checklist.application.port.out.ChecklistCommandPort;
 import com.dangbun.domain.checklist.application.port.out.ChecklistQueryPort;
 import com.dangbun.domain.checklist.domain.ChecklistDueDateChecker;
-import com.dangbun.domain.cleaning.application.port.out.CleaningQueryPort;
-import com.dangbun.domain.cleaning.domain.Cleaning;
-import com.dangbun.domain.cleaningdate.application.port.out.CleaningDateQueryPort;
-import com.dangbun.domain.cleaningdate.domain.CleaningDate;
+import com.dangbun.domain.cleaning.application.port.in.query.GetCleaningForChecklistQuery;
+import com.dangbun.domain.cleaning.application.port.in.query.GetCleaningForChecklistQuery.CleaningInfo;
+import com.dangbun.domain.cleaningdate.application.port.in.query.GetCleaningDateForChecklistQuery;
 import lombok.RequiredArgsConstructor;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -20,19 +20,19 @@ import java.util.List;
 @Transactional
 public class ChecklistGenerateService implements GenerateDailyChecklistsUseCase {
 
-    private final CleaningQueryPort cleaningQueryPort;
-    private final CleaningDateQueryPort cleaningDateQueryPort;
+    private final GetCleaningForChecklistQuery getCleaningForChecklistQuery;
+    private final GetCleaningDateForChecklistQuery getCleaningDateForChecklistQuery;
     private final ChecklistQueryPort checklistQueryPort;
     private final ChecklistCommandPort checklistCommandPort;
     private final ChecklistDueDateChecker dueDateChecker;
 
     @Override
     public void generateDailyChecklists(LocalDateTime now) {
-        List<Cleaning> cleanings = cleaningQueryPort.findAll();
+        List<CleaningInfo> cleanings = getCleaningForChecklistQuery.findAll();
 
-        for (Cleaning cleaning : cleanings) {
-            List<CleaningDate> cleaningDates = cleaningDateQueryPort.findByCleaningId(
-                    cleaning.getCleaningId().value()
+        for (CleaningInfo cleaning : cleanings) {
+            List<LocalDate> cleaningDates = getCleaningDateForChecklistQuery.findDatesByCleaningId(
+                    cleaning.cleaningId()
             );
 
             if (!dueDateChecker.isDueToday(cleaning, cleaningDates)) {
@@ -40,7 +40,7 @@ public class ChecklistGenerateService implements GenerateDailyChecklistsUseCase 
             }
 
             boolean exists = checklistQueryPort.existsByCleaningIdAndCreatedAt(
-                    cleaning.getCleaningId().value(),
+                    cleaning.cleaningId(),
                     now
             );
 
@@ -48,7 +48,7 @@ public class ChecklistGenerateService implements GenerateDailyChecklistsUseCase 
                 continue;
             }
 
-            checklistCommandPort.createChecklist(cleaning.getCleaningId().value());
+            checklistCommandPort.createChecklist(cleaning.cleaningId());
         }
     }
 }

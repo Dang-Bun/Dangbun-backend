@@ -14,8 +14,7 @@ import com.dangbun.domain.checklist.adapter.out.persistence.ChecklistJpaEntity;
 import com.dangbun.domain.checklist.application.port.in.command.ChecklistCommandUseCase;
 import com.dangbun.domain.checklist.application.port.in.command.ChecklistForCalendarUseCase;
 import com.dangbun.domain.checklist.application.port.in.command.CreateChecklistByDateAndTimeUseCase;
-import com.dangbun.domain.cleaning.application.port.out.CleaningQueryPort;
-import com.dangbun.domain.cleaning.domain.Cleaning;
+import com.dangbun.domain.cleaning.application.port.in.query.GetCleaningForChecklistQuery;
 import com.dangbun.domain.cleaningdate.domain.CleaningDate;
 import com.dangbun.domain.cleaningImage.application.port.in.command.CleaningImageCommandUseCase;
 import com.dangbun.domain.cleaningImage.application.port.in.query.CleaningImageQuery;
@@ -48,7 +47,7 @@ public class ChecklistCommandService implements ChecklistCommandUseCase, CreateC
     private final ChecklistQueryPort checklistQueryPort;
     private final ChecklistCommandPort checklistCommandPort;
 
-    private final CleaningQueryPort cleaningQueryPort;
+    private final GetCleaningForChecklistQuery getCleaningForChecklistQuery;
 
 
     @Override
@@ -68,15 +67,15 @@ public class ChecklistCommandService implements ChecklistCommandUseCase, CreateC
 
     @Override
     public PostIncompleteChecklistResponse incompleteChecklist() {
-
         Checklist checklist = checklistQueryPort.findById(ChecklistContext.get().getChecklistId()).get();
 
+        GetCleaningForChecklistQuery.CleaningInfo cleaningInfo = getCleaningForChecklistQuery
+                .findById(checklist.getCleaningId())
+                .orElseThrow(() -> new IllegalStateException("Cleaning not found for checklist"));
 
-        Cleaning cleaning = checklistQueryPort.getCleaningJpaEntity(checklist.getChecklistId().value());
-
-        List<Member> members = getMembersByCleaningQuery.getMembersByCleaningId(cleaning.getCleaningId().value());
+        List<Member> members = getMembersByCleaningQuery.getMembersByCleaningId(cleaningInfo.cleaningId());
         List<String> membersName = members.stream().map(Member::getName).toList();
-        LocalTime endTime = getPlaceEndTimeQuery.getEndTimeByPlaceId(cleaning.getPlaceId());
+        LocalTime endTime = getPlaceEndTimeQuery.getEndTimeByPlaceId(cleaningInfo.placeId());
 
         Checklist incompleted = checklistCommandPort.incompleteChecklist(checklist.getChecklistId().value());
 
@@ -106,8 +105,9 @@ public class ChecklistCommandService implements ChecklistCommandUseCase, CreateC
     }
 
     private boolean isRequiredImage(Checklist checklist) {
-        Cleaning cleaning = cleaningQueryPort.findById(checklist.getCleaningId()).orElse(null);
-        return cleaning != null && cleaning.getNeedPhoto();
+        return getCleaningForChecklistQuery.findById(checklist.getCleaningId())
+                .map(GetCleaningForChecklistQuery.CleaningInfo::needPhoto)
+                .orElse(false);
     }
 
     private void checkIsImageRegistered(Checklist checklist) {
