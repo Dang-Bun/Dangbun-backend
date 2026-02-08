@@ -24,7 +24,12 @@ public class FakeDutyRepository implements DutyCommandPort, DutyQueryPort {
             storage.put(newId, saved);
             return saved;
         } else {
-            storage.put(duty.getDutyId().value(), duty);
+            Long existingId = duty.getDutyId().value();
+            storage.put(existingId, duty);
+            // idGenerator를 기존 ID보다 큰 값으로 유지
+            if (existingId >= idGenerator.get()) {
+                idGenerator.set(existingId + 1);
+            }
             return duty;
         }
     }
