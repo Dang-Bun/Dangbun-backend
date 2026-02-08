@@ -1,6 +1,6 @@
 package com.dangbun.global.security.jwt;
 
-import com.dangbun.domain.user.entity.User;
+import com.dangbun.domain.user.adapter.out.persistence.UserJpaEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -16,14 +16,14 @@ public class JwtService {
     private final JwtProvider jwtProvider;
 
 
-    public Map<String, String> generateToken(User user) {
+    public Map<String, String> generateToken(UserJpaEntity userJpaEntity) {
 
         Map<String , String> tokenMap = new HashMap<>();
 
-        final String accessToken = jwtProvider.createAccessToken(user.getEmail());
+        final String accessToken = jwtProvider.createAccessToken(userJpaEntity.getEmail());
         tokenMap.put(ACCESS.getName(),accessToken);
 
-        final String refreshToken = jwtProvider.createRefreshToken(user);
+        final String refreshToken = jwtProvider.createRefreshToken(userJpaEntity);
         tokenMap.put(REFRESH.getName(), refreshToken);
 
         return tokenMap;

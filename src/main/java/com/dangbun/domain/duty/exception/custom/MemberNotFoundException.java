@@ -11,5 +11,4 @@ public class MemberNotFoundException extends RuntimeException {
         super(exceptionStatus.getMessage());
         this.exceptionStatus = exceptionStatus;
     }
-
 }

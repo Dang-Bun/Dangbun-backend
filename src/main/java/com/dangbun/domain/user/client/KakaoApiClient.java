@@ -1,6 +1,6 @@
 package com.dangbun.domain.user.client;
 
-import com.dangbun.domain.user.dto.response.KakaoUserResponse;
+import com.dangbun.domain.user.adapter.in.web.dto.response.KakaoUserResponse;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;

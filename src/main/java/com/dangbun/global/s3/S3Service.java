@@ -17,7 +17,8 @@ import java.time.Duration;
 import java.util.Map;
 import java.util.UUID;
 
-import static com.dangbun.domain.cleaningImage.response.status.CleaningImageExceptionResponse.*;
+import static com.dangbun.domain.cleaningImage.exception.status.CleaningImageExceptionResponse.INVALID_S3_KEY;
+
 
 @Service
 @RequiredArgsConstructor

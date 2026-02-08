@@ -1,7 +1,7 @@
 package com.dangbun.global.security.jwt;
 
 
-import com.dangbun.domain.user.entity.User;
+import com.dangbun.domain.user.adapter.out.persistence.UserJpaEntity;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
@@ -36,8 +36,8 @@ public class JwtProvider {
         return buildToken(email, issuer, ACCESS.getName());
     }
 
-    public String createRefreshToken(User user){
-        return buildToken(user.getEmail(), issuer, REFRESH.getName());
+    public String createRefreshToken(UserJpaEntity userJpaEntity){
+        return buildToken(userJpaEntity.getEmail(), issuer, REFRESH.getName());
     }
 
 

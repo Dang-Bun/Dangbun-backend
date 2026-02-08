@@ -1,15 +1,15 @@
 package com.dangbun.global.aop;
 
-import com.dangbun.domain.member.entity.MemberRole;
+import com.dangbun.domain.checklist.adapter.out.persistence.ChecklistJpaEntity;
+import com.dangbun.domain.checklist.adapter.out.persistence.SpringDataChecklistRepository;
+import com.dangbun.domain.member.adapter.out.persistence.MemberRole;
 import com.dangbun.global.aop.support.AnnotationResolver;
 import com.dangbun.global.aop.support.RequestParamResolver;
 import com.dangbun.global.aop.support.SecuritySupport;
 import com.dangbun.global.context.ChecklistContext;
-import com.dangbun.domain.checklist.entity.Checklist;
 import com.dangbun.domain.checklist.exception.custom.ChecklistAccessDeniedException;
-import com.dangbun.domain.checklist.repository.ChecklistRepository;
 import com.dangbun.global.context.MemberContext;
-import com.dangbun.domain.member.entity.Member;
+import com.dangbun.domain.member.adapter.out.persistence.MemberJpaEntity;
 import com.dangbun.global.exception.RequiredParamMissingException;
 import lombok.RequiredArgsConstructor;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -28,7 +28,7 @@ import static com.dangbun.global.response.status.BaseExceptionResponse.REQUIRED_
 @RequiredArgsConstructor
 public class CheckChecklistMembershipAspect {
 
-    private final ChecklistRepository checklistRepository;
+    private final SpringDataChecklistRepository checklistRepository;
     private final SecuritySupport securitySupport;
     private final RequestParamResolver requestParamResolver;
     private final AnnotationResolver annotationResolver;
@@ -46,20 +46,20 @@ public class CheckChecklistMembershipAspect {
             throw new RequiredParamMissingException(REQUIRED_PARAM_MISSING);
         }
 
-        Member me = MemberContext.get();
+        MemberJpaEntity me = MemberContext.get();
 
-        Checklist checklist;
+        ChecklistJpaEntity checklistJpaEntity;
         if (me.getRole() == MemberRole.MANAGER) {
-            checklist = checklistRepository.findById(checklistId)
+            checklistJpaEntity = checklistRepository.findById(checklistId)
                     .orElseThrow(() -> new ChecklistAccessDeniedException(CHECKLIST_ACCESS_DENIED));
         } else {
-            checklist = checklistRepository
+            checklistJpaEntity = checklistRepository
                     .findByChecklistAndMemberId(checklistId, me.getMemberId())
                     .orElseThrow(() -> new ChecklistAccessDeniedException(CHECKLIST_ACCESS_DENIED));
         }
 
         try {
-            ChecklistContext.set(checklist);
+            ChecklistContext.set(checklistJpaEntity);
             return joinPoint.proceed();
         } finally {
             ChecklistContext.clear();

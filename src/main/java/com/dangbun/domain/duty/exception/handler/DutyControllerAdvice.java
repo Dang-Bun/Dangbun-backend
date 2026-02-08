@@ -1,6 +1,5 @@
 package com.dangbun.domain.duty.exception.handler;
 
-import com.dangbun.domain.cleaning.exception.custom.DutyNotFoundException;
 import com.dangbun.domain.duty.exception.custom.*;
 import com.dangbun.global.response.BaseErrorResponse;
 import org.springframework.core.Ordered;
@@ -10,7 +9,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import static com.dangbun.domain.duty.response.status.DutyExceptionResponse.*;
+import static com.dangbun.domain.duty.exception.status.DutyExceptionResponse.*;
 
 @Order(Ordered.HIGHEST_PRECEDENCE)
 @RestControllerAdvice(basePackages = "com.dangbun.domain.duty")
@@ -22,9 +21,15 @@ public class DutyControllerAdvice {
         return new BaseErrorResponse(DUTY_ALREADY_EXISTS);
     }
 
+    @ExceptionHandler(DutyNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public BaseErrorResponse handleDutyNotFoundException(DutyNotFoundException e) {
+        return new BaseErrorResponse(DUTY_NOT_FOUND);
+    }
+
     @ExceptionHandler(DutyNotInPlaceFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public BaseErrorResponse handleDutyNotFoundException(DutyNotInPlaceFoundException e) {
+    public BaseErrorResponse handleDutyNotInPlaceFoundException(DutyNotInPlaceFoundException e) {
         return new BaseErrorResponse(DUTY_NOT_IN_PLACE);
     }
 

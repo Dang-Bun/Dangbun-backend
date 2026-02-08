@@ -6,10 +6,10 @@ import lombok.Getter;
 @Getter
 public class ChecklistStatusConflictException extends RuntimeException {
 
-  private final ResponseStatus exceptionStatus;
+    private final ResponseStatus exceptionStatus;
 
-  public ChecklistStatusConflictException(ResponseStatus status) {
-    super(status.getMessage());
-    this.exceptionStatus = status;
-  }
+    public ChecklistStatusConflictException(ResponseStatus status) {
+        super(status.getMessage());
+        this.exceptionStatus = status;
+    }
 }

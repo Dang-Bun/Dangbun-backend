@@ -11,5 +11,4 @@ public class MemberNotExistsException extends RuntimeException {
         super(exceptionStatus.getMessage());
         this.exceptionStatus = exceptionStatus;
     }
-
 }

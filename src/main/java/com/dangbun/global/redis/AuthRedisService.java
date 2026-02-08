@@ -10,7 +10,7 @@ import java.time.Duration;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
-import static com.dangbun.domain.user.response.status.UserExceptionResponse.*;
+import static com.dangbun.domain.user.response.status.UserExceptionResponse.AUTH_CODE_SENT;
 
 @RequiredArgsConstructor
 @Service
