@@ -3,8 +3,8 @@ package com.dangbun.domain.calendar.refactor.application.service;
 import com.dangbun.common.hexagonal.UseCase;
 import com.dangbun.domain.calendar.refactor.adapter.in.web.dto.response.PatchUpdateChecklistToCompleteResponse;
 import com.dangbun.domain.calendar.refactor.application.port.in.command.CalendarCommandUseCase;
-import com.dangbun.domain.checklist.refactor.adapter.out.persistence.ChecklistJpaEntity;
-import com.dangbun.domain.checklist.refactor.adapter.out.persistence.SpringDataChecklistRepository;
+import com.dangbun.domain.checklist.adapter.out.persistence.ChecklistJpaEntity;
+import com.dangbun.domain.checklist.adapter.out.persistence.SpringDataChecklistRepository;
 import com.dangbun.domain.cleaningImage.application.port.in.command.CleaningImageCommandUseCase;
 import com.dangbun.domain.member.adapter.out.persistence.MemberJpaEntity;
 import com.dangbun.global.context.MemberContext;
@@ -32,7 +32,7 @@ public class CalendarCommandService implements CalendarCommandUseCase {
         ChecklistJpaEntity checklistJpaEntity = checklistRepository.findById(checklistId)
                 .orElseThrow();
 
-        checklistJpaEntity.completeChecklist(me);
+        checklistJpaEntity.completeChecklist(me.getMemberId());
 
         return PatchUpdateChecklistToCompleteResponse.of(me.getName(), LocalTime.now());
     }

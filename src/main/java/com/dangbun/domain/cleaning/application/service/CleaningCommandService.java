@@ -1,9 +1,9 @@
 package com.dangbun.domain.cleaning.application.service;
 
 import com.dangbun.common.hexagonal.UseCase;
-import com.dangbun.domain.checklist.refactor.adapter.out.persistence.ChecklistJpaEntity;
-import com.dangbun.domain.checklist.refactor.adapter.out.persistence.SpringDataChecklistRepository;
-import com.dangbun.domain.checklist.refactor.application.port.out.ChecklistCommandPort;
+import com.dangbun.domain.checklist.adapter.out.persistence.ChecklistJpaEntity;
+import com.dangbun.domain.checklist.adapter.out.persistence.SpringDataChecklistRepository;
+import com.dangbun.domain.checklist.application.port.in.command.CreateChecklistByDateAndTimeUseCase;
 import com.dangbun.domain.cleaning.adapter.in.web.dto.request.PostCleaningCreateRequest;
 import com.dangbun.domain.cleaning.adapter.in.web.dto.request.PutCleaningUpdateRequest;
 import com.dangbun.domain.cleaning.adapter.in.web.dto.response.PostCleaningResponse;
@@ -49,7 +49,7 @@ public class CleaningCommandService implements CleaningCommandUseCase {
     private final MemberQueryPort memberQueryPort;
     private final CleaningDateCommandPort cleaningDateCommandPort;
     private final MemberCleaningCommandPort memberCleaningCommandPort;
-    private final ChecklistCommandPort checklistCommandPort;
+    private final CreateChecklistByDateAndTimeUseCase createChecklistByDateAndTimeUseCase;
 
     /*
      * TODO: Checklist/CleaningImage 도메인 헥사고날 아키텍처 전환 시 수정
@@ -112,7 +112,7 @@ public class CleaningCommandService implements CleaningCommandUseCase {
                 .toList();
 
 
-        checklistCommandPort.createChecklistByDateAndTime(savedCleaning.getCleaningId().value(), cleaningDates, place.getPlaceId());
+        createChecklistByDateAndTimeUseCase.createChecklistByDateAndTime(savedCleaning.getCleaningId().value(), cleaningDates, place.getPlaceId());
         cleaningDateCommandPort.saveAll(cleaningDates);
 
 

@@ -9,8 +9,8 @@ import com.dangbun.domain.calendar.refactor.adapter.in.web.dto.response.GetProgr
 import com.dangbun.domain.calendar.refactor.application.port.in.query.CalendarQuery;
 import com.dangbun.domain.calendar.refactor.exception.custom.InvalidDateException;
 import com.dangbun.domain.calendar.refactor.exception.custom.NoPhotoException;
-import com.dangbun.domain.checklist.refactor.adapter.out.persistence.ChecklistJpaEntity;
-import com.dangbun.domain.checklist.refactor.adapter.out.persistence.SpringDataChecklistRepository;
+import com.dangbun.domain.checklist.adapter.out.persistence.ChecklistJpaEntity;
+import com.dangbun.domain.checklist.adapter.out.persistence.SpringDataChecklistRepository;
 import com.dangbun.domain.cleaning.adapter.out.persistence.CleaningJpaEntity;
 import com.dangbun.domain.cleaning.domain.CleaningRepeatType;
 import com.dangbun.domain.cleaningImage.application.port.in.query.CleaningImageQuery;

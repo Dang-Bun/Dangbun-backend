@@ -4,6 +4,9 @@ import com.dangbun.common.hexagonal.UseCase;
 import com.dangbun.domain.cleaning.adapter.in.web.dto.response.GetCleaningDetailListResponse;
 import com.dangbun.domain.cleaning.adapter.in.web.dto.response.GetCleaningListResponse;
 import com.dangbun.domain.cleaning.adapter.in.web.dto.response.GetCleaningUnassignedResponse;
+import com.dangbun.domain.cleaning.adapter.out.persistence.CleaningJpaEntity;
+import com.dangbun.domain.cleaning.adapter.out.persistence.CleaningMapper;
+import com.dangbun.domain.cleaning.adapter.out.persistence.CleaningRepository;
 import com.dangbun.domain.cleaning.application.port.out.CleaningQueryPort;
 import com.dangbun.domain.cleaning.domain.Cleaning;
 import com.dangbun.domain.duty.refactor.adapter.out.persistence.DutyJpaEntity;
@@ -27,6 +30,8 @@ public class CleaningQueryService implements CleaningQuery {
     private final DutyQueryPort dutyQueryPort;
     private final CleaningQueryPort cleaningQueryPort;
     private final MemberCleaningQueryPort memberCleaningQueryPort;
+    private final CleaningRepository cleaningRepository;
+    private final CleaningMapper cleaningMapper;
 
     @Override
     public List<GetCleaningListResponse> getCleaningList(List<Long> memberIds) {
@@ -71,5 +76,12 @@ public class CleaningQueryService implements CleaningQuery {
         return cleanings.stream()
                 .map(cleaning -> GetCleaningUnassignedResponse.of(cleaning.getCleaningId().value(), cleaning.getName()))
                 .toList();
+    }
+
+    @Override
+    public Cleaning getCleaning(Long cleaningId) {
+        CleaningJpaEntity cleaningJpaEntity = cleaningRepository.findById(cleaningId).get();
+
+        return cleaningMapper.mapToDomainEntity(cleaningJpaEntity);
     }
 }

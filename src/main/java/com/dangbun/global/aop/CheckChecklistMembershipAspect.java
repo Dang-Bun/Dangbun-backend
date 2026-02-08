@@ -1,7 +1,7 @@
 package com.dangbun.global.aop;
 
-import com.dangbun.domain.checklist.refactor.adapter.out.persistence.ChecklistJpaEntity;
-import com.dangbun.domain.checklist.refactor.adapter.out.persistence.SpringDataChecklistRepository;
+import com.dangbun.domain.checklist.adapter.out.persistence.ChecklistJpaEntity;
+import com.dangbun.domain.checklist.adapter.out.persistence.SpringDataChecklistRepository;
 import com.dangbun.domain.member.adapter.out.persistence.MemberRole;
 import com.dangbun.global.aop.support.AnnotationResolver;
 import com.dangbun.global.aop.support.RequestParamResolver;
@@ -19,7 +19,7 @@ import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 
-import static com.dangbun.domain.checklist.refactor.response.status.ChecklistExceptionResponse.CHECKLIST_ACCESS_DENIED;
+import static com.dangbun.domain.checklist.response.status.ChecklistExceptionResponse.CHECKLIST_ACCESS_DENIED;
 import static com.dangbun.global.response.status.BaseExceptionResponse.REQUIRED_PARAM_MISSING;
 
 @Aspect

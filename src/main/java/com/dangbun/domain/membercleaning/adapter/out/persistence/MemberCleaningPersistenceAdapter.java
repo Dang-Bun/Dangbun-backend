@@ -7,6 +7,8 @@ import com.dangbun.domain.duty.refactor.adapter.out.persistence.DutyJpaEntity;
 import com.dangbun.domain.duty.refactor.domain.Duty;
 import com.dangbun.domain.member.adapter.out.persistence.MemberJpaEntity;
 import com.dangbun.domain.member.adapter.out.persistence.MemberRepository;
+import com.dangbun.domain.member.application.port.out.MemberQueryPort;
+import com.dangbun.domain.member.domain.Member;
 import com.dangbun.domain.membercleaning.application.port.out.MemberCleaningCommandPort;
 import com.dangbun.domain.membercleaning.application.port.out.MemberCleaningQueryPort;
 import com.dangbun.domain.membercleaning.domain.MemberCleaning;
@@ -22,6 +24,7 @@ public class MemberCleaningPersistenceAdapter implements MemberCleaningQueryPort
     private final MemberCleaningRepository memberCleaningRepository;
     private final MemberRepository memberRepository;
     private final CleaningRepository cleaningRepository;
+    private final MemberQueryPort memberQueryPort;
 
     @Override
     public List<Duty> findDistinctDutiesByMemberIds(List<Long> memberIds) {
@@ -54,5 +57,15 @@ public class MemberCleaningPersistenceAdapter implements MemberCleaningQueryPort
         return memberCleaningRepository.findMembersByCleaningId(cleaningId).stream()
                 .map(MemberJpaEntity::getName)
                 .toList();
+    }
+
+    @Override
+    public List<Member> findMembersByCleaningId(Long cleaningId) {
+        List<MemberJpaEntity> memberJpaEntities = memberCleaningRepository.findMembersByCleaningId(cleaningId);
+        List<Long> memberIds = memberJpaEntities.stream()
+                .map(MemberJpaEntity::getMemberId)
+                .toList();
+
+        return memberQueryPort.findAllByIds(memberIds);
     }
 }

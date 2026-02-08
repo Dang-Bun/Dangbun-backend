@@ -2,6 +2,7 @@ package com.dangbun.domain.cleaningdate.adapter.out.persistence;
 
 import com.dangbun.common.hexagonal.PersistenceAdapter;
 import com.dangbun.domain.cleaningdate.application.port.out.CleaningDateCommandPort;
+import com.dangbun.domain.cleaningdate.application.port.out.CleaningDateQueryPort;
 import com.dangbun.domain.cleaningdate.domain.CleaningDate;
 import lombok.RequiredArgsConstructor;
 
@@ -9,7 +10,7 @@ import java.util.List;
 
 @PersistenceAdapter
 @RequiredArgsConstructor
-public class CleaningDatePersistenceAdapter implements CleaningDateCommandPort {
+public class CleaningDatePersistenceAdapter implements CleaningDateCommandPort, CleaningDateQueryPort {
 
     private final CleaningDateRepository cleaningDateRepository;
 
@@ -26,5 +27,12 @@ public class CleaningDatePersistenceAdapter implements CleaningDateCommandPort {
     @Override
     public void deleteAllByCleaningId(Long cleaningId) {
         cleaningDateRepository.deleteAllByCleaningJpaEntity_CleaningId(cleaningId);
+    }
+
+    @Override
+    public List<CleaningDate> findByCleaningId(Long cleaningId) {
+        return cleaningDateRepository.findByCleaningJpaEntity_CleaningId(cleaningId).stream()
+                .map(cleaningDateMapper::mapToDomainEntity)
+                .toList();
     }
 }

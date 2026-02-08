@@ -24,4 +24,6 @@ public interface CleaningQueryPort {
     boolean existsByNameAndDutyIdAndPlaceId(String name, Long dutyId, Long placeId);
 
     boolean existsByNameAndDutyIdAndCleaningIdNotAndPlaceId(String name, Long dutyId, Long cleaningId, Long placeId);
+
+    List<Cleaning> findAll();
 }

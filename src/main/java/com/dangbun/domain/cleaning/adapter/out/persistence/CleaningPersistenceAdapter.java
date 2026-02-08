@@ -116,4 +116,11 @@ class CleaningPersistenceAdapter implements CleaningCommandPort, CleaningQueryPo
                 cleaningId,
                 placeId);
     }
+
+    @Override
+    public List<Cleaning> findAll() {
+        return cleaningRepository.findAll().stream()
+                .map(cleaningMapper::mapToDomainEntity)
+                .toList();
+    }
 }

@@ -10,4 +10,6 @@ public interface CleaningDateRepository extends JpaRepository<CleaningDateJpaEnt
     void deleteAllByCleaningJpaEntity_CleaningId(Long cleaningId);
 
     List<CleaningDateJpaEntity> findByCleaningJpaEntity(CleaningJpaEntity cleaningJpaEntity);
+
+    List<CleaningDateJpaEntity> findByCleaningJpaEntity_CleaningId(Long cleaningId);
 }

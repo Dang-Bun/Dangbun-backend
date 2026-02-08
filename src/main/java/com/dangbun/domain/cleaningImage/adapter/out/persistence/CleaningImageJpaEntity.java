@@ -1,6 +1,6 @@
 package com.dangbun.domain.cleaningImage.adapter.out.persistence;
 
-import com.dangbun.domain.checklist.refactor.adapter.out.persistence.ChecklistJpaEntity;
+import com.dangbun.domain.checklist.adapter.out.persistence.ChecklistJpaEntity;
 import com.dangbun.global.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;

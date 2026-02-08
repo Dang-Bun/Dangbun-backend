@@ -1,7 +1,7 @@
 package com.dangbun.domain.place.application.port.service;
 
-import com.dangbun.domain.checklist.refactor.adapter.out.persistence.ChecklistJpaEntity;
-import com.dangbun.domain.checklist.refactor.adapter.out.persistence.SpringDataChecklistRepository;
+import com.dangbun.domain.checklist.adapter.out.persistence.ChecklistJpaEntity;
+import com.dangbun.domain.checklist.adapter.out.persistence.SpringDataChecklistRepository;
 import com.dangbun.domain.cleaning.adapter.out.persistence.CleaningJpaEntity;
 import com.dangbun.domain.cleaning.adapter.out.persistence.CleaningRepository;
 import com.dangbun.domain.duty.original.repository.DutyRepository;
@@ -26,6 +26,7 @@ import com.dangbun.domain.place.exception.custom.AlreadyInvitedException;
 import com.dangbun.domain.place.exception.custom.InvalidInviteCodeException;
 import com.dangbun.domain.place.exception.custom.InviteCodeNotExistsException;
 import com.dangbun.domain.place.application.port.in.query.DutyProgressResult;
+import com.dangbun.domain.place.application.port.in.query.GetPlaceEndTimeQuery;
 import com.dangbun.domain.place.application.port.in.query.PlaceListResult;
 import com.dangbun.domain.place.application.port.in.query.PlaceQuery;
 import com.dangbun.domain.place.application.port.in.query.PlaceResult;
@@ -51,7 +52,7 @@ import static com.dangbun.domain.place.exception.status.PlaceExceptionResponse.*
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
-public class PlaceQueryService implements PlaceQuery {
+public class PlaceQueryService implements PlaceQuery, GetPlaceEndTimeQuery {
 
     private final PlaceQueryPort placeQueryPort;
     private final DutyQueryPort dutyQueryPort;
@@ -293,6 +294,12 @@ public class PlaceQueryService implements PlaceQuery {
             throw new InviteCodeNotExistsException(INVITE_CODE_NOT_EXISTS);
         }
         return code;
+    }
+
+    @Override
+    public LocalTime getEndTimeByPlaceId(Long placeId) {
+        Place place = placeQueryPort.findById(placeId).orElseThrow();
+        return place.getEndTime();
     }
 
     private List<ChecklistJpaEntity> filterChecklist(DutyId dutyId, PlaceJpaEntity place) {

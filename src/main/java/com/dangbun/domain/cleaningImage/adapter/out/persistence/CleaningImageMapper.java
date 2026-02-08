@@ -1,7 +1,7 @@
 package com.dangbun.domain.cleaningImage.adapter.out.persistence;
 
-import com.dangbun.domain.checklist.refactor.adapter.out.persistence.ChecklistJpaEntity;
-import com.dangbun.domain.checklist.refactor.adapter.out.persistence.SpringDataChecklistRepository;
+import com.dangbun.domain.checklist.adapter.out.persistence.ChecklistJpaEntity;
+import com.dangbun.domain.checklist.adapter.out.persistence.SpringDataChecklistRepository;
 import com.dangbun.domain.cleaningImage.domain.CleaningImage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
