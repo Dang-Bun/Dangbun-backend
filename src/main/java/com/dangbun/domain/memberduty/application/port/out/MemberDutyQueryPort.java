@@ -24,5 +24,12 @@ public interface MemberDutyQueryPort {
      */
     List<MemberDutyMemberInfo> findMemberInfosByDutyId(Long dutyId);
 
+    /**
+     * Member에 할당된 Duty 정보 조회 (Member 도메인에서 사용)
+     */
+    List<MemberDutyDutyInfo> findDutyInfosByMemberId(Long memberId);
+
     record MemberDutyMemberInfo(Long memberId, String role, String name) {}
+
+    record MemberDutyDutyInfo(Long dutyId, String dutyName) {}
 }

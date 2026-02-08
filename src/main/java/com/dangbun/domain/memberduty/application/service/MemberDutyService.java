@@ -2,7 +2,9 @@ package com.dangbun.domain.memberduty.application.service;
 
 import com.dangbun.common.hexagonal.UseCase;
 import com.dangbun.domain.memberduty.application.port.in.command.MemberDutyForDutyUseCase;
+import com.dangbun.domain.memberduty.application.port.in.command.MemberDutyForMemberUseCase;
 import com.dangbun.domain.memberduty.application.port.in.query.GetMemberDutyForDutyQuery;
+import com.dangbun.domain.memberduty.application.port.in.query.GetMemberDutyForMemberQuery;
 import com.dangbun.domain.memberduty.application.port.out.MemberDutyCommandPort;
 import com.dangbun.domain.memberduty.application.port.out.MemberDutyQueryPort;
 import com.dangbun.domain.memberduty.domain.MemberDuty;
@@ -14,7 +16,7 @@ import java.util.List;
 @UseCase
 @RequiredArgsConstructor
 @Transactional
-public class MemberDutyService implements GetMemberDutyForDutyQuery, MemberDutyForDutyUseCase {
+public class MemberDutyService implements GetMemberDutyForDutyQuery, MemberDutyForDutyUseCase, GetMemberDutyForMemberQuery, MemberDutyForMemberUseCase {
 
     private final MemberDutyQueryPort memberDutyQueryPort;
     private final MemberDutyCommandPort memberDutyCommandPort;
@@ -45,5 +47,27 @@ public class MemberDutyService implements GetMemberDutyForDutyQuery, MemberDutyF
     @Override
     public void deleteAllByDutyId(Long dutyId) {
         memberDutyCommandPort.deleteAllByDutyId(dutyId);
+    }
+
+    // GetMemberDutyForMemberQuery 구현
+    @Override
+    @Transactional(readOnly = true)
+    public List<DutyInfo> findDutyInfosByMemberId(Long memberId) {
+        return memberDutyQueryPort.findDutyInfosByMemberId(memberId).stream()
+                .map(info -> new DutyInfo(info.dutyId(), info.dutyName()))
+                .toList();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public boolean existsByDutyIdAndMemberId(Long dutyId, Long memberId) {
+        return memberDutyQueryPort.existsByDutyIdAndMemberId(dutyId, memberId);
+    }
+
+    // MemberDutyForMemberUseCase 구현
+    @Override
+    public void saveMemberDuty(Long memberId, Long dutyId) {
+        MemberDuty memberDuty = MemberDuty.of(memberId, dutyId);
+        memberDutyCommandPort.save(memberDuty);
     }
 }

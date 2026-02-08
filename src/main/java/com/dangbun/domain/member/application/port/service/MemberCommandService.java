@@ -1,7 +1,8 @@
 package com.dangbun.domain.member.application.port.service;
 
-import com.dangbun.domain.duty.application.port.out.DutyQueryPort;
-import com.dangbun.domain.duty.domain.Duty;
+import com.dangbun.common.hexagonal.UseCase;
+import com.dangbun.domain.duty.application.port.in.query.GetDutyForMemberQuery;
+import com.dangbun.domain.duty.application.port.in.query.GetDutyForMemberQuery.DutyInfo;
 import com.dangbun.domain.member.adapter.out.persistence.MemberJpaEntity;
 import com.dangbun.domain.member.adapter.out.persistence.MemberRole;
 import com.dangbun.domain.member.application.port.in.command.AssignDutyCommand;
@@ -12,33 +13,24 @@ import com.dangbun.domain.member.exception.custom.*;
 import com.dangbun.domain.member.application.port.out.MemberCommandPort;
 import com.dangbun.domain.member.application.port.out.MemberQueryPort;
 import com.dangbun.domain.member.domain.Member;
-import com.dangbun.domain.memberduty.domain.MemberDuty;
-import com.dangbun.domain.memberduty.application.port.out.MemberDutyCommandPort;
-import com.dangbun.domain.memberduty.adapter.out.persistence.SpringDataMemberDutyRepository;
+import com.dangbun.domain.memberduty.application.port.in.command.MemberDutyForMemberUseCase;
+import com.dangbun.domain.memberduty.application.port.in.query.GetMemberDutyForMemberQuery;
 import com.dangbun.global.context.MemberContext;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import static com.dangbun.domain.member.exception.status.MemberExceptionResponse.*;
 
-/*
- * TODO: 다른 도메인 헥사고날 아키텍처 전환 시 수정
- * 각 도메인의 Port를 통해 접근하도록 변경 필요
- * - DutyRepository -> DutyQueryPort
- * - MemberDutyRepository -> MemberDutyCommandPort
- */
+@UseCase
 @RequiredArgsConstructor
-@Service
 @Transactional
 public class MemberCommandService implements MemberCommandUseCase {
 
     private final MemberCommandPort memberCommandPort;
     private final MemberQueryPort memberQueryPort;
-    private final MemberDutyCommandPort memberDutyCommandPort;
-    private final DutyQueryPort dutyQueryPort;
-
-    private final SpringDataMemberDutyRepository memberDutyRepository;
+    private final GetDutyForMemberQuery getDutyForMemberQuery;
+    private final GetMemberDutyForMemberQuery getMemberDutyForMemberQuery;
+    private final MemberDutyForMemberUseCase memberDutyForMemberUseCase;
 
     @Override
     public void registerMember(Long memberId) {
@@ -100,22 +92,14 @@ public class MemberCommandService implements MemberCommandUseCase {
         Member targetMember = memberQueryPort.findByMemberIdAndPlaceId(command.memberId(), placeId)
                 .orElseThrow(() -> new MemberNotFoundException(MEMBER_NOT_FOUND));
 
-
-        Duty duty = dutyQueryPort.findByIdAndPlaceId(command.dutyId(), placeId)
+        DutyInfo duty = getDutyForMemberQuery.findByIdAndPlaceId(command.dutyId(), placeId)
                 .orElseThrow(() -> new DutyNotInPlaceException(DUTY_NOT_IN_PLACE));
 
-
-        /*
-         * TODO: MemberDuty 도메인 헥사고날 아키텍처 전환 시 수정
-         * MemberDutyRepository -> MemberDutyQueryPort, MemberDutyCommandPort
-         */
-        if (memberDutyRepository.existsByDuty_DutyIdAndMember_MemberId(duty.getDutyId().value(), targetMember.getMemberId())) {
+        if (getMemberDutyForMemberQuery.existsByDutyIdAndMemberId(duty.dutyId(), targetMember.getMemberId())) {
             throw new MemberDutyAlreadyAssignedException(MEMBER_DUTY_ALREADY_ASSIGNED);
         }
 
-        MemberDuty md = MemberDuty.of(targetMember.getMemberId(), duty.getDutyId().value());
-
-        memberDutyCommandPort.save(md);
+        memberDutyForMemberUseCase.saveMemberDuty(targetMember.getMemberId(), duty.dutyId());
     }
 
     private Member getMemberByMemberIdAndPlaceId(Long memberId, Long placeId) {

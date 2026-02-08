@@ -16,13 +16,14 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 
 import static com.dangbun.domain.duty.exception.status.DutyExceptionResponse.DUTY_NOT_FOUND;
 
 @UseCase
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
-public class DutyQueryService implements DutyQuery {
+public class DutyQueryService implements DutyQuery, GetDutyForMemberQuery {
 
     private final DutyQueryPort dutyQueryPort;
     private final GetMemberDutyForDutyQuery getMemberDutyForDutyQuery;
@@ -104,5 +105,12 @@ public class DutyQueryService implements DutyQuery {
     private void validateDutyExists(Long dutyId) {
         dutyQueryPort.findById(dutyId)
                 .orElseThrow(() -> new DutyNotFoundException(DUTY_NOT_FOUND));
+    }
+
+    // GetDutyForMemberQuery 구현
+    @Override
+    public Optional<DutyInfo> findByIdAndPlaceId(Long dutyId, Long placeId) {
+        return dutyQueryPort.findByIdAndPlaceId(dutyId, placeId)
+                .map(duty -> new DutyInfo(duty.getDutyId().value(), duty.getName()));
     }
 }

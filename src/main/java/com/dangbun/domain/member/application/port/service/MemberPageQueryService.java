@@ -1,36 +1,31 @@
 package com.dangbun.domain.member.application.port.service;
 
+import com.dangbun.common.hexagonal.UseCase;
 import com.dangbun.domain.member.adapter.out.persistence.MemberJpaEntity;
 import com.dangbun.domain.member.adapter.out.persistence.MemberRole;
 import com.dangbun.domain.member.application.port.in.query.*;
 import com.dangbun.domain.member.exception.custom.MemberNotFoundException;
 import com.dangbun.domain.member.application.port.out.MemberQueryPort;
 import com.dangbun.domain.member.domain.Member;
-import com.dangbun.domain.memberduty.adapter.out.persistence.MemberDutyJpaEntity;
-import com.dangbun.domain.memberduty.adapter.out.persistence.SpringDataMemberDutyRepository;
+import com.dangbun.domain.memberduty.application.port.in.query.GetMemberDutyForMemberQuery;
+import com.dangbun.domain.memberduty.application.port.in.query.GetMemberDutyForMemberQuery.DutyInfo;
 import com.dangbun.global.context.MemberContext;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 
 import static com.dangbun.domain.member.exception.status.MemberExceptionResponse.MEMBER_NOT_FOUND;
 
-/*
- * TODO: 다른 도메인 헥사고날 아키텍처 전환 시 수정
- * 각 도메인의 Query Port를 통해 조회하도록 변경 필요
- * - MemberDutyRepository -> MemberDutyQueryPort
- */
+@UseCase
 @RequiredArgsConstructor
-@Service
 @Transactional(readOnly = true)
 public class MemberPageQueryService implements MemberQuery, GetAllMemberQuery, GetMemberPageQuery, GetMemberQuery {
 
     private final MemberQueryPort memberQueryPort;
-    private final SpringDataMemberDutyRepository memberDutyRepository;
+    private final GetMemberDutyForMemberQuery getMemberDutyForMemberQuery;
 
     @Override
     public MembersResult getMembers() {
@@ -48,15 +43,10 @@ public class MemberPageQueryService implements MemberQuery, GetAllMemberQuery, G
 
         for (Member member : members) {
             if (member.getStatus()) {
-                /*
-                 * TODO: MemberDuty 도메인 헥사고날 아키텍처 전환 시 수정
-                 * MemberDutyRepository -> MemberDutyQueryPort
-                 */
-                List<MemberDutyJpaEntity> memberDuties = memberDutyRepository.findAllByMember_MemberId(member.getMemberId());
-                List<String> dutyNames = new ArrayList<>();
-                for (MemberDutyJpaEntity memberDutyJpaEntity : memberDuties) {
-                    dutyNames.add(memberDutyJpaEntity.getDuty().getName());
-                }
+                List<DutyInfo> dutyInfos = getMemberDutyForMemberQuery.findDutyInfosByMemberId(member.getMemberId());
+                List<String> dutyNames = dutyInfos.stream()
+                        .map(DutyInfo::dutyName)
+                        .toList();
                 memberMap.put(member, dutyNames);
             }
             if (!member.getStatus()) {
@@ -84,15 +74,11 @@ public class MemberPageQueryService implements MemberQuery, GetAllMemberQuery, G
         Long placeId = MemberContext.get().getPlace().getPlaceId();
         Member member = getMemberByMemberIdAndPlaceId(memberId, placeId);
 
-        /*
-         * TODO: MemberDuty 도메인 헥사고날 아키텍처 전환 시 수정
-         * MemberDutyRepository -> MemberDutyQueryPort
-         */
-        List<MemberDutyJpaEntity> memberDuties = memberDutyRepository.findAllByMember_MemberId(member.getMemberId());
-        List<MemberDetailResult.DutyDto> dutyDtos = memberDuties.stream()
-                .map(md -> new MemberDetailResult.DutyDto(
-                        md.getDuty().getDutyId(),
-                        md.getDuty().getName()
+        List<DutyInfo> dutyInfos = getMemberDutyForMemberQuery.findDutyInfosByMemberId(member.getMemberId());
+        List<MemberDetailResult.DutyDto> dutyDtos = dutyInfos.stream()
+                .map(info -> new MemberDetailResult.DutyDto(
+                        info.dutyId(),
+                        info.dutyName()
                 )).toList();
 
         MemberDetailResult.MemberDto memberDto = new MemberDetailResult.MemberDto(

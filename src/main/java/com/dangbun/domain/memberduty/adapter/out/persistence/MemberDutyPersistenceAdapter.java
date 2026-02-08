@@ -88,4 +88,14 @@ class MemberDutyPersistenceAdapter implements MemberDutyCommandPort, MemberDutyQ
                 ))
                 .toList();
     }
+
+    @Override
+    public List<MemberDutyDutyInfo> findDutyInfosByMemberId(Long memberId) {
+        return memberDutyRepository.findAllByMember_MemberId(memberId).stream()
+                .map(md -> new MemberDutyDutyInfo(
+                        md.getDuty().getDutyId(),
+                        md.getDuty().getName()
+                ))
+                .toList();
+    }
 }
