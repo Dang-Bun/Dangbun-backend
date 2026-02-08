@@ -1,7 +1,7 @@
 package com.dangbun.domain.place.application.port.service;
 
-import com.dangbun.domain.checklist.entity.Checklist;
-import com.dangbun.domain.checklist.repository.ChecklistRepository;
+import com.dangbun.domain.checklist.refactor.adapter.out.persistence.ChecklistJpaEntity;
+import com.dangbun.domain.checklist.refactor.adapter.out.persistence.SpringDataChecklistRepository;
 import com.dangbun.domain.cleaning.adapter.out.persistence.CleaningJpaEntity;
 import com.dangbun.domain.cleaning.adapter.out.persistence.CleaningRepository;
 import com.dangbun.domain.duty.original.repository.DutyRepository;
@@ -71,7 +71,7 @@ public class PlaceQueryService implements PlaceQuery {
     private final MemberRepository memberRepository;
     private final UserRepository userRepository;
     private final DutyRepository dutyRepository;
-    private final ChecklistRepository checklistRepository;
+    private final SpringDataChecklistRepository checklistRepository;
     private final CleaningRepository cleaningRepository;
     private final MemberCleaningRepository memberCleaningRepository;
     private final SpringDataMemberDutyRepository memberDutyRepository;
@@ -204,7 +204,7 @@ public class PlaceQueryService implements PlaceQuery {
             List<DutyId> dutyIds = duties.stream().map(Duty::getDutyId).toList();
 //            List<Duty> duties = dutyRepository.findByPlace_PlaceId(placeId);
 
-            Map<DutyId, List<Checklist>> checklistMap = dutyIds.stream()
+            Map<DutyId, List<ChecklistJpaEntity>> checklistMap = dutyIds.stream()
                     .collect(Collectors.toMap(
                             Function.identity(),
                             d -> filterChecklist(d, place),
@@ -229,7 +229,7 @@ public class PlaceQueryService implements PlaceQuery {
                 .distinct()
                 .toList();
 
-        Map<DutyId, List<Checklist>> checklistMap = duties.stream()
+        Map<DutyId, List<ChecklistJpaEntity>> checklistMap = duties.stream()
                 .collect(Collectors.toMap(
                         Function.identity(),
                         d -> filterChecklist(d, place),
@@ -295,41 +295,41 @@ public class PlaceQueryService implements PlaceQuery {
         return code;
     }
 
-    private List<Checklist> filterChecklist(DutyId dutyId, PlaceJpaEntity place) {
-        List<Checklist> result = new ArrayList<>();
+    private List<ChecklistJpaEntity> filterChecklist(DutyId dutyId, PlaceJpaEntity place) {
+        List<ChecklistJpaEntity> result = new ArrayList<>();
 
         Boolean isToday = place.getIsToday();
         LocalDateTime now = LocalDateTime.now();
         LocalTime startTime = place.getStartTime();
         LocalTime endTime = place.getEndTime();
 
-        List<Checklist> checklists = checklistRepository.findWithCleaningByDutyId(dutyId.value());
-        for (Checklist checklist : checklists) {
-            LocalDateTime createdAt = checklist.getCreatedAt();
+        List<ChecklistJpaEntity> checklistJpaEntities = checklistRepository.findWithCleaningByDutyId(dutyId.value());
+        for (ChecklistJpaEntity checklistJpaEntity : checklistJpaEntities) {
+            LocalDateTime createdAt = checklistJpaEntity.getCreatedAt();
             if (isToday && (createdAt.toLocalTime().isAfter(startTime) && createdAt.toLocalTime().isBefore(endTime)) && now.toLocalDate().equals(createdAt.toLocalDate())) {
-                result.add(checklist);
+                result.add(checklistJpaEntity);
             }
             if (!isToday && (
                     (createdAt.toLocalTime().isAfter(startTime) && createdAt.toLocalTime().isBefore(LocalTime.MAX) && createdAt.toLocalDate().isEqual(now.minusDays(1).toLocalDate())) ||
                             (createdAt.toLocalTime().isBefore(endTime) && createdAt.toLocalDate().isEqual(now.toLocalDate()))
             )) {
-                result.add(checklist);
+                result.add(checklistJpaEntity);
             }
         }
         return result;
     }
 
-    private PlaceResult.DutyDto createManagerDutyResult(Map<DutyId, List<Checklist>> checklistMap, List<MemberCleaningJpaEntity> memberCleaningJpaEntities) {
+    private PlaceResult.DutyDto createManagerDutyResult(Map<DutyId, List<ChecklistJpaEntity>> checklistMap, List<MemberCleaningJpaEntity> memberCleaningJpaEntities) {
         List<PlaceResult.CheckListDto> allCheckLists = new ArrayList<>();
         String dutyName = null;
         Long dutyId = null;
 
-        for (Map.Entry<DutyId, List<Checklist>> entry : checklistMap.entrySet()) {
+        for (Map.Entry<DutyId, List<ChecklistJpaEntity>> entry : checklistMap.entrySet()) {
             dutyId = entry.getKey().value();
             dutyName = dutyQueryPort.getDutyNameById(dutyId);
 
-            for (Checklist checklist : entry.getValue()) {
-                CleaningJpaEntity cleaningJpaEntity = checklist.getCleaningJpaEntity();
+            for (ChecklistJpaEntity checklistJpaEntity : entry.getValue()) {
+                CleaningJpaEntity cleaningJpaEntity = checklistJpaEntity.getCleaningJpaEntity();
 
                 List<PlaceResult.MemberDto> members = new ArrayList<>();
                 for (MemberCleaningJpaEntity mc : memberCleaningJpaEntities) {
@@ -339,12 +339,12 @@ public class PlaceQueryService implements PlaceQuery {
                     }
                 }
 
-                LocalTime completeTime = checklist.getCompleteTime() != null
-                        ? checklist.getCompleteTime().toLocalTime()
+                LocalTime completeTime = checklistJpaEntity.getCompleteTime() != null
+                        ? checklistJpaEntity.getCompleteTime().toLocalTime()
                         : null;
 
                 allCheckLists.add(new PlaceResult.CheckListDto(
-                        checklist.getChecklistId(),
+                        checklistJpaEntity.getChecklistId(),
                         members,
                         cleaningJpaEntity.getName(),
                         completeTime,
@@ -370,18 +370,18 @@ public class PlaceQueryService implements PlaceQuery {
         );
     }
 
-    private PlaceResult.DutyDto createMemberDutyResult(MemberJpaEntity me, Map<DutyId, List<Checklist>> checklistMap, List<MemberCleaningJpaEntity> memberCleaningJpaEntities) {
+    private PlaceResult.DutyDto createMemberDutyResult(MemberJpaEntity me, Map<DutyId, List<ChecklistJpaEntity>> checklistMap, List<MemberCleaningJpaEntity> memberCleaningJpaEntities) {
         List<PlaceResult.CheckListDto> allCheckLists = new ArrayList<>();
         String dutyName = null;
         Long dutyId = null;
 
-        for (Map.Entry<DutyId, List<Checklist>> entry : checklistMap.entrySet()) {
+        for (Map.Entry<DutyId, List<ChecklistJpaEntity>> entry : checklistMap.entrySet()) {
             dutyId = entry.getKey().value();
 //            dutyId = duty.getDutyId();
             dutyName = dutyQueryPort.getDutyNameById(dutyId);
 
-            for (Checklist checklist : entry.getValue()) {
-                CleaningJpaEntity cleaningJpaEntity = checklist.getCleaningJpaEntity();
+            for (ChecklistJpaEntity checklistJpaEntity : entry.getValue()) {
+                CleaningJpaEntity cleaningJpaEntity = checklistJpaEntity.getCleaningJpaEntity();
 
                 List<PlaceResult.MemberDto> members = new ArrayList<>();
                 boolean containsMe = false;
@@ -397,12 +397,12 @@ public class PlaceQueryService implements PlaceQuery {
                 }
 
                 if (containsMe) {
-                    LocalTime completeTime = checklist.getCompleteTime() != null
-                            ? checklist.getCompleteTime().toLocalTime()
+                    LocalTime completeTime = checklistJpaEntity.getCompleteTime() != null
+                            ? checklistJpaEntity.getCompleteTime().toLocalTime()
                             : null;
 
                     allCheckLists.add(new PlaceResult.CheckListDto(
-                            checklist.getChecklistId(),
+                            checklistJpaEntity.getChecklistId(),
                             members,
                             cleaningJpaEntity.getName(),
                             completeTime,

@@ -1,15 +1,15 @@
 package com.dangbun.global.context;
 
-import com.dangbun.domain.checklist.entity.Checklist;
+import com.dangbun.domain.checklist.refactor.adapter.out.persistence.ChecklistJpaEntity;
 
 public class ChecklistContext {
-    private static final ThreadLocal<Checklist> currentChecklist = new ThreadLocal<>();
+    private static final ThreadLocal<ChecklistJpaEntity> currentChecklist = new ThreadLocal<>();
 
-    public static void set(Checklist ch){
+    public static void set(ChecklistJpaEntity ch){
         currentChecklist.set(ch);
     }
 
-    public static Checklist get(){
+    public static ChecklistJpaEntity get(){
         return currentChecklist.get();
     }
 

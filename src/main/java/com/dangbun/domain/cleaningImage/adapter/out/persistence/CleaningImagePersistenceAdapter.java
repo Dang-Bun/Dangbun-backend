@@ -17,13 +17,13 @@ class CleaningImagePersistenceAdapter implements CleaningImageQueryPort, Cleanin
 
     @Override
     public Optional<CleaningImage> findByChecklistId(Long checklistId) {
-        return cleaningImageRepository.findByChecklist_ChecklistId(checklistId)
+        return cleaningImageRepository.findByChecklistJpaEntity_ChecklistId(checklistId)
                 .map(cleaningImageMapper::mapToDomainEntity);
     }
 
     @Override
     public boolean existsByChecklistId(Long checklistId) {
-        return cleaningImageRepository.existsByChecklist_ChecklistId(checklistId);
+        return cleaningImageRepository.existsByChecklistJpaEntity_ChecklistId(checklistId);
     }
 
     @Override
@@ -35,6 +35,6 @@ class CleaningImagePersistenceAdapter implements CleaningImageQueryPort, Cleanin
 
     @Override
     public void deleteByChecklistId(Long checklistId) {
-        cleaningImageRepository.deleteByChecklist_ChecklistId(checklistId);
+        cleaningImageRepository.deleteByChecklistJpaEntity_ChecklistId(checklistId);
     }
 }

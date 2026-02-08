@@ -1,6 +1,6 @@
 package com.dangbun.domain.place.adapter.in.web.dto.response;
 
-import com.dangbun.domain.checklist.entity.Checklist;
+import com.dangbun.domain.checklist.refactor.adapter.out.persistence.ChecklistJpaEntity;
 import com.dangbun.domain.member.adapter.out.persistence.MemberJpaEntity;
 import com.dangbun.domain.place.domain.PlaceCategory;
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -86,16 +86,16 @@ public record GetPlaceResponse(
             Boolean needPhoto
 
     ) {
-        public static CheckListDto of(Checklist checklist, List<MemberJpaEntity> members) {
+        public static CheckListDto of(ChecklistJpaEntity checklistJpaEntity, List<MemberJpaEntity> members) {
 
             List<MemberDto> memberDtos = members.stream()
                     .map(MemberDto::of).toList();
 
-            LocalTime time = checklist.getCompleteTime() != null
-                    ? checklist.getCompleteTime().toLocalTime()
+            LocalTime time = checklistJpaEntity.getCompleteTime() != null
+                    ? checklistJpaEntity.getCompleteTime().toLocalTime()
                     : null;
 
-            return new CheckListDto(checklist.getChecklistId(), memberDtos, checklist.getCleaningJpaEntity().getName(), time, checklist.getCleaningJpaEntity().getNeedPhoto());
+            return new CheckListDto(checklistJpaEntity.getChecklistId(), memberDtos, checklistJpaEntity.getCleaningJpaEntity().getName(), time, checklistJpaEntity.getCleaningJpaEntity().getNeedPhoto());
         }
     }
 

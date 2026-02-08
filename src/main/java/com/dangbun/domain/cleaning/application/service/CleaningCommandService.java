@@ -1,9 +1,9 @@
 package com.dangbun.domain.cleaning.application.service;
 
 import com.dangbun.common.hexagonal.UseCase;
-import com.dangbun.domain.checklist.entity.Checklist;
-import com.dangbun.domain.checklist.refactor.ChecklistCommandPort;
-import com.dangbun.domain.checklist.repository.ChecklistRepository;
+import com.dangbun.domain.checklist.refactor.adapter.out.persistence.ChecklistJpaEntity;
+import com.dangbun.domain.checklist.refactor.adapter.out.persistence.SpringDataChecklistRepository;
+import com.dangbun.domain.checklist.refactor.application.port.out.ChecklistCommandPort;
 import com.dangbun.domain.cleaning.adapter.in.web.dto.request.PostCleaningCreateRequest;
 import com.dangbun.domain.cleaning.adapter.in.web.dto.request.PutCleaningUpdateRequest;
 import com.dangbun.domain.cleaning.adapter.in.web.dto.response.PostCleaningResponse;
@@ -56,7 +56,7 @@ public class CleaningCommandService implements CleaningCommandUseCase {
      * ChecklistRepository -> ChecklistQueryPort
      * CleaningImageRepository -> CleaningImageQueryPort
      */
-    private final ChecklistRepository checklistRepository;
+    private final SpringDataChecklistRepository checklistRepository;
     private final CleaningImageCommandUseCase cleaningImageCommandUseCase;
 
     @Override
@@ -193,9 +193,9 @@ public class CleaningCommandService implements CleaningCommandUseCase {
          * checklistRepository -> ChecklistQueryPort
          * cleaningImageRepository -> CleaningImageQueryPort
          */
-        List<Checklist> checklists = checklistRepository.findByCleaningJpaEntity_CleaningId(cleaningId);
-        for (Checklist checklist : checklists) {
-            cleaningImageCommandUseCase.deleteS3File(checklist.getChecklistId());
+        List<ChecklistJpaEntity> checklistJpaEntities = checklistRepository.findByCleaningJpaEntity_CleaningId(cleaningId);
+        for (ChecklistJpaEntity checklistJpaEntity : checklistJpaEntities) {
+            cleaningImageCommandUseCase.deleteS3File(checklistJpaEntity.getChecklistId());
         }
 
         cleaningCommandPort.deleteById(cleaningId);

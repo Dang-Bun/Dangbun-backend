@@ -26,7 +26,7 @@ public interface DutyRepository extends JpaRepository<DutyJpaEntity, Long> {
         COUNT(cl),
         SUM(CASE WHEN cl.isComplete = true THEN 1 ELSE 0 END)
     )
-    FROM Checklist cl
+    FROM ChecklistJpaEntity cl
     JOIN cl.cleaningJpaEntity c
     JOIN c.duty d
     WHERE d.place.placeId = :placeId

@@ -1,13 +1,16 @@
 package com.dangbun.domain.checklist.service;
 
-import com.dangbun.domain.checklist.dto.response.*;
+import com.dangbun.domain.checklist.refactor.adapter.in.web.dto.response.GetImageUrlResponse;
+import com.dangbun.domain.checklist.refactor.adapter.in.web.dto.response.PostCompleteChecklistResponse;
+import com.dangbun.domain.checklist.refactor.adapter.in.web.dto.response.PostGetPresignedUrlResponse;
+import com.dangbun.domain.checklist.refactor.adapter.in.web.dto.response.PostIncompleteChecklistResponse;
+import com.dangbun.domain.checklist.refactor.adapter.out.persistence.ChecklistJpaEntity;
 import com.dangbun.domain.checklist.exception.custom.ChecklistRequireImageException;
 import com.dangbun.domain.cleaningImage.application.port.in.command.CleaningImageCommandUseCase;
 import com.dangbun.domain.cleaningImage.application.port.in.query.CleaningImageQuery;
 import com.dangbun.global.context.ChecklistContext;
-import com.dangbun.domain.checklist.dto.request.PostGetPresignedUrlRequest;
-import com.dangbun.domain.checklist.dto.request.PostSaveUploadResultRequest;
-import com.dangbun.domain.checklist.entity.Checklist;
+import com.dangbun.domain.checklist.refactor.adapter.in.web.dto.request.PostGetPresignedUrlRequest;
+import com.dangbun.domain.checklist.refactor.adapter.in.web.dto.request.PostSaveUploadResultRequest;
 import com.dangbun.domain.cleaning.adapter.out.persistence.CleaningJpaEntity;
 import com.dangbun.global.context.MemberContext;
 import com.dangbun.domain.member.adapter.out.persistence.MemberJpaEntity;
@@ -22,7 +25,7 @@ import java.time.LocalTime;
 import java.util.List;
 import java.util.Map;
 
-import static com.dangbun.domain.checklist.response.status.ChecklistExceptionResponse.*;
+import static com.dangbun.domain.checklist.refactor.response.status.ChecklistExceptionResponse.REQUIRE_IMAGE;
 
 @Transactional
 @RequiredArgsConstructor
@@ -37,41 +40,41 @@ public class ChecklistService {
 
     public PostCompleteChecklistResponse completeChecklist() {
         MemberJpaEntity member = MemberContext.get();
-        Checklist checklist = ChecklistContext.get();
-        if(isRequiredImage(checklist)){
-            checkIsImageRegistered(checklist);
+        ChecklistJpaEntity checklistJpaEntity = ChecklistContext.get();
+        if(isRequiredImage(checklistJpaEntity)){
+            checkIsImageRegistered(checklistJpaEntity);
         }
-        checklist.completeChecklist(member);
-        LocalDateTime endTime = checklist.getUpdatedAt();
+        checklistJpaEntity.completeChecklist(member);
+        LocalDateTime endTime = checklistJpaEntity.getUpdatedAt();
         return PostCompleteChecklistResponse.of(member.getName(), LocalTime.from(endTime));
     }
 
     public PostIncompleteChecklistResponse incompleteChecklist() {
-        Checklist checklist = ChecklistContext.get();
+        ChecklistJpaEntity checklistJpaEntity = ChecklistContext.get();
 
-        CleaningJpaEntity cleaningJpaEntity = checklist.getCleaningJpaEntity();
+        CleaningJpaEntity cleaningJpaEntity = checklistJpaEntity.getCleaningJpaEntity();
         List<MemberJpaEntity> members = memberCleaningRepository.findMembersByCleaningId(cleaningJpaEntity.getCleaningId());
         List<String> membersName = members.stream().map(MemberJpaEntity::getName).toList();
         LocalTime endTime = cleaningJpaEntity.getPlace().getEndTime();
 
-        checklist.incompleteChecklist();
+        checklistJpaEntity.incompleteChecklist();
 
-        return PostIncompleteChecklistResponse.of(checklist.getChecklistId(), membersName, endTime);
+        return PostIncompleteChecklistResponse.of(checklistJpaEntity.getChecklistId(), membersName, endTime);
 
     }
 
     public PostGetPresignedUrlResponse generateImageUrl(PostGetPresignedUrlRequest request) {
-        Checklist checklist = ChecklistContext.get();
+        ChecklistJpaEntity checklistJpaEntity = ChecklistContext.get();
         Map<String, String> uploadUrlAndKey = cleaningImageCommandUseCase
-                .generateUploadUrl(request.originalFileName(), request.contentType(), checklist.getChecklistId());
+                .generateUploadUrl(request.originalFileName(), request.contentType(), checklistJpaEntity.getChecklistId());
 
 
         return new PostGetPresignedUrlResponse(uploadUrlAndKey.get("uploadUrl"), uploadUrlAndKey.get("s3Key"));
     }
 
     public void saveUploadResult(PostSaveUploadResultRequest request) {
-        Checklist checklist = ChecklistContext.get();
-        cleaningImageCommandUseCase.saveImage(checklist.getChecklistId(), request.s3Key());
+        ChecklistJpaEntity checklistJpaEntity = ChecklistContext.get();
+        cleaningImageCommandUseCase.saveImage(checklistJpaEntity.getChecklistId(), request.s3Key());
     }
 
     public GetImageUrlResponse getImageUrl(Long checklistId) {
@@ -91,13 +94,13 @@ public class ChecklistService {
     }
 
 
-    private boolean isRequiredImage(Checklist checklist) {
-        CleaningJpaEntity cleaningJpaEntity = checklist.getCleaningJpaEntity();
+    private boolean isRequiredImage(ChecklistJpaEntity checklistJpaEntity) {
+        CleaningJpaEntity cleaningJpaEntity = checklistJpaEntity.getCleaningJpaEntity();
         return cleaningJpaEntity.getNeedPhoto();
     }
 
-    private void checkIsImageRegistered(Checklist checklist){
-        if(!cleaningImageQuery.isImagePresent(checklist.getChecklistId())){
+    private void checkIsImageRegistered(ChecklistJpaEntity checklistJpaEntity){
+        if(!cleaningImageQuery.isImagePresent(checklistJpaEntity.getChecklistId())){
             throw new ChecklistRequireImageException(REQUIRE_IMAGE);
         }
     }

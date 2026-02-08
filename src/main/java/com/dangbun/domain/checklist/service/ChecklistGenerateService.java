@@ -1,7 +1,7 @@
 package com.dangbun.domain.checklist.service;
 
-import com.dangbun.domain.checklist.entity.Checklist;
-import com.dangbun.domain.checklist.repository.ChecklistRepository;
+import com.dangbun.domain.checklist.refactor.adapter.out.persistence.ChecklistJpaEntity;
+import com.dangbun.domain.checklist.refactor.adapter.out.persistence.SpringDataChecklistRepository;
 import com.dangbun.domain.cleaning.adapter.out.persistence.CleaningJpaEntity;
 import com.dangbun.domain.cleaning.adapter.out.persistence.CleaningRepository;
 import com.dangbun.domain.cleaningdate.adapter.out.persistence.CleaningDateJpaEntity;
@@ -23,7 +23,7 @@ import static com.dangbun.domain.cleaning.domain.CleaningRepeatType.*;
 public class ChecklistGenerateService {
 
     private final CleaningDateRepository cleaningDateRepository;
-    private final ChecklistRepository checklistRepository;
+    private final SpringDataChecklistRepository checklistRepository;
     private final CleaningRepository cleaningRepository;
 
 
@@ -82,14 +82,14 @@ public class ChecklistGenerateService {
 
             if (exists) continue;
 
-            Checklist checklist = Checklist.builder()
+            ChecklistJpaEntity checklistJpaEntity = ChecklistJpaEntity.builder()
                     .cleaningJpaEntity(cleaningJpaEntity)
                     .isComplete(false)
                     .completeMemberId(null)
                     .completeTime(null)
                     .build();
 
-            checklistRepository.save(checklist);
+            checklistRepository.save(checklistJpaEntity);
         }
     }
 }

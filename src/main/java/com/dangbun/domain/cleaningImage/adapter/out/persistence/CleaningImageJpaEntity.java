@@ -1,6 +1,6 @@
 package com.dangbun.domain.cleaningImage.adapter.out.persistence;
 
-import com.dangbun.domain.checklist.entity.Checklist;
+import com.dangbun.domain.checklist.refactor.adapter.out.persistence.ChecklistJpaEntity;
 import com.dangbun.global.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -34,13 +34,13 @@ public class CleaningImageJpaEntity extends BaseEntity {
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "checklist_id")
     @OnDelete(action = OnDeleteAction.CASCADE)
-    private Checklist checklist;
+    private ChecklistJpaEntity checklistJpaEntity;
 
     @Builder
-    public CleaningImageJpaEntity(Long cleaningImageId, String s3Key, String uploader, Checklist checklist) {
+    public CleaningImageJpaEntity(Long cleaningImageId, String s3Key, String uploader, ChecklistJpaEntity checklistJpaEntity) {
         this.cleaningImageId = cleaningImageId;
         this.s3Key = s3Key;
         this.uploader = uploader;
-        this.checklist = checklist;
+        this.checklistJpaEntity = checklistJpaEntity;
     }
 }

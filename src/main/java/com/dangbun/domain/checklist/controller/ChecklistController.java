@@ -1,12 +1,15 @@
 package com.dangbun.domain.checklist.controller;
 
-import com.dangbun.domain.checklist.dto.response.*;
+import com.dangbun.domain.checklist.refactor.adapter.in.web.dto.response.GetImageUrlResponse;
+import com.dangbun.domain.checklist.refactor.adapter.in.web.dto.response.PostCompleteChecklistResponse;
+import com.dangbun.domain.checklist.refactor.adapter.in.web.dto.response.PostGetPresignedUrlResponse;
+import com.dangbun.domain.checklist.refactor.adapter.in.web.dto.response.PostIncompleteChecklistResponse;
 import com.dangbun.domain.cleaningImage.exception.status.CleaningImageExceptionResponse;
 import com.dangbun.domain.member.exception.status.MemberExceptionResponse;
 import com.dangbun.global.aop.CheckChecklistMembership;
-import com.dangbun.domain.checklist.dto.request.PostGetPresignedUrlRequest;
-import com.dangbun.domain.checklist.dto.request.PostSaveUploadResultRequest;
-import com.dangbun.domain.checklist.response.status.ChecklistExceptionResponse;
+import com.dangbun.domain.checklist.refactor.adapter.in.web.dto.request.PostGetPresignedUrlRequest;
+import com.dangbun.domain.checklist.refactor.adapter.in.web.dto.request.PostSaveUploadResultRequest;
+import com.dangbun.domain.checklist.refactor.response.status.ChecklistExceptionResponse;
 import com.dangbun.domain.checklist.service.ChecklistService;
 import com.dangbun.global.aop.CheckPlaceMembership;
 import com.dangbun.global.docs.DocumentedApiErrors;

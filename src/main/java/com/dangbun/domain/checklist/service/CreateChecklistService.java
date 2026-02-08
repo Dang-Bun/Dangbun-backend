@@ -1,7 +1,7 @@
 package com.dangbun.domain.checklist.service;
 
-import com.dangbun.domain.checklist.entity.Checklist;
-import com.dangbun.domain.checklist.repository.ChecklistRepository;
+import com.dangbun.domain.checklist.refactor.adapter.out.persistence.ChecklistJpaEntity;
+import com.dangbun.domain.checklist.refactor.adapter.out.persistence.SpringDataChecklistRepository;
 import com.dangbun.domain.cleaning.adapter.out.persistence.CleaningJpaEntity;
 import com.dangbun.domain.cleaning.domain.CleaningRepeatType;
 import com.dangbun.domain.cleaningdate.adapter.out.persistence.CleaningDateJpaEntity;
@@ -23,7 +23,7 @@ import java.util.Locale;
 public class CreateChecklistService {
 
 
-    private final ChecklistRepository checklistRepository;
+    private final SpringDataChecklistRepository checklistRepository;
 
     @Transactional
     public void createChecklistByDateAndTime(CleaningJpaEntity cleaningJpaEntity, List<CleaningDateJpaEntity> cleaningDateJpaEntities, PlaceJpaEntity place) {
@@ -89,12 +89,12 @@ public class CreateChecklistService {
     }
 
     private void createChecklist(CleaningJpaEntity cleaningJpaEntity) {
-        Checklist checklist = Checklist.builder()
+        ChecklistJpaEntity checklistJpaEntity = ChecklistJpaEntity.builder()
                 .cleaningJpaEntity(cleaningJpaEntity)
                 .completeMemberId(null)
                 .completeTime(null)
                 .isComplete(false)
                 .build();
-        checklistRepository.save(checklist);
+        checklistRepository.save(checklistJpaEntity);
     }
 }
