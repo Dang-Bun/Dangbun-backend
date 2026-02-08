@@ -77,4 +77,15 @@ class MemberDutyPersistenceAdapter implements MemberDutyCommandPort, MemberDutyQ
                 .map(memberDutyMapper::mapDutyToDomainEntity)
                 .toList();
     }
+
+    @Override
+    public List<MemberDutyMemberInfo> findMemberInfosByDutyId(Long dutyId) {
+        return memberDutyRepository.findAllByDuty_DutyId(dutyId).stream()
+                .map(md -> new MemberDutyMemberInfo(
+                        md.getMember().getMemberId(),
+                        md.getMember().getRole().name(),
+                        md.getMember().getName()
+                ))
+                .toList();
+    }
 }

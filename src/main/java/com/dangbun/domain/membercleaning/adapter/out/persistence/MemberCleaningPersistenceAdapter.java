@@ -80,4 +80,9 @@ public class MemberCleaningPersistenceAdapter implements MemberCleaningQueryPort
     public Integer countCleaningsByMemberId(Long memberId) {
         return memberCleaningRepository.findAllByMember_MemberId(memberId).size();
     }
+
+    @Override
+    public Integer countMembersByCleaningId(Long cleaningId) {
+        return memberCleaningRepository.findMembersByCleaningId(cleaningId).size();
+    }
 }

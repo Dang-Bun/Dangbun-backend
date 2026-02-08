@@ -17,4 +17,9 @@ public interface MemberCleaningQueryPort {
     List<Long> findCleaningIdsByMemberId(Long memberId);
 
     Integer countCleaningsByMemberId(Long memberId);
+
+    /**
+     * Cleaning에 할당된 멤버 수 조회 (Duty 도메인에서 사용)
+     */
+    Integer countMembersByCleaningId(Long cleaningId);
 }

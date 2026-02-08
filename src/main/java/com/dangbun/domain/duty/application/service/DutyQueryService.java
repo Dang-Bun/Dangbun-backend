@@ -1,20 +1,16 @@
 package com.dangbun.domain.duty.application.service;
 
 import com.dangbun.common.hexagonal.UseCase;
-import com.dangbun.domain.cleaning.adapter.out.persistence.CleaningJpaEntity;
-import com.dangbun.domain.cleaning.adapter.out.persistence.CleaningRepository;
-import com.dangbun.domain.duty.adapter.out.persistence.DutyJpaEntity;
-import com.dangbun.domain.duty.adapter.out.persistence.SpringDataDutyRepository;
+import com.dangbun.domain.cleaning.application.port.in.query.GetCleaningForDutyQuery;
+import com.dangbun.domain.cleaning.application.port.in.query.GetCleaningForDutyQuery.CleaningInfo;
 import com.dangbun.domain.duty.application.port.in.query.*;
 import com.dangbun.domain.duty.application.port.out.DutyQueryPort;
 import com.dangbun.domain.duty.domain.Duty;
 import com.dangbun.domain.duty.exception.custom.DutyNotFoundException;
-import com.dangbun.domain.member.adapter.out.persistence.MemberJpaEntity;
 import com.dangbun.domain.member.adapter.out.persistence.MemberRole;
-import com.dangbun.domain.membercleaning.adapter.out.persistence.MemberCleaningJpaEntity;
-import com.dangbun.domain.membercleaning.adapter.out.persistence.MemberCleaningRepository;
-import com.dangbun.domain.memberduty.adapter.out.persistence.MemberDutyJpaEntity;
-import com.dangbun.domain.memberduty.adapter.out.persistence.SpringDataMemberDutyRepository;
+import com.dangbun.domain.membercleaning.application.port.in.query.GetMemberCleaningForDutyQuery;
+import com.dangbun.domain.memberduty.application.port.in.query.GetMemberDutyForDutyQuery;
+import com.dangbun.domain.memberduty.application.port.in.query.GetMemberDutyForDutyQuery.MemberDutyMemberInfo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,29 +25,9 @@ import static com.dangbun.domain.duty.exception.status.DutyExceptionResponse.DUT
 public class DutyQueryService implements DutyQuery {
 
     private final DutyQueryPort dutyQueryPort;
-
-    /*
-     * TODO: MemberDuty 도메인 헥사고날 아키텍처 전환 시 수정
-     * SpringDataMemberDutyRepository -> MemberDutyQueryPort
-     */
-    private final SpringDataMemberDutyRepository memberDutyRepository;
-
-    /*
-     * TODO: Cleaning 도메인 헥사고날 아키텍처 전환 시 수정
-     * CleaningRepository -> CleaningQueryPort
-     */
-    private final CleaningRepository cleaningRepository;
-
-    /*
-     * TODO: MemberCleaning 도메인 헥사고날 아키텍처 전환 시 수정
-     * MemberCleaningRepository -> MemberCleaningQueryPort
-     */
-    private final MemberCleaningRepository memberCleaningRepository;
-
-    /*
-     * TODO: 임시 의존성 - MemberDuty/Cleaning 리팩토링 완료 후 제거
-     */
-    private final SpringDataDutyRepository dutyJpaEntityRepository;
+    private final GetMemberDutyForDutyQuery getMemberDutyForDutyQuery;
+    private final GetCleaningForDutyQuery getCleaningForDutyQuery;
+    private final GetMemberCleaningForDutyQuery getMemberCleaningForDutyQuery;
 
     @Override
     public DutyListResult getDutyList(Long placeId) {
@@ -61,22 +37,20 @@ public class DutyQueryService implements DutyQuery {
 
     @Override
     public DutyMembersResult getDutyMembers(Long dutyId) {
-        DutyJpaEntity dutyEntity =
-                findDutyJpaEntity(dutyId);
+        validateDutyExists(dutyId);
 
-        List<MemberDutyJpaEntity> memberDuties = memberDutyRepository.findAllByDuty(dutyEntity);
+        List<MemberDutyMemberInfo> memberInfos = getMemberDutyForDutyQuery.findMemberInfosByDutyId(dutyId);
 
-        List<DutyMembersResult.MemberItem> members = memberDuties.stream()
-                .map(MemberDutyJpaEntity::getMember)
+        List<DutyMembersResult.MemberItem> members = memberInfos.stream()
                 .sorted(
                         Comparator
-                                .comparing((MemberJpaEntity m) -> m.getRole() != MemberRole.MANAGER)
-                                .thenComparing(MemberJpaEntity::getName, Comparator.nullsLast(String::compareTo))
+                                .comparing((MemberDutyMemberInfo m) -> !m.role().equals(MemberRole.MANAGER.name()))
+                                .thenComparing(MemberDutyMemberInfo::name, Comparator.nullsLast(String::compareTo))
                 )
                 .map(m -> new DutyMembersResult.MemberItem(
-                        m.getMemberId(),
-                        m.getRole().name(),
-                        m.getName()
+                        m.memberId(),
+                        m.role(),
+                        m.name()
                 ))
                 .toList();
 
@@ -85,15 +59,14 @@ public class DutyQueryService implements DutyQuery {
 
     @Override
     public DutyCleaningsResult getDutyCleanings(Long dutyId) {
-        DutyJpaEntity dutyEntity =
-                findDutyJpaEntity(dutyId);
+        validateDutyExists(dutyId);
 
-        List<CleaningJpaEntity> cleaningJpaEntities = cleaningRepository.findAllByDuty(dutyEntity);
+        List<CleaningInfo> cleanings = getCleaningForDutyQuery.findAllByDutyId(dutyId);
 
-        List<DutyCleaningsResult.CleaningItem> items = cleaningJpaEntities.stream()
+        List<DutyCleaningsResult.CleaningItem> items = cleanings.stream()
                 .map(c -> new DutyCleaningsResult.CleaningItem(
-                        c.getCleaningId(),
-                        c.getName()
+                        c.cleaningId(),
+                        c.name()
                 ))
                 .toList();
 
@@ -102,29 +75,25 @@ public class DutyQueryService implements DutyQuery {
 
     @Override
     public CleaningInfoListResult getCleaningInfoList(Long dutyId) {
-        DutyJpaEntity dutyEntity =
-                findDutyJpaEntity(dutyId);
+        validateDutyExists(dutyId);
 
-        List<CleaningJpaEntity> cleaningJpaEntities = cleaningRepository.findAllByDuty(dutyEntity);
+        List<CleaningInfo> cleanings = getCleaningForDutyQuery.findAllByDutyId(dutyId);
 
-        List<CleaningInfoListResult.CleaningInfo> infos = cleaningJpaEntities.stream()
+        List<CleaningInfoListResult.CleaningInfo> infos = cleanings.stream()
                 .map(cleaning -> {
-                    List<MemberCleaningJpaEntity> mappings = memberCleaningRepository.findAllByCleaningJpaEntity(cleaning);
-                    List<MemberJpaEntity> members = mappings.stream()
-                            .map(MemberCleaningJpaEntity::getMember)
-                            .distinct()
-                            .toList();
+                    Long cleaningId = cleaning.cleaningId();
+                    List<String> memberNames = getMemberCleaningForDutyQuery.findMemberNamesByCleaningId(cleaningId);
+                    Integer memberCount = getMemberCleaningForDutyQuery.countMembersByCleaningId(cleaningId);
 
-                    List<String> displayedNames = members.stream()
-                            .map(MemberJpaEntity::getName)
+                    List<String> displayedNames = memberNames.stream()
                             .limit(2)
                             .toList();
 
                     return new CleaningInfoListResult.CleaningInfo(
-                            cleaning.getCleaningId(),
-                            cleaning.getName(),
+                            cleaningId,
+                            cleaning.name(),
                             displayedNames,
-                            members.size()
+                            memberCount
                     );
                 })
                 .toList();
@@ -132,11 +101,8 @@ public class DutyQueryService implements DutyQuery {
         return CleaningInfoListResult.of(infos);
     }
 
-    /*
-     * TODO: 임시 메서드 - MemberDuty/Cleaning 리팩토링 완료 후 제거
-     */
-    private DutyJpaEntity findDutyJpaEntity(Long dutyId) {
-        return dutyJpaEntityRepository.findById(dutyId)
+    private void validateDutyExists(Long dutyId) {
+        dutyQueryPort.findById(dutyId)
                 .orElseThrow(() -> new DutyNotFoundException(DUTY_NOT_FOUND));
     }
 }

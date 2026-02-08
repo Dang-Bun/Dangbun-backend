@@ -1,10 +1,9 @@
 package com.dangbun.domain.duty.application.service;
 
 import com.dangbun.common.hexagonal.UseCase;
-import com.dangbun.domain.cleaning.adapter.out.persistence.CleaningJpaEntity;
-import com.dangbun.domain.cleaning.adapter.out.persistence.CleaningRepository;
-import com.dangbun.domain.duty.adapter.out.persistence.DutyJpaEntity;
-import com.dangbun.domain.duty.adapter.out.persistence.SpringDataDutyRepository;
+import com.dangbun.domain.cleaning.application.port.in.command.CleaningForDutyUseCase;
+import com.dangbun.domain.cleaning.application.port.in.query.GetCleaningForDutyQuery;
+import com.dangbun.domain.cleaning.application.port.in.query.GetCleaningForDutyQuery.CleaningInfo;
 import com.dangbun.domain.duty.application.port.in.command.*;
 import com.dangbun.domain.duty.exception.custom.*;
 import com.dangbun.domain.duty.application.port.in.query.AddCleaningsResult;
@@ -13,13 +12,11 @@ import com.dangbun.domain.duty.application.port.in.query.UpdateDutyResult;
 import com.dangbun.domain.duty.application.port.out.DutyCommandPort;
 import com.dangbun.domain.duty.application.port.out.DutyQueryPort;
 import com.dangbun.domain.duty.domain.Duty;
-import com.dangbun.domain.member.adapter.out.persistence.MemberJpaEntity;
-import com.dangbun.domain.member.adapter.out.persistence.MemberRepository;
-import com.dangbun.domain.membercleaning.adapter.out.persistence.MemberCleaningJpaEntity;
-import com.dangbun.domain.membercleaning.adapter.out.persistence.MemberCleaningRepository;
-import com.dangbun.domain.memberduty.application.port.out.MemberDutyCommandPort;
-import com.dangbun.domain.memberduty.adapter.out.persistence.MemberDutyJpaEntity;
-import com.dangbun.domain.memberduty.adapter.out.persistence.SpringDataMemberDutyRepository;
+import com.dangbun.domain.member.application.port.in.query.GetMembersForDutyQuery;
+import com.dangbun.domain.member.application.port.in.query.GetMembersForDutyQuery.MemberInfo;
+import com.dangbun.domain.membercleaning.application.port.in.command.MemberCleaningForDutyUseCase;
+import com.dangbun.domain.memberduty.application.port.in.command.MemberDutyForDutyUseCase;
+import com.dangbun.domain.memberduty.application.port.in.query.GetMemberDutyForDutyQuery;
 import lombok.RequiredArgsConstructor;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,31 +32,14 @@ public class DutyCommandService implements DutyCommandUseCase {
     private final DutyCommandPort dutyCommandPort;
     private final DutyQueryPort dutyQueryPort;
 
-    private final MemberDutyCommandPort memberDutyCommandPort;
+    private final GetMembersForDutyQuery getMembersForDutyQuery;
+    private final MemberDutyForDutyUseCase memberDutyForDutyUseCase;
+    private final GetMemberDutyForDutyQuery getMemberDutyForDutyQuery;
 
-    /*
-     * TODO: Member 도메인 헥사고날 아키텍처 전환 시 수정
-     * MemberRepository -> MemberQueryPort
-     */
-    private final MemberRepository memberRepository;
+    private final GetCleaningForDutyQuery getCleaningForDutyQuery;
+    private final CleaningForDutyUseCase cleaningForDutyUseCase;
 
-    /*
-     * TODO: MemberDuty 도메인 헥사고날 아키텍처 전환 시 수정
-     * SpringDataMemberDutyRepository -> MemberDutyQueryPort
-     */
-    private final SpringDataMemberDutyRepository memberDutyRepository;
-
-    /*
-     * TODO: Cleaning 도메인 헥사고날 아키텍처 전환 시 수정
-     * CleaningRepository -> CleaningQueryPort/CommandPort
-     */
-    private final CleaningRepository cleaningRepository;
-
-    /*
-     * TODO: MemberCleaning 도메인 헥사고날 아키텍처 전환 시 수정
-     * MemberCleaningRepository -> MemberCleaningQueryPort/CommandPort
-     */
-    private final MemberCleaningRepository memberCleaningRepository;
+    private final MemberCleaningForDutyUseCase memberCleaningForDutyUseCase;
 
     @Override
     public Long createDuty(CreateDutyCommand command) {
@@ -98,147 +78,119 @@ public class DutyCommandService implements DutyCommandUseCase {
 
     @Override
     public AddMembersResult addMembers(AddMembersCommand command) {
-        /*
-         * TODO: Duty 도메인 헥사고날 아키텍처 전환 시 DutyJpaEntity 참조 제거
-         * 현재는 MemberDutyRepository가 DutyJpaEntity를 참조하므로 임시로 처리
-         */
-        DutyJpaEntity dutyEntity =
-                findDutyJpaEntity(command.getDutyId());
+        validateDutyExists(command.getDutyId());
 
         List<Long> requestedIds = command.getMemberIds();
-        List<MemberJpaEntity> members = memberRepository.findAllById(requestedIds);
+        List<MemberInfo> members = getMembersForDutyQuery.findAllByIds(requestedIds);
 
         if (members.size() != requestedIds.size()) {
             throw new MemberNotFoundException(MEMBER_NOT_FOUND);
         }
 
-        memberDutyCommandPort.deleteAllByDutyId(dutyEntity.getDutyId());
+        memberDutyForDutyUseCase.deleteAllByDutyId(command.getDutyId());
+        memberDutyForDutyUseCase.saveAllByDutyId(command.getDutyId(), requestedIds);
 
-        List<Long> addedMemberIds = new ArrayList<>();
-        for (MemberJpaEntity member : members) {
-            MemberDutyJpaEntity md = MemberDutyJpaEntity.builder()
-                    .duty(dutyEntity)
-                    .member(member)
-                    .build();
-            memberDutyRepository.save(md);
-            addedMemberIds.add(member.getMemberId());
-        }
+        List<Long> addedMemberIds = members.stream()
+                .map(MemberInfo::memberId)
+                .toList();
 
         return AddMembersResult.of(addedMemberIds);
     }
 
     @Override
     public void assignMember(AssignMemberCommand command) {
-        DutyJpaEntity dutyEntity =
-                findDutyJpaEntity(command.getDutyId());
+        validateDutyExists(command.getDutyId());
 
-        List<CleaningJpaEntity> cleaningJpaEntities = cleaningRepository.findAllByDuty(dutyEntity);
-        List<MemberJpaEntity> allMembers = memberDutyRepository.findMembersByDuty(dutyEntity);
+        List<CleaningInfo> cleanings = getCleaningForDutyQuery.findAllByDutyId(command.getDutyId());
+        List<Long> memberIds = getMemberDutyForDutyQuery.findMemberIdsByDutyId(command.getDutyId());
+        List<MemberInfo> allMembers = getMembersForDutyQuery.findAllByIds(memberIds);
 
         switch (command.getAssignType()) {
-            case CUSTOM -> handleCustomAssign(command, dutyEntity);
-            case COMMON -> handleCommonAssign(cleaningJpaEntities, allMembers);
-            case RANDOM -> handleRandomAssign(command, cleaningJpaEntities, allMembers);
+            case CUSTOM -> handleCustomAssign(command);
+            case COMMON -> handleCommonAssign(cleanings, allMembers);
+            case RANDOM -> handleRandomAssign(command, cleanings, allMembers);
         }
     }
 
-    private void handleCustomAssign(AssignMemberCommand command,
-                                    DutyJpaEntity dutyEntity) {
-        CleaningJpaEntity cleaningJpaEntity = cleaningRepository.findByCleaningIdAndDuty_DutyId(
-                        command.getCleaningId(), dutyEntity.getDutyId())
+    private void handleCustomAssign(AssignMemberCommand command) {
+        CleaningInfo cleaning = getCleaningForDutyQuery.findByCleaningIdAndDutyId(
+                        command.getCleaningId(), command.getDutyId())
                 .orElseThrow(() -> new CleaningNotFoundException(CLEANING_NOT_FOUND));
 
-        memberCleaningRepository.deleteAllByCleaningJpaEntity_CleaningId(cleaningJpaEntity.getCleaningId());
+        memberCleaningForDutyUseCase.deleteAllByCleaningId(cleaning.cleaningId());
 
         if (command.getMemberIds() == null) {
             return;
         }
 
-        List<MemberJpaEntity> selectedMembers = memberRepository.findAllById(command.getMemberIds());
-        List<MemberCleaningJpaEntity> mappings = selectedMembers.stream()
-                .map(m -> MemberCleaningJpaEntity.builder().member(m).cleaningJpaEntity(cleaningJpaEntity).build())
-                .toList();
-        memberCleaningRepository.saveAll(mappings);
+        memberCleaningForDutyUseCase.saveAllByCleaningIdAndMemberIds(cleaning.cleaningId(), command.getMemberIds());
     }
 
-    private void handleCommonAssign(List<CleaningJpaEntity> cleaningJpaEntities, List<MemberJpaEntity> allMembers) {
+    private void handleCommonAssign(List<CleaningInfo> cleanings, List<MemberInfo> allMembers) {
         if (allMembers.isEmpty()) {
             throw new MemberNotExistsException(MEMBER_NOT_EXISTS);
         }
 
-        for (CleaningJpaEntity c : cleaningJpaEntities) {
-            memberCleaningRepository.deleteAllByCleaningJpaEntity_CleaningId(c.getCleaningId());
-            List<MemberCleaningJpaEntity> mappings = allMembers.stream()
-                    .map(m -> MemberCleaningJpaEntity.builder().member(m).cleaningJpaEntity(c).build())
-                    .toList();
-            memberCleaningRepository.saveAll(mappings);
+        List<Long> memberIds = allMembers.stream()
+                .map(MemberInfo::memberId)
+                .toList();
+
+        for (CleaningInfo cleaning : cleanings) {
+            memberCleaningForDutyUseCase.deleteAllByCleaningId(cleaning.cleaningId());
+            memberCleaningForDutyUseCase.saveAllByCleaningIdAndMemberIds(cleaning.cleaningId(), memberIds);
         }
     }
 
     private void handleRandomAssign(AssignMemberCommand command,
-                                    List<CleaningJpaEntity> cleaningJpaEntities,
-                                    List<MemberJpaEntity> allMembers) {
+                                    List<CleaningInfo> cleanings,
+                                    List<MemberInfo> allMembers) {
         Random random = new Random();
 
-        for (CleaningJpaEntity cleaningJpaEntity : cleaningJpaEntities) {
-            memberCleaningRepository.deleteAllByCleaningJpaEntity_CleaningId(cleaningJpaEntity.getCleaningId());
+        for (CleaningInfo cleaning : cleanings) {
+            memberCleaningForDutyUseCase.deleteAllByCleaningId(cleaning.cleaningId());
 
-            List<MemberJpaEntity> shuffled = new ArrayList<>(allMembers);
+            List<MemberInfo> shuffled = new ArrayList<>(allMembers);
             Collections.shuffle(shuffled, random);
-            List<MemberJpaEntity> assigned = shuffled.stream()
+            List<Long> assignedMemberIds = shuffled.stream()
                     .limit(command.getAssignCount())
+                    .map(MemberInfo::memberId)
                     .toList();
 
-            List<MemberCleaningJpaEntity> mappings = assigned.stream()
-                    .map(m -> MemberCleaningJpaEntity.builder().member(m).cleaningJpaEntity(cleaningJpaEntity).build())
-                    .toList();
-            memberCleaningRepository.saveAll(mappings);
+            memberCleaningForDutyUseCase.saveAllByCleaningIdAndMemberIds(cleaning.cleaningId(), assignedMemberIds);
         }
     }
 
     @Override
     public AddCleaningsResult addCleanings(AddCleaningsCommand command) {
-        DutyJpaEntity dutyEntity =
-                findDutyJpaEntity(command.getDutyId());
+        validateDutyExists(command.getDutyId());
 
-        List<CleaningJpaEntity> cleaningJpaEntities = cleaningRepository.findAllById(command.getCleaningIds());
-        List<Long> assignedIds = new ArrayList<>();
+        List<CleaningInfo> cleanings = getCleaningForDutyQuery.findAllByIds(command.getCleaningIds());
+        List<Long> unassignedIds = cleanings.stream()
+                .filter(c -> c.dutyId() == null)
+                .map(CleaningInfo::cleaningId)
+                .toList();
 
-        for (CleaningJpaEntity cleaningJpaEntity : cleaningJpaEntities) {
-            if (cleaningJpaEntity.getDuty() == null) {
-                cleaningJpaEntity.assignToDuty(dutyEntity);
-                assignedIds.add(cleaningJpaEntity.getCleaningId());
-            }
+        if (!unassignedIds.isEmpty()) {
+            cleaningForDutyUseCase.assignCleaningsToDuty(command.getDutyId(), unassignedIds);
         }
-        cleaningRepository.saveAll(cleaningJpaEntities);
 
-        return AddCleaningsResult.of(assignedIds);
+        return AddCleaningsResult.of(unassignedIds);
     }
 
     @Override
     public void removeCleaning(RemoveCleaningCommand command) {
-        CleaningJpaEntity cleaningJpaEntity = cleaningRepository.findById(command.getCleaningId())
+        CleaningInfo cleaning = getCleaningForDutyQuery.findById(command.getCleaningId())
                 .orElseThrow(() -> new CleaningNotFoundException(CLEANING_NOT_FOUND));
 
-        if (cleaningJpaEntity.getDuty() == null || !cleaningJpaEntity.getDuty().getDutyId().equals(command.getDutyId())) {
+        if (cleaning.dutyId() == null || !cleaning.dutyId().equals(command.getDutyId())) {
             throw new CleaningNotAssignedException(CLEANING_NOT_ASSIGNED);
         }
 
-        cleaningJpaEntity.removeDuty();
+        cleaningForDutyUseCase.removeCleaningFromDuty(command.getCleaningId());
     }
 
-    /*
-     * TODO: 임시 메서드 - MemberDuty/Cleaning 리팩토링 완료 후 제거
-     * 현재 MemberDutyRepository, CleaningRepository가 DutyJpaEntity를 참조하므로
-     * DutyJpaEntity를 직접 조회하는 임시 메서드
-     */
-    private DutyJpaEntity findDutyJpaEntity(Long dutyId) {
-        return dutyJpaEntityRepository.findById(dutyId)
+    private void validateDutyExists(Long dutyId) {
+        dutyQueryPort.findById(dutyId)
                 .orElseThrow(() -> new DutyNotFoundException(DUTY_NOT_FOUND));
     }
-
-    /*
-     * TODO: 임시 의존성 - MemberDuty/Cleaning 리팩토링 완료 후 제거
-     */
-    private final SpringDataDutyRepository dutyJpaEntityRepository;
 }

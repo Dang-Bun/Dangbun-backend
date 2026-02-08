@@ -18,4 +18,11 @@ public interface MemberDutyQueryPort {
     boolean existsByDutyIdAndMemberId(Long dutyId, Long memberId);
 
     List<Duty> findDistinctDutiesByMemberIds(List<Long> memberIds);
+
+    /**
+     * Duty에 할당된 멤버 정보 조회 (Duty 도메인에서 사용)
+     */
+    List<MemberDutyMemberInfo> findMemberInfosByDutyId(Long dutyId);
+
+    record MemberDutyMemberInfo(Long memberId, String role, String name) {}
 }

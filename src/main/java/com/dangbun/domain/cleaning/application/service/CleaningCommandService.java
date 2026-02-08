@@ -37,11 +37,12 @@ import static com.dangbun.domain.cleaning.domain.CleaningRepeatType.*;
 import static com.dangbun.domain.cleaning.exception.status.CleaningExceptionResponse.*;
 
 import com.dangbun.domain.cleaning.application.port.in.command.CleaningCommandUseCase;
+import com.dangbun.domain.cleaning.application.port.in.command.CleaningForDutyUseCase;
 
 @UseCase
 @RequiredArgsConstructor
 @Transactional
-public class CleaningCommandService implements CleaningCommandUseCase {
+public class CleaningCommandService implements CleaningCommandUseCase, CleaningForDutyUseCase {
 
     private final DutyQueryPort dutyQueryPort;
     private final CleaningQueryPort cleaningQueryPort;
@@ -199,5 +200,28 @@ public class CleaningCommandService implements CleaningCommandUseCase {
         }
 
         cleaningCommandPort.deleteById(cleaningId);
+    }
+
+    // CleaningForDutyUseCase 구현
+    @Override
+    public void assignCleaningsToDuty(Long dutyId, List<Long> cleaningIds) {
+        List<Cleaning> cleanings = cleaningQueryPort.findAllByIds(cleaningIds);
+
+        for (Cleaning cleaning : cleanings) {
+            if (cleaning.getDutyId() == null) {
+                cleaning.assignToDuty(dutyId);
+            }
+        }
+
+        cleaningCommandPort.saveAll(cleanings);
+    }
+
+    @Override
+    public void removeCleaningFromDuty(Long cleaningId) {
+        Cleaning cleaning = cleaningQueryPort.findById(cleaningId)
+                .orElseThrow(() -> new CleaningNotFoundException(CLEANING_NOT_FOUND));
+
+        cleaning.removeDuty();
+        cleaningCommandPort.save(cleaning);
     }
 }
